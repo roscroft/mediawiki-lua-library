@@ -12,7 +12,7 @@
         "markdown": true
     },
     "editor.codeActionsOnSave": {
-        "source.fixAll": true
+        "source.fixAll": "explicit"
     },
     "editor.formatOnSave": true,
     "[lua]": {
