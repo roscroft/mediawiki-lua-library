@@ -1,23 +1,33 @@
 -- Performance Benchmark Example
 -- Demonstrates performance analysis tools and techniques
 
+-- Setup module path (run from project root: lua examples/advanced/performance_benchmark.lua)
+package.path = package.path .. ';src/modules/?.lua'
+
+-- Setup MediaWiki environment
+local env = dofile('tests/env/wiki-lua-env.lua')
+_G.mw = env.mw
+_G.libraryUtil = env.libraryUtil
+
 -- Load required modules
-local PerformanceDashboard = require('src.modules.PerformanceDashboard')
-local Array = require('src.modules.Array')
-local Tables = require('src.modules.Tables')
+local PerformanceDashboard = require('PerformanceDashboard')
+local Array = require('Array')
+local TableTools = require('TableTools')
 
 print("=== Performance Benchmark Example ===")
 
 -- Create test data
-local smallArray = Array.new({})
+local smallData = {}
 for i = 1, 100 do
-    smallArray:push(math.random(1, 1000))
+    table.insert(smallData, math.random(1, 1000))
 end
+local smallArray = Array.new(smallData)
 
-local largeArray = Array.new({})
+local largeData = {}
 for i = 1, 10000 do
-    largeArray:push(math.random(1, 1000))
+    table.insert(largeData, math.random(1, 1000))
 end
+local largeArray = Array.new(largeData)
 
 -- Benchmark different sorting approaches
 local function benchmarkSort()
@@ -25,27 +35,19 @@ local function benchmarkSort()
 
     -- Test 1: Native table.sort
     local start = os.clock()
-    local nativeCopy = Tables.deepcopy(smallArray:toTable())
+    local nativeCopy = TableTools.deepCopy(smallArray)
     table.sort(nativeCopy)
     local nativeTime = os.clock() - start
     results.native = nativeTime
 
     -- Test 2: Array sort method
     start = os.clock()
-    local arrayCopy = Array.new(Tables.deepcopy(smallArray:toTable()))
-    arrayCopy:sort()
+    local arrayCopy = Array.new(TableTools.deepCopy(smallArray))
+    table.sort(arrayCopy)
     local arrayTime = os.clock() - start
     results.array = arrayTime
 
     -- Test 3: Custom quicksort implementation
-    local function quicksort(arr, low, high)
-        if low < high then
-            local pi = partition(arr, low, high)
-            quicksort(arr, low, pi - 1)
-            quicksort(arr, pi + 1, high)
-        end
-    end
-
     local function partition(arr, low, high)
         local pivot = arr[high]
         local i = low - 1
@@ -60,8 +62,16 @@ local function benchmarkSort()
         return i + 1
     end
 
+    local function quicksort(arr, low, high)
+        if low < high then
+            local pi = partition(arr, low, high)
+            quicksort(arr, low, pi - 1)
+            quicksort(arr, pi + 1, high)
+        end
+    end
+
     start = os.clock()
-    local customCopy = Tables.deepcopy(smallArray:toTable())
+    local customCopy = TableTools.deepCopy(smallArray)
     quicksort(customCopy, 1, #customCopy)
     local customTime = os.clock() - start
     results.custom = customTime
@@ -80,7 +90,7 @@ print(string.format("Custom sort: %.6f seconds", sortResults.custom))
 print("\n2. Memory Usage Analysis:")
 local function measureMemory(operation, iterations)
     collectgarbage("collect")
-    local before = collectgatbage("count")
+    local before = collectgarbage("count")
 
     for i = 1, iterations do
         operation()
@@ -94,7 +104,7 @@ end
 local function createArray()
     local arr = Array.new({})
     for i = 1, 1000 do
-        arr:push(i)
+        arr = Array.insert(arr, i)
     end
     return arr
 end

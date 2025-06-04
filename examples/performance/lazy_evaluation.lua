@@ -109,20 +109,20 @@ function LazyEvaluation.lazyFilter(array, predicateFn)
         for i = 1, self.source:length() do
             local value = self.source:get(i)
             if self.predicate(value) then
-                self.filtered_indices:push(i)
+                table.insert(self.filtered_indices, i)
             end
         end
     end
 
     function lazyFilter:get(index)
         self:_computeIndices()
-        local sourceIndex = self.filtered_indices:get(index)
+        local sourceIndex = self.filtered_indices[index]
         return sourceIndex and self.source:get(sourceIndex) or nil
     end
 
     function lazyFilter:length()
         self:_computeIndices()
-        return self.filtered_indices:length()
+        return #self.filtered_indices
     end
 
     function lazyFilter:materialize()
