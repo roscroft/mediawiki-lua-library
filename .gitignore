@@ -1,0 +1,63 @@
+### Lua ###
+# Compiled Lua sources
+luac.out
+*.o
+*.so
+*.dll
+
+# Lua backup files
+*.lua~
+
+### MediaWiki ###
+# SQLite database files
+*.sqlite
+*.sqlite-*
+*.db
+
+### Project Specific ###
+# Build artifacts
+/build/
+
+# Docker volumes and data
+/data/
+*.tar.gz
+
+# Backups
+*_backup_*
+*.bak
+
+### Development Environment ###
+# VS Code files (keep settings.json for shared config)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Editor backup files
+*~
+\#*\#
+*.swp
+*.swo
+
+### System Files ###
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+### Logs and temp files ###
+*.log
+/logs/
+/tmp/
+/temp/
+
+### Test files ###
+/coverage/
+/test-results/

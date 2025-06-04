@@ -1,0 +1,20 @@
+{
+    "$schema": "https://raw.githubusercontent.com/LuaLS/lua-language-server/master/locale/en-us/setting.lua",
+    "workspace": {
+        "ignoreDir": [
+            "build/",
+            ".git/",
+            "node_modules/"
+        ],
+        "ignoreSubmodules": true
+    },
+    "diagnostics": {
+        "enable": true,
+        "globals": [
+            "mw"
+        ]
+    },
+    "runtime": {
+        "version": "Lua 5.1"
+    }
+}
