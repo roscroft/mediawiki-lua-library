@@ -2,7 +2,8 @@
 
 ## Overview
 
-This guide documents the comprehensive testing pipeline for MediaWiki Lua modules with multiple verification stages. Our framework provides methods to test modules at different levels - from basic syntax checking to full MediaWiki integration.
+This guide documents the comprehensive testing pipeline for MediaWiki Lua modules with multiple verification stages.
+Our framework provides methods to test modules at different levels - from basic syntax checking to full MediaWiki integration.
 
 ## Mock Environment
 
