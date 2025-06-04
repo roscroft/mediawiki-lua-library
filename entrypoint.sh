@@ -1,5 +1,24 @@
 #!/bin/bash
 # entrypoint.sh
+
+# Load environment variables if .env file exists
+if [ -f "/var/www/html/.env" ]; then
+    echo "Loading environment variables from .env file..."
+    set -a  # automatically export all variables
+    source /var/www/html/.env
+    set +a
+fi
+
+# Set default values if environment variables are not set
+MEDIAWIKI_ADMIN_PASSWORD=${MEDIAWIKI_ADMIN_PASSWORD:-"admin123"}
+MEDIAWIKI_PROD_PASSWORD=${MEDIAWIKI_PROD_PASSWORD:-"WikiLuaTestAdmin2024#"}
+MEDIAWIKI_DB_TYPE=${MEDIAWIKI_DB_TYPE:-"sqlite"}
+MEDIAWIKI_DB_PATH=${MEDIAWIKI_DB_PATH:-"/var/www/html/data"}
+MEDIAWIKI_DB_NAME=${MEDIAWIKI_DB_NAME:-"my_wiki"}
+MEDIAWIKI_SITE_NAME=${MEDIAWIKI_SITE_NAME:-"Wiki Lua Test"}
+MEDIAWIKI_ADMIN_USER=${MEDIAWIKI_ADMIN_USER:-"Admin"}
+MEDIAWIKI_SERVER_URL=${MEDIAWIKI_SERVER_URL:-"http://localhost:8080"}
+
 if [ "$1" = "test" ]; then
     echo "Running in test mode with mocks..."
     if [ -n "$2" ]; then
@@ -25,9 +44,9 @@ elif [ "$1" = "real-test" ]; then
         if [ ! -f "/var/www/html/data/my_wiki.sqlite" ]; then
             echo "Setting up database..."
             cd /var/www/html/maintenance
-            php install.php --dbtype=sqlite --dbpath=/var/www/html/data --dbname=my_wiki \
+            php install.php --dbtype="$MEDIAWIKI_DB_TYPE" --dbpath="$MEDIAWIKI_DB_PATH" --dbname="$MEDIAWIKI_DB_NAME" \
                 --scriptpath="" --server="http://localhost" \
-                --pass=admin123 "Wiki Lua Test" "Admin"
+                --pass="$MEDIAWIKI_ADMIN_PASSWORD" "$MEDIAWIKI_SITE_NAME" "$MEDIAWIKI_ADMIN_USER"
             php update.php --quick
         fi
         
@@ -54,9 +73,9 @@ else
         fi
         
         cd /var/www/html/maintenance
-        php install.php --dbtype=sqlite --dbpath=/var/www/html/data --dbname=my_wiki \
-            --scriptpath="" --server="http://localhost:8080" \
-            --pass="WikiLuaTestAdmin2024#" "Wiki Lua Test" "Admin"
+        php install.php --dbtype="$MEDIAWIKI_DB_TYPE" --dbpath="$MEDIAWIKI_DB_PATH" --dbname="$MEDIAWIKI_DB_NAME" \
+            --scriptpath="" --server="$MEDIAWIKI_SERVER_URL" \
+            --pass="$MEDIAWIKI_PROD_PASSWORD" "$MEDIAWIKI_SITE_NAME" "$MEDIAWIKI_ADMIN_USER"
         echo "Database setup completed"
         
         # Apply our custom LocalSettings.php with Scribunto configuration
