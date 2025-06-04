@@ -14,7 +14,7 @@ echo -e "${BLUE}📊 Generating and Viewing Performance Dashboard${NC}"
 
 # Configuration
 DASHBOARD_PATH="/tmp/wiki-lua-dashboard.html"
-DEMO_SCRIPT="demo_performance_dashboard.lua"
+DEMO_SCRIPT="tests/demos/demo_performance_dashboard.lua"
 
 # Function to generate dashboard
 generate_dashboard() {
@@ -129,7 +129,7 @@ generate_dashboard() {
         <div class="section">
             <h3>📝 Getting Started</h3>
             <ol>
-                <li>Run <code>lua demo_performance_dashboard.lua</code> to generate performance data</li>
+                <li>Run <code>lua tests/demos/demo_performance_dashboard.lua</code> to generate performance data</li>
                 <li>Use the Performance Dashboard module in your MediaWiki Lua code</li>
                 <li>Monitor function performance in real-time</li>
                 <li>Analyze bottlenecks and optimize your code</li>
@@ -210,7 +210,7 @@ fi
 if open_dashboard; then
     echo -e "\n${GREEN}🎉 Performance Dashboard is now open and ready!${NC}"
     echo -e "${BLUE}Dashboard file: $DASHBOARD_PATH${NC}"
-    echo -e "${BLUE}To regenerate: run 'lua demo_performance_dashboard.lua'${NC}"
+    echo -e "${BLUE}To regenerate: run 'lua tests/demos/demo_performance_dashboard.lua'${NC}"
     echo -e "${BLUE}To view again: run this script or use the VS Code task${NC}"
 else
     echo -e "\n${YELLOW}⚠ Dashboard generated but browser opening failed${NC}"

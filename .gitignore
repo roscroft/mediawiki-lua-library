@@ -49,8 +49,9 @@ docker-compose.prod.yml
 docker-compose.local.yml
 
 ### Project Specific ###
-# Build artifacts
-/build/
+# Build artifacts (allow tracking of important build files)
+/build/test-results/
+/build/*.log
 
 # Docker volumes and data
 /data/
@@ -59,6 +60,13 @@ docker-compose.local.yml
 # Backups
 *_backup_*
 *.bak
+
+# Temporary test files and outputs
+/tmp/
+temp_*.lua
+temp_*.php
+demo_output/
+analysis_output/
 
 ### Development Environment ###
 # VS Code files (keep settings.json for shared config)
@@ -125,3 +133,15 @@ docs/generated/
 # Test outputs
 test-output/
 *.test.log
+
+# Development artifacts
+*.profraw
+*.profdata
+/.luacov*
+luacov.report.out
+luacov.stats.out
+
+# OS and editor artifacts
+*.orig
+*.rej
+.directory

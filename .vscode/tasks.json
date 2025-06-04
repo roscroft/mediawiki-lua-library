@@ -65,6 +65,19 @@
                 "focus": false,
                 "panel": "shared"
             }
+        },
+        {
+            "label": "Auto-fix Lua and Markdown", 
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/auto-fix.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
         }
     ]
 }

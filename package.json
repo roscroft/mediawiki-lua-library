@@ -1,0 +1,16 @@
+{
+    "name": "mediawiki-lua-project",
+    "version": "1.0.0",
+    "description": "MediaWiki Lua Module Library",
+    "scripts": {
+        "lint": "npx markdownlint docs/*.md *.md --config .markdownlint.json",
+        "lint:fix": "npx markdownlint docs/*.md *.md --fix --config .markdownlint.json",
+        "format": "prettier --write docs/*.md *.md",
+        "fix": "./scripts/auto-fix.sh",
+        "postinstall": "chmod +x scripts/*.sh"
+    },
+    "devDependencies": {
+        "prettier": "^3.0.0",
+        "markdownlint-cli": "^0.37.0"
+    }
+}

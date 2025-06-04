@@ -62,7 +62,7 @@ docker run --rm -v $(pwd)/src/modules/Funclib.lua:/test.lua alpine:latest \
 
 ### 3. Mocked Environment Testing
 
-Test with our mock environment that provides mw.* and libraryUtil:
+Test with our mock environment that provides mw.\* and libraryUtil:
 
 ```bash
 # Build the Docker image (if not already built)
@@ -230,7 +230,7 @@ alias wl-server="docker run -d --name wiki-lua -p 8080:80 -v $(pwd)/src:/var/www
 alias wl-test="./tests/scripts/test-pipeline.sh"
 alias wl-stop="docker stop wiki-lua"
 alias wl-rm="docker rm wiki-lua"
-alias wl-restart="wl-stop && wl-rm && wl-server" 
+alias wl-restart="wl-stop && wl-rm && wl-server"
 alias wl-logs="docker logs -f wiki-lua"
 alias wl-shell="docker exec -it wiki-lua bash"
 ```
@@ -258,12 +258,12 @@ mkdir -p src/modules
 
 Make sure these essential files exist:
 
-1. **Dockerfile** - Defines the MediaWiki container
+1. **docker/Dockerfile** - Defines the MediaWiki container
 2. **LocalSettings.php** - MediaWiki configuration
-3. **entrypoint.sh** - Container startup script
-4. **wiki-lua-env.lua** - Mock environment
-5. **test-script-simple.php** - Testing script
-6. **test-pipeline.sh** - Pipeline orchestration script
+3. **docker/entrypoint.sh** - Container startup script
+4. **tests/env/wiki-lua-env.lua** - Mock environment
+5. **tests/php/test-script-simple.php** - Testing script  
+6. **tests/scripts/test-pipeline.sh** - Pipeline orchestration script
 
 ## Step 3: Build the Docker Image
 
@@ -312,7 +312,7 @@ You can also run specific stages:
 # Run only mocked environment tests
 ./test-pipeline.sh funclib.lua --mock
 
-# Run only real Scribunto tests 
+# Run only real Scribunto tests
 ./test-pipeline.sh funclib.lua --real
 ```
 
