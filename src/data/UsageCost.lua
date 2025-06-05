@@ -42,7 +42,7 @@ local arr = require('Array')
 local plink = require('Plink')._plink
 
 --- Currency formatting functions
-local coins = require('Currency')._coins
+local to_coins = require('Currency')._coins
 
 --- Calculation value retrieval
 local get_calcvalue = require('Calcvalue')._get
@@ -66,14 +66,14 @@ local f = require('Functools')
 local partial, compose = f.c2, f.compose
 
 -- Core array/collection operations
-local map, pmap, pfilter, get, pget, pconcat = f.map, f.pmap, f.pfilter, f.get, f.pget, f.pconcat
+local map, pmap, get, pconcat = f.map, f.pmap, f.prop, f.pconcat
 
 -- Functional operators
-local append, pmult = f.ops.append, f.ops.pmult
+local append, pmult, ap = f.ops.ap, f.mul, f.ap
+
 -- Functional pair operations
-local fold_div, fold_or, fold_append = f.fold_div, f.fold_or, f.fold_append
-local first, second, bimap, send_right, dbl, ifThenElse, pifThenElse = f.pair.first, f.pair.second, f.pair.bimap,
-    f.pair.send_right, f.pair.dbl, f.pair.choose, f.pair.pchoose
+local first, second, bimap, dbl, ifThenElse, pifThenElse = f.pair.first, f.pair.second, f.pair.bimap, f.pair.dbl,
+    f.pair.choose, f.pair.pchoose
 local id, thrush = f.combinators.id, f.combinators.thrush
 
 -- ======================
@@ -94,6 +94,12 @@ local fnum = function(num) return lang:formatNum(num) end
 local GEPRICES = mw.loadJsonData('Module:GEPrices/data.json')
 local geprice = function(item) return GEPRICES[item] end
 
+local fold_div = function(pair) return pair[1] / pair[2] end
+local fold_or = function(pair) return pair[1] or pair[2] end
+local fold_append = function(values)
+    return f.reduce(function(acc, val) return acc .. tostring(val) end, "", values)
+end
+
 -- ======================
 -- FORMATTING UTILITIES
 -- ======================
@@ -106,12 +112,12 @@ local to_text = function(str) return { text = str } end
 --- Convert number to formatted coins text node
 ---@param amount number Amount to format as coins
 ---@return table HTML text node with formatted coins
-local to_coins = compose(to_text, coins)
+local to_coins = function(amount) return compose(to_text, to_coins)(amount) end
 
 --- Format coins with sort value for tables
 ---@param n number Coin amount
 ---@return string Formatted coins with sort value
-local coins_with_sort = function(n) return string.format("data-sort-value=\"%d\" | %s", n, coins(n)) end
+local coins_with_sort = function(n) return string.format("data-sort-value=\"%d\" | %s", n, to_coins(n)) end
 
 -- ======================
 -- CONSTANTS & DEFAULTS
@@ -152,7 +158,7 @@ local default_num = function(arg, n) return tonumber(default(arg, n or 0)) end
 ---@param attr string Attribute path
 ---@param def_val any Default value
 ---@return function Function that extracts attribute or returns default
-local default_from = function(def_fn, attr, def_val) return function(base) return def_fn(get(attr, base), def_val) end end
+local default_from = function(def_fn, attr, def_val) return function(base) return def_fn(get(attr)(base), def_val) end end
 
 --- Default values for various parameters
 local defaults = {
@@ -201,8 +207,7 @@ local function calcvalue(item)
         return false
     end
 
-    return f.maybe_call(get_calcvalue, item)
-        .getOrElse(false)
+    return f.Maybe.fromMaybe(false)(f.maybe_call(get_calcvalue, item))
 end
 
 -- Either type for error handling (to be extended)
@@ -291,12 +296,12 @@ local function get_header_and_rows(header, rows)
     local header_attr = ifThenElse(header.attr, { header.attr, {} })
     local rows_tbl = rows
     if not rows_tbl then rows_tbl = { false } end
-    return arr.insert({ { tag = "th", text = header_text, attr = header_attr } }, rows_tbl, true)
+    return arr.insert({ { tag = "th", text = header_text, attr = header_attr } }, rows_tbl, nil, true)
 end
 
 local function get_descriptions_table(methods)
     -- If the descriptions are all nil, don't show them or the header
-    local all_nil_desc = arr.any(methods, pget("description"))
+    local all_nil_desc = arr.any(methods, get("description"))
     local description_fn = function(method) return ifThenElse(method.description, { to_text(method.description), na() }) end
     local rows_tbl = get_header_and_rows("Method", map(description_fn, methods))
     return ifThenElse(all_nil_desc, { rows_tbl, { false } })
@@ -313,7 +318,7 @@ local function time_to_str(total_minutes)
         return elem.val .. " " .. elem.time .. plural .. " "
     end, times)
 
-    return pconcat("", formatted)
+    return pconcat("")(formatted)
 end
 
 local function get_durations_table(methods)
@@ -321,7 +326,7 @@ local function get_durations_table(methods)
     local all_same_duration = arr.all(methods, function(method) return method.duration == methods[1].duration end)
     local options = {
         { colspan(time_to_str(methods[1].duration), #methods) },
-        map(compose(to_text, time_to_str, pget("duration")), methods)
+        map(compose(to_text, time_to_str, get("duration")), methods)
     }
     return get_header_and_rows("Duration", ifThenElse(all_same_duration, options))
 end
@@ -338,8 +343,14 @@ local function combat_rate_data(costs, charges)
     return function(combat_rate, i)
         local rate_name, rate = combat_rate.name, combat_rate.rate
         local header = rate_name .. " rate" .. ref(fnum(drain(rate)) .. " charges per hour.", "rate" .. i)
-        local data = map(compose(coins, round, pmult(drain(rate) / charges)), costs)
-        return get_header_and_rows(header, map(to_text, data))
+
+        -- Calculate hourly costs (more readable steps)
+        local hourly_rate_factor = drain(rate) / charges
+        local adjusted_costs = f.map(function(cost)
+            return to_coins(round(cost * hourly_rate_factor))
+        end, costs)
+
+        return get_header_and_rows(header, map(to_text, adjusted_costs))
     end
 end
 
@@ -390,19 +401,26 @@ end
 local build_methods_pipe = function(args)
     return compose(
         partial(build_method)(args),
-        partial(append)("method")
+        ap("method")
     )
 end
 
 ---Pipeline for transforming method data into item display information
 ---@description Converts method data into formatted items with references and alignment
-local method_to_items_pipe = compose(
-    bottom_aligned,
-    fold_append,
-    bimap(
-        compose(pconcat('<br>'), pmap(format_as_wikitext), pget("iqprs")),
-        compose(if_smithing, pget("is_smithing"))),
-    dbl)
+local method_to_items_pipe = function(method)
+    -- Format items with references
+    local items_text = f.pipe(
+        method.iqprs,
+        pmap(format_as_wikitext),
+        pconcat('<br>')
+    )
+
+    -- Get smithing reference if applicable
+    local smithing_text = if_smithing(method.is_smithing)
+
+    -- Combine and format for bottom alignment
+    return bottom_aligned(fold_append({ items_text, smithing_text }))
+end
 
 ---Pipeline for extracting total cost from method data
 ---@description Calculates total cost of all items in a method
@@ -509,8 +527,8 @@ function p.fixedDuration(frame)
     local args, methods, items, item_costs, needs_ref_group = p._common(frame, false)
 
     -- Calculate hourly cost by dividing total cost by duration
-    local coin_amounts = map(compose(to_text, coins, round, fold_div),
-        arr.zip(item_costs, map(pget("duration"), methods)))
+    local coin_amounts = map(compose(to_text, to_coins, round, fold_div),
+        arr.zip(item_costs, map(get("duration"), methods)))
 
     -- Store usage cost data for semantic queries
     local enc_table = { type = "FixedDuration", methods = methods }
@@ -603,7 +621,7 @@ function p.divineCharge(frame)
     local slotName = DIVINE_CHARGE_SLOTS[slot]["name"]
     if slotName == nil then error("Invalid slot: " .. slot) end
     local chargesPerHour = divineChargeCalc(tier, DIVINE_CHARGE_SLOTS[slot]["chargeDrainMult"])
-    local coins_per_hour = coins(geprice("Divine charge") * chargesPerHour / consts.nums.charges_per_charge)
+    local coins_per_hour = to_coins(geprice("Divine charge") * chargesPerHour / consts.nums.charges_per_charge)
     local divine_ref = fnum(chargesPerHour) .. ref(consts.strs.div_ref_str, "divine charge")
     local enc_table = { type = "DivineCharge", ["tier"] = tier, ["slot"] = slot }
     local fn_args_list = {
@@ -658,7 +676,7 @@ local function usage_table_ask()
 end
 
 ---Format mapping table for different output formats
-local format_table = { coins = coins, coinssort = coins_with_sort, default = id }
+local format_table = { coins = to_coins, coinssort = coins_with_sort, default = id }
 
 ---Get appropriate formatting function based on args
 ---@param args table Template arguments
@@ -832,7 +850,7 @@ local page_cell = to_text
 ---Format cost as HTML table cell with sort value
 ---@param cost number Cost value
 ---@return table HTML table cell with formatted cost
-local function cost_cell(cost) return { text = coins(cost), attr = { ["data-sort-value"] = cost } } end
+local function cost_cell(cost) return { text = to_coins(cost), attr = { ["data-sort-value"] = cost } } end
 
 ---Check if the right element of a pair is a string
 ---@return boolean True if right element is a string
@@ -840,7 +858,7 @@ local right_is_string = f.compose(f.is_type("string"), second)
 
 ---Check if the right element has a type field
 ---@return boolean True if right element has a type field
-local right_has_type = f.compose(f.not_nil, f.get("type"), second)
+local right_has_type = f.compose(f.not_nil, f.prop("type"), second)
 
 ---Check if the item is not a non-standard degradation item
 ---@param pair table Pair containing any value and potentially a table with type
@@ -853,30 +871,52 @@ function p.getMultiUsageCosts()
     -- Set default arguments
     local args = { is_smithing = false, smithing_level = 1 }
 
-    -- Pipeline explanation:
-    -- 1. Get all usage costs from SMW
-    -- 2. Create pairs of page name and JSON data
-    -- 3. Filter for valid string data
-    -- 4. Decode JSON
-    -- 5. Filter for items with type data
-    -- 6. Filter out non-standard items
-    -- 7. Calculate costs
-    -- 8. Format as table cells
-    local usage_cost_table_pipeline = compose(
-        pmap(bimap(
-            page_cell,
-            cost_cell)),
-        pmap(send_right(compose(cost_metric(args), cost_type(args)))),
-        pfilter(isnt_nonstandard),
-        pfilter(right_has_type),
-        pmap(send_right(double_decode)),
-        pfilter(right_is_string),
-        pmap(bimap(
-            compose(plink, pget("pageName")),
-            pget("Usage Cost JSON"))),
-        pmap(dbl)
-    )
-    return usage_cost_table_pipeline(usage_table_ask())
+    -- Create readable pipeline with named transformations
+    local function extract_page_json_pairs(data)
+        return f.map(function(item)
+            return { item.pageName, item["Usage Cost JSON"] }
+        end, data)
+    end
+
+    local function decode_valid_json(pairs)
+        return f.pipe(
+        -- Filter for valid string data
+            f.pfilter(function(pair) return type(pair[2]) == "string" end),
+            -- Decode JSON
+            f.pmap(function(pair) return { pair[1], double_decode(pair[2]) } end)
+        )(pairs)
+    end
+
+    local function calculate_costs(pairs)
+        return f.pipe(
+        -- Filter for items with type data
+            f.pfilter(function(pair) return pair[2] and pair[2].type end),
+            -- Filter out non-standard items
+            f.pfilter(function(pair) return pair[2].type ~= "NonStandardDegrade" end),
+            -- Calculate costs
+            f.pmap(function(pair)
+                local page = pair[1]
+                local cost = cost_metric(args)(cost_type(args)(pair[2]))
+                return { page, cost }
+            end)
+        )(pairs)
+    end
+
+    local function format_as_cells(pairs)
+        return f.map(function(pair)
+            return { page_cell(plink(pair[1])), cost_cell(pair[2]) }
+        end, pairs)
+    end
+
+    -- Apply pipeline steps in sequence
+    local function process_cost_data(data)
+        local page_json_pairs = extract_page_json_pairs(data)
+        local decoded_pairs = decode_valid_json(page_json_pairs)
+        local cost_pairs = calculate_costs(decoded_pairs)
+        return format_as_cells(cost_pairs)
+    end
+
+    return process_cost_data(usage_table_ask())
 end
 
 ---Generate a complete HTML table with all item usage costs
@@ -893,7 +933,7 @@ function p.getUsageCostTable()
     add_table(t, multi_usage_costs)
 
     -- Add references and return
-    return append(t, add_reflist())
+    return append(tostring(t), add_reflist())
 end
 
 return p

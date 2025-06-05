@@ -914,6 +914,7 @@ end
 
 -- Short aliases for common operations
 func.getOrElse = func.Maybe.fromMaybe
+
 -- ======================
 -- MATHEMATICAL OPERATIONS - Numeric and comparison operation
 -- ======================
@@ -994,6 +995,19 @@ end
 ---@return boolean Greater than
 function func.ops.gt(a, b)
     return a > b
+end
+
+---String concatenation
+---@param a string First value
+---@param b string Second value
+---@return string Concatted
+function func.ops.ap(a, b)
+    return tostring(a) .. tostring(b)
+end
+
+-- String concatenation with separator
+func.concat = function(separator, array)
+    return table.concat(array, separator)
 end
 
 -- ======================
@@ -1468,6 +1482,7 @@ func.pow = func.c2(func.ops.pow)
 func.eq = func.c2(func.ops.eq)
 func.lt = func.c2(func.ops.lt)
 func.gt = func.c2(func.ops.gt)
+func.ap = func.c2(func.ops.ap)
 
 -- Using thrush combinator for flip application
 func.tap = func.flip(func.apply)
@@ -1488,6 +1503,9 @@ func.is_array = function(x) return type(x) == "table" and #x > 0 end
 
 -- Curried sequence operations
 func.pzip = func.c2(func.zip)
+
+-- Curried version
+func.pconcat = func.c2(func.concat)
 
 -- ======================
 -- MODULE EXPORT
