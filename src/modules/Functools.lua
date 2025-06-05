@@ -445,8 +445,9 @@ function func.foldl(f, init, ...)
 end
 
 ---Function composition in left-to-right (pipe) order
----@vararg function Functions to pipe, leftmost is applied first
----@return function Piped function
+---@generic T, U
+---@param ... fun(x: any): any[] Functions to pipe, leftmost is applied first
+---@return fun(x: T): U Piped function
 function func.pipe(...)
     local fns = { ... }
     return function(x)
@@ -657,11 +658,14 @@ function func.while_fn(predicate, transform)
     return func.until_fn(func.complement(predicate), transform)
 end
 
+---@alias Pair<A,B> {[1]: A, [2]: B}
+---@alias ArrayLike<T> {[integer]: T}
+
 ---Zip two arrays together into pairs
 ---@generic T, U
----@param xs T[] First array
----@param ys U[] Second array
----@return table<integer, table<1, T, 2, U>> Array of pairs
+---@param xs ArrayLike<T> First array
+---@param ys ArrayLike<U> Second array
+---@return Pair<T,U>[] Array of pairs
 function func.zip(xs, ys)
     local limit = math.min(#xs, #ys)
     if limit == 0 then return {} end
@@ -827,7 +831,7 @@ function func.Maybe.isNothing(maybe)
     return not maybe or maybe.isNothing or maybe.value == nil
 end
 
----Map a function over Maybe value
+-- Improve function signatures to better specify Maybe types
 ---@generic T, U
 ---@param f fun(x: T): U Function to map
 ---@return fun(m: Maybe<T>): Maybe<U> Function that maps over Maybe
@@ -939,16 +943,20 @@ end
 ---@param f fun(rec: fun(x: T): R): fun(x: T): R Function that takes its own recursive call
 ---@return fun(x: T): R Recursive function
 function func.fix(f)
+    checkType('Module:Functools.fix', 1, f, 'function')
     local function rec(...)
         return f(rec)(...)
     end
     return rec
 end
 
+---@alias Reducer<A,B> fun(acc: A, input: B): A
+---@alias Transducer<A,B,C> fun(reducer: Reducer<A,B>): Reducer<A,C>
+
 ---Create a transducer for efficient composition of map/filter operations
----@generic T, U
----@param xform fun(reducer: function): function Transformation function
----@return function Transducer function
+---@generic A, B, C
+---@param xform fun(reducer: Reducer<A,B>): Reducer<A,C> Transformation function
+---@return Transducer<A,B,C> Transducer function
 function func.transducer(xform)
     return function(reducer)
         return xform(reducer)
@@ -1120,6 +1128,7 @@ end
 ---@param operations function[] Array of functions to chain
 ---@return function Chained safe operation
 function func.chain_safe(operations)
+    checkType('Module:Functools.chain_safe', 1, operations, 'table')
     return function(initial_value)
         return func.foldl(function(acc)
             return function(op)
@@ -1189,7 +1198,7 @@ end
 
 ---Check if input has specific type
 ---@param type_name string Type name to check
----@return function Predicate that checks if value is of specified type
+---@return fun(value: any): boolean Predicate that checks if value is of specified type
 function func.is_type(type_name)
     return function(value)
         return type(value) == type_name
