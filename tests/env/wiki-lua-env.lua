@@ -8,7 +8,7 @@ mw = {
         -- In test environment, just print to stdout
         print("[MW-LOG]", ...)
     end,
-    
+
     -- HTML builder
     html = {
         create = function(tag)

@@ -5,8 +5,8 @@
 local libraryUtil = {}
 
 function libraryUtil.checkType(name, argIdx, arg, expectType, nilOk)
-    if arg == nil and nilOk then 
-        return 
+    if arg == nil and nilOk then
+        return
     end
     if type(arg) ~= expectType then
         error(string.format("bad argument #%d to %s (%s expected, got %s)",

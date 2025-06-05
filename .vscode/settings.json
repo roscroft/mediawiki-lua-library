@@ -20,5 +20,6 @@
     },
     "[markdown]": {
         "editor.formatOnSave": true
-    }
+    },
+    "markdown.validate.enabled": true
 }

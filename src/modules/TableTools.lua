@@ -36,7 +36,7 @@ function p.isPositiveInteger(num)
 end
 
 ---Check if a value is NaN (Not a Number)
----@param num any # Value to check  
+---@param num any # Value to check
 ---@return boolean isNaN # Whether the value is NaN
 function p.isNan(num)
     return type(num) == 'number' and tostring(num) == '-nan'
@@ -47,10 +47,10 @@ end
 ---@return boolean isArray # Whether the table is an array
 function p.isArray(t)
     checkType("isArray", 1, t, "table")
-    
+
     local maxKey = 0
     local keyCount = 0
-    
+
     for key, _ in pairs(t) do
         keyCount = keyCount + 1
         if type(key) ~= 'number' or key < 1 or floor(key) ~= key then
@@ -60,7 +60,7 @@ function p.isArray(t)
             maxKey = key
         end
     end
-    
+
     -- Array must have consecutive keys from 1 to maxKey
     return keyCount == maxKey
 end
@@ -98,7 +98,7 @@ end
 ---@return integer size Number of key-value pairs
 function p.size(t)
     checkType('size', 1, t, 'table')
-    
+
     local count = 0
     for _ in pairs(t) do
         count = count + 1
@@ -117,7 +117,7 @@ end
 ---@return table clonedTable # Shallow copy of the input table
 function p.shallowClone(t)
     checkType("shallowClone", 1, t, "table")
-    
+
     local ret = {}
     for key, value in pairs(t) do
         ret[key] = value
@@ -142,9 +142,9 @@ local function _deepCopy(orig, includeMetatable, already_seen)
 
     copy = {}
     already_seen[orig] = copy
-    
+
     for orig_key, orig_value in pairs(orig) do
-        copy[_deepCopy(orig_key, includeMetatable, already_seen)] = 
+        copy[_deepCopy(orig_key, includeMetatable, already_seen)] =
             _deepCopy(orig_value, includeMetatable, already_seen)
     end
 
@@ -179,15 +179,15 @@ end
 ---@return integer[] numericKeys # Sorted array of positive integer keys
 function p.numKeys(t)
     checkType('numKeys', 1, t, 'table')
-    
+
     local nums = {}
-    
+
     for key, _ in pairs(t) do
         if p.isPositiveInteger(key) then
             nums[#nums + 1] = key
         end
     end
-    
+
     table.sort(nums)
     return nums
 end
@@ -195,7 +195,7 @@ end
 ---Extract numeric keys from string keys with given prefix/suffix pattern
 ---@param t table # Table to search
 ---@param prefix? string # Prefix pattern (default: empty)
----@param suffix? string # Suffix pattern (default: empty)  
+---@param suffix? string # Suffix pattern (default: empty)
 ---@return integer[] affixedNumbers # Sorted array of extracted numbers
 function p.affixNums(t, prefix, suffix)
     checkType('affixNums', 1, t, 'table')
@@ -219,7 +219,7 @@ function p.affixNums(t, prefix, suffix)
             end
         end
     end
-    
+
     table.sort(nums)
     return nums
 end
@@ -306,7 +306,7 @@ function p.sparseConcat(t, sep, i, j)
 end
 
 ---Remove nil values from sparse array while preserving order
----@param t table Sparse array to compress  
+---@param t table Sparse array to compress
 ---@return table compressedArray Array with nil values removed
 function p.compressSparseArray(t)
     checkType('compressSparseArray', 1, t, 'table')
@@ -516,18 +516,18 @@ end
 function p.sortedPairsByValue(t, valueSort)
     checkType('sortedPairsByValue', 1, t, 'table')
     checkType('sortedPairsByValue', 2, valueSort, 'function', true)
-    
+
     local elements = {}
     for k, v in pairs(t) do
         table.insert(elements, {key = k, value = v})
     end
 
-    local sortFunc = valueSort or function(a, b) 
+    local sortFunc = valueSort or function(a, b)
         return tostring(a) < tostring(b)
     end
-    
-    table.sort(elements, function(lhs, rhs) 
-        return sortFunc(lhs.value, rhs.value) 
+
+    table.sort(elements, function(lhs, rhs)
+        return sortFunc(lhs.value, rhs.value)
     end)
 
     local function iterator(elements, i)
@@ -537,7 +537,7 @@ function p.sortedPairsByValue(t, valueSort)
         end
         return nil
     end
-    
+
     return iterator, elements, 0
 end
 
@@ -552,7 +552,7 @@ end
 ---@return table<any, integer> invertedMap Map from values to indices
 function p.invert(array)
     checkType("invert", 1, array, "table")
-    
+
     local map = {}
     for idx, item in ipairs(array) do
         map[item] = idx
@@ -565,7 +565,7 @@ end
 ---@return table<any, true> set Set representation of the array
 function p.listToSet(t)
     checkType("listToSet", 1, t, "table")
-    
+
     local set = {}
     for _, item in ipairs(t) do
         set[item] = true
@@ -596,7 +596,7 @@ end
 function p.count(t, predicate)
     checkType("count", 1, t, "table")
     checkType("count", 2, predicate, "function")
-    
+
     local count = 0
     for key, value in pairs(t) do
         if predicate(value, key) then
@@ -613,7 +613,7 @@ end
 function p.all(t, predicate)
     checkType("all", 1, t, "table")
     checkType("all", 2, predicate, "function")
-    
+
     for key, value in pairs(t) do
         if not predicate(value, key) then
             return false
@@ -629,7 +629,7 @@ end
 function p.any(t, predicate)
     checkType("any", 1, t, "table")
     checkType("any", 2, predicate, "function")
-    
+
     for key, value in pairs(t) do
         if predicate(value, key) then
             return true
@@ -646,7 +646,7 @@ end
 function p.find(t, predicate)
     checkType("find", 1, t, "table")
     checkType("find", 2, predicate, "function")
-    
+
     for key, value in pairs(t) do
         if predicate(value, key) then
             return key, value

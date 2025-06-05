@@ -21,7 +21,7 @@ p.clean = function(args)
 	if not hc(file) or (file and (file:lower() == 'no' or file == '')) then
 		return ''
 	end
-	
+
 	local height, width = '',''
 	if hc(args.height) then
 		height = 'x'..args.height
@@ -33,7 +33,7 @@ p.clean = function(args)
 	if width ~= '' or height ~= '' then
 		size = string.format('|%s%spx', width, height)
 	end
-	
+
 	local link = ''
 	if hc(args.link) then
 		if args.link == 'no' then
@@ -42,13 +42,13 @@ p.clean = function(args)
 			link = '|link='..args.link
 		end
 	end
-	
+
 	local alignment = ''
 	local align = args.align
 	if align and (align:lower() == 'left' or align:lower() == 'center' or align:lower() == 'right') then
 		alignment = string.format('|%s', align)
 	end
-	
+
 	file = file:gsub('%[',''):gsub('%]',''):gsub('[Ff]ile:',''):gsub('{{!}}','|')
 
 	-- enforce max height and width

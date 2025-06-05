@@ -45,12 +45,12 @@ for i = 1, 50 do
     local filtered = MonitoredArray.filter(testData, function(x) return x % 2 == 0 end)
     local mapped = MonitoredArray.map(smallData, function(x) return x * x end)
     local found = MonitoredArray.find(testData, function(x) return x > 500 end)
-    
+
     -- Functools operations
     local add = function(a, b) return a + b end
     local multiply = function(x) return x * 2 end
     local composed = monitoredCompose(multiply, add)
-    
+
     -- Intentionally slow operation for testing
     if i % 10 == 0 then
         local slowOp = CodeStandards.trackPerformance('slow_operation', function()
@@ -62,7 +62,7 @@ for i = 1, 50 do
         end)
         slowOp()
     end
-    
+
     -- Memory intensive operation
     if i % 15 == 0 then
         local memoryOp = CodeStandards.trackPerformance('memory_intensive', function()
@@ -133,7 +133,7 @@ local activity = dashboard.recentActivity
 for i, act in ipairs(activity) do
     if i <= 10 then -- Show only first 10 for brevity
         local status = act.success and "✅" or "❌"
-        print(string.format("%s %s - %.4fs - %.1fKB - %s", 
+        print(string.format("%s %s - %.4fs - %.1fKB - %s",
             status, act.function_name, act.duration, act.memory,
             os.date('%H:%M:%S', act.timestamp)))
     end
@@ -184,13 +184,13 @@ for name, analysis in pairs(analysisReport.analysis) do
     end
 end
 
-print(string.format("Health Summary: ✅ %d healthy, ⚠️ %d warnings, 🚨 %d critical", 
+print(string.format("Health Summary: ✅ %d healthy, ⚠️ %d warnings, 🚨 %d critical",
     healthyCount, warningCount, criticalCount))
 
 if #analysisReport.bottlenecks > 0 then
     print("\nIdentified Bottlenecks:")
     for _, bottleneck in ipairs(analysisReport.bottlenecks) do
-        print(string.format("• %s: %.3fs total time (%d calls)", 
+        print(string.format("• %s: %.3fs total time (%d calls)",
             bottleneck.name, bottleneck.totalTime, bottleneck.calls))
     end
 end
@@ -228,7 +228,7 @@ print("Key capabilities demonstrated:")
 print("• Real-time performance monitoring")
 print("• Comprehensive metrics collection")
 print("• Visual dashboard generation")
-print("• Performance analysis and alerts") 
+print("• Performance analysis and alerts")
 print("• Data export capabilities")
 print("• Module instrumentation")
 print("")

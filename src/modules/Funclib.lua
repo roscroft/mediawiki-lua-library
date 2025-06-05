@@ -67,7 +67,7 @@ local clean = require('Clean_image')
 local checkType = libraryUtil.checkType
 local checkTypeMulti = libraryUtil.checkTypeMulti
 
--- Import functional utilities from Functools  
+-- Import functional utilities from Functools
 local functools = require('Functools')
 
 -- Import Arguments for frame processing
@@ -77,7 +77,7 @@ local arguments = require('Arguments')
 local standards = require('CodeStandards')
 
 -- ======================
--- TABLE/COLUMN VALIDATION - Domain Specific  
+-- TABLE/COLUMN VALIDATION - Domain Specific
 -- ======================
 
 -- Use functools for validation (delegate to pure functional validation)

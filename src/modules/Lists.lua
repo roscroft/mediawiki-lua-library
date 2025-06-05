@@ -40,7 +40,7 @@ local COLUMN_PRESETS = funclib.COLUMN_PRESETS
 ---@field formatter? function # Optional formatter function
 ---@field classes? string # Generated CSS classes
 
----@class Lists.BuildListOptions  
+---@class Lists.BuildListOptions
 ---@field get_data_fn fun(args: table): table # Function to fetch data
 ---@field parse_single_fn fun(entry: table): table # Function to parse single entries
 ---@field build_table_fn fun(entries: table, args: table): string # Function to build output table
@@ -51,7 +51,7 @@ local COLUMN_PRESETS = funclib.COLUMN_PRESETS
 ---@class Lists.ModuleConfig
 ---@field category string # Category to fetch entries from
 ---@field json_field string # Field containing JSON data
----@field columns table<number, Lists.ColumnConfig> # Column configuration  
+---@field columns table<number, Lists.ColumnConfig> # Column configuration
 ---@field type_field? string # Optional field for type filtering
 ---@field field_mapping? table<string, function> # Optional JSON field mapping
 ---@field filter_fn? fun(args: table): table # Optional function for custom filtering

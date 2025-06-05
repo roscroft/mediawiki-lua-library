@@ -12,9 +12,9 @@ local function scanModules()
         "/var/www/html/src/data/",     -- Data modules
         "/var/www/html/"              -- Legacy compatibility
     }
-    
+
     print("Scanning for modules in new structure...")
-    
+
     for _, path in ipairs(modulePaths) do
         local handle = io.popen("find " .. path .. " -type f -name '*.lua' 2>/dev/null")
         if handle then
@@ -25,13 +25,13 @@ local function scanModules()
                     if basename ~= "module-loader" and basename ~= "wiki-lua-env" then
                         -- Register multiple name variants for flexibility
                         local cleanName = basename:gsub("_", " ") -- Convert underscores back to spaces
-                        
+
                         -- Register both Module: and direct names
                         moduleMap["Module:" .. cleanName] = filename
                         moduleMap["Module:" .. basename] = filename
                         moduleMap[basename] = filename
                         moduleMap[cleanName] = filename
-                        
+
                         print("Registered " .. basename .. " → " .. filename)
                     end
                 end
@@ -39,7 +39,7 @@ local function scanModules()
             handle:close()
         end
     end
-    
+
     -- Debug: print all registered modules
     print("Module map contents:")
     for k, v in pairs(moduleMap) do
@@ -51,7 +51,7 @@ end
 local originalRequire = require
 function require(modname)
     print("Requiring: " .. modname)
-    
+
     if moduleMap[modname] then
         -- MediaWiki module - load from file
         print("Loading module: " .. modname .. " from " .. moduleMap[modname])
@@ -71,7 +71,7 @@ function require(modname)
             end
             return func()
         end
-        
+
         -- Try standard require
         print("Using standard require for: " .. modname)
         return originalRequire(modname)

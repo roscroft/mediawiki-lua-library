@@ -130,7 +130,7 @@ Array.__index = Array
 
 setmetatable(Array, {
 	__index = table,
-	__call = function (_, arr)
+	__call = function(_, arr)
 		return Array.new(arr)
 	end
 })
@@ -162,8 +162,8 @@ end
 ---@param fun fun(lhs: number, rhs: number): number
 ---@return Array
 local function mathTemplate(lhs, rhs, funName, opName, fun)
-	checkTypeMulti('Module:Array.' .. funName, 1, lhs, {'number', 'table'})
-	checkTypeMulti('Module:Array.' .. funName, 2, rhs, {'number', 'table'})
+	checkTypeMulti('Module:Array.' .. funName, 1, lhs, { 'number', 'table' })
+	checkTypeMulti('Module:Array.' .. funName, 2, rhs, { 'number', 'table' })
 	local res = {}
 
 	if type(lhs) == 'number' then
@@ -179,7 +179,9 @@ local function mathTemplate(lhs, rhs, funName, opName, fun)
 	else
 		local lhsArray = lhs --[[@as any[] ]]
 		local rhsArray = rhs --[[@as any[] ]]
-		assert(len(lhsArray) == len(rhsArray), string.format('Elementwise %s failed because arrays have different sizes (left: %d, right: %d)', opName, len(lhsArray), len(rhsArray)))
+		assert(len(lhsArray) == len(rhsArray),
+			string.format('Elementwise %s failed because arrays have different sizes (left: %d, right: %d)', opName,
+				len(lhsArray), len(rhsArray)))
 		for i = 1, len(lhsArray) do
 			res[i] = fun(lhsArray[i], rhsArray[i])
 		end
@@ -366,15 +368,15 @@ function Array.convolve(x, y)
 	checkType('Module:Array.convolve', 1, x, 'table')
 	checkType('Module:Array.convolve', 2, y, 'table')
 	local z = {}
-    local xLen, yLen = len(x), len(y)
-    for j = 1, (xLen + yLen - 1) do
-        local sum = 0
-        for k = math.max(1, j - yLen + 1), math.min(xLen, j) do
-            sum = sum + x[k] * y[j-k+1]
-        end
-        z[j] = sum
-    end
-    return setmetatable(z, getmetatable(x) or getmetatable(y))
+	local xLen, yLen = len(x), len(y)
+	for j = 1, (xLen + yLen - 1) do
+		local sum = 0
+		for k = math.max(1, j - yLen + 1), math.min(xLen, j) do
+			sum = sum + x[k] * y[j - k + 1]
+		end
+		z[j] = sum
+	end
+	return setmetatable(z, getmetatable(x) or getmetatable(y))
 end
 
 ---Remove **nil** values from `arr` while preserving order.
@@ -391,7 +393,7 @@ function Array.condenseSparse(arr)
 		keys[l] = k
 	end
 	table.sort(keys)
-	for i =  1, l do
+	for i = 1, l do
 		res[i] = arr[keys[i]]
 	end
 	return setmetatable(res, getmetatable(arr))
@@ -430,7 +432,7 @@ function Array.diff(arr, order)
 	checkType('Module:Array.diff', 2, order, 'number', true)
 	local res = {}
 	for i = 1, len(arr) - 1 do
-		res[i] = arr[i+1] - arr[i]
+		res[i] = arr[i + 1] - arr[i]
 	end
 	if order and order > 1 then
 		return Array.diff(res, order - 1)
@@ -529,12 +531,12 @@ function Array.filter(arr, fn)
 	if type(fn) ~= 'function' then
 		error("Array.filter: second argument must be a function, got " .. type(fn))
 	end
-	
+
 	local r = {}
 	local l = 0
 	-- Performance optimization: cache array length
 	local array_len = len(arr)
-		for i = 1, array_len do
+	for i = 1, array_len do
 		if fn(arr[i], i) then
 			l = l + 1
 			r[l] = arr[i]
@@ -591,7 +593,7 @@ end
 ---```
 function Array.find(arr, fn, default)
 	checkType('Module:Array.find', 1, arr, 'table')
-	checkTypeMulti('Module:Array.find', 2, fn, {'function', 'table', 'number', 'boolean', 'string'})
+	checkTypeMulti('Module:Array.find', 2, fn, { 'function', 'table', 'number', 'boolean', 'string' })
 	-- Performance optimization: early termination and value caching
 	if type(fn) ~= 'function' then
 		local search_val = fn
@@ -622,7 +624,7 @@ end
 ---@return integer?
 function Array.find_index(arr, val, default)
 	checkType('Module:Array.find_index', 1, arr, 'table')
-	checkTypeMulti('Module:Array.find_index', 2, val, {'function', 'table', 'number', 'boolean', 'string'})
+	checkTypeMulti('Module:Array.find_index', 2, val, { 'function', 'table', 'number', 'boolean', 'string' })
 	if type(val) ~= 'function' then
 		local _val = val
 		val = function(item) return item == _val end
@@ -643,9 +645,10 @@ end
 ---@return T
 function Array.get(arr, indexes)
 	checkType('Module:Array.get', 1, arr, 'table')
-	checkTypeMulti('Module:Array.get', 2, indexes, {'number', 'table'})
-	assert((type(indexes) == 'number') and (math.floor(indexes) == indexes) or (type(indexes) == 'table'), "Module:Array.get: 'indexes' must be an integer or table of integers")
-	
+	checkTypeMulti('Module:Array.get', 2, indexes, { 'number', 'table' })
+	assert((type(indexes) == 'number') and (math.floor(indexes) == indexes) or (type(indexes) == 'table'),
+		"Module:Array.get: 'indexes' must be an integer or table of integers")
+
 	local single_index = type(indexes) == 'number'
 	if single_index then
 		-- For single index, return the raw value directly
@@ -656,19 +659,19 @@ function Array.get(arr, indexes)
 			return nil
 		end
 	end
-	
+
 	-- For multiple indexes, return Array object
 	local indexArray = indexes --[[@as integer[] ]]
 	local res = {}
-    local arrLength = len(arr)
-    for i = 1, len(indexArray) do
-        local idx = indexArray[i]
-        if idx >= 1 and idx <= arrLength then
-            res[i] = arr[idx]
-        else
-            res[i] = nil
-        end
-    end
+	local arrLength = len(arr)
+	for i = 1, len(indexArray) do
+		local idx = indexArray[i]
+		if idx >= 1 and idx <= arrLength then
+			res[i] = arr[idx]
+		else
+			res[i] = nil
+		end
+	end
 	return setmetatable(res, getmetatable(arr))
 end
 
@@ -687,7 +690,7 @@ function Array.int(arr, start, stop)
 	stop = stop or len(arr)
 	res[1] = arr[start]
 	for i = 1, stop - start do
-		res[i+1] = res[i] + arr[start + i]
+		res[i + 1] = res[i] + arr[start + i]
 	end
 	return setmetatable(res, getmetatable(arr))
 end
@@ -741,9 +744,9 @@ end
 ---@return T
 function Array.insert(arr, val, index, unpackVal)
 	checkType('Module:Array.insert', 1, arr, 'table')
-	checkTypeMulti('Module:Array.insert', 3, index, {'number', 'boolean', 'nil'})
+	checkTypeMulti('Module:Array.insert', 3, index, { 'number', 'boolean', 'nil' })
 	checkType('Module:Array.insert', 4, unpackVal, 'boolean', true)
-	if type(index) == 'boolean'  then
+	if type(index) == 'boolean' then
 		unpackVal, index = index, nil
 	end
 	local l = len(arr)
@@ -836,19 +839,19 @@ function Array.map(arr, fn)
 	if type(fn) ~= 'function' then
 		error("Array.map: second argument must be a function, got " .. type(fn))
 	end
-	
+
 	local l = 0
 	local r = {}
 	-- Performance optimization: cache array length and pre-allocate result when possible
-		local array_len = len(arr)
-		for i = 1, array_len do
-			local tmp = fn(arr[i], i)
-			if tmp ~= nil then
-				l = l + 1
-				r[l] = tmp
-			end
+	local array_len = len(arr)
+	for i = 1, array_len do
+		local tmp = fn(arr[i], i)
+		if tmp ~= nil then
+			l = l + 1
+			r[l] = tmp
 		end
-		return setmetatable(r, getmetatable(arr))
+	end
+	return setmetatable(r, getmetatable(arr))
 end
 
 ---Find the element for which `fn` returned the largest value.
@@ -865,8 +868,8 @@ function Array.max_by(arr, fn)
 	end
 	return unpack(Array.reduce(arr, function(new, old, i)
 		local y = fn(new)
-		return y > old[2] and {new, y, i} or old
-	end, {nil, -math.huge}))
+		return y > old[2] and { new, y, i } or old
+	end, { nil, -math.huge }))
 end
 
 ---Find the largest value in the array.
@@ -981,7 +984,10 @@ function Array.newIncrementor(start, step)
 	local n = (start or 1) - step
 	local obj = {}
 	return setmetatable(obj, {
-		__call = function() n = n + step return n end,
+		__call = function()
+			n = n + step
+			return n
+		end,
 		__tostring = function() return tostring(n) end,
 		__index = function() return n end,
 		__newindex = function(self, k, v)
@@ -1030,16 +1036,16 @@ function Array.range(start, stop, step)
 	checkType('Module:Array.range', 1, start, 'number')
 	checkType('Module:Array.range', 2, stop, 'number', true)
 	checkType('Module:Array.range', 3, step, 'number', true)
-	
+
 	local arr = {}
 	local length = 0
 	if not stop then
 		stop = start
 		start = 1
 	end
-	
+
 	step = step or 1
-	
+
 	-- Prevent infinite loops
 	if step == 0 then
 		error("Module:Array.range: step cannot be 0")
@@ -1050,7 +1056,7 @@ function Array.range(start, stop, step)
 	if step < 0 and start < stop then
 		error("Module:Array.range: start must be >= stop when step is negative")
 	end
-	
+
 	for i = start, stop, step do
 		length = length + 1
 		-- Prevent excessive memory usage
@@ -1102,9 +1108,9 @@ end
 ---@return T
 function Array.reject(arr, val)
 	checkType('Module:Array.reject', 1, arr, 'table')
-	checkTypeMulti('Module:Array.reject', 2, val, {'function', 'table', 'number', 'boolean'})
+	checkTypeMulti('Module:Array.reject', 2, val, { 'function', 'table', 'number', 'boolean' })
 	if type(val) ~= 'function' and type(val) ~= 'table' then
-		val = {val}
+		val = { val }
 	end
 	local r = {}
 	local l = 0
@@ -1183,16 +1189,19 @@ end
 ---@return T
 function Array.set(arr, indexes, values)
 	checkType('Module:Array.set', 1, arr, 'table')
-	checkTypeMulti('Module:Array.set', 2, indexes, {'table', 'number'})
+	checkTypeMulti('Module:Array.set', 2, indexes, { 'table', 'number' })
 	local mt = getmetatable(arr)
 	setmetatable(arr, nil)
 	if type(indexes) == 'number' then
-		indexes = {indexes}
+		indexes = { indexes }
 	end
 	local indexArray = indexes --[[@as integer[] ]]
 	if type(values) == 'table' then
 		local valueArray = values --[[@as any[] ]]
-		assert(len(indexArray) == len(valueArray), string.format("Module:Array.set: 'indexes' and 'values' arrays are not equal length (#indexes = %d, #values = %d)", len(indexArray), len(valueArray)))
+		assert(len(indexArray) == len(valueArray),
+			string.format(
+			"Module:Array.set: 'indexes' and 'values' arrays are not equal length (#indexes = %d, #values = %d)",
+				len(indexArray), len(valueArray)))
 		for i = 1, len(indexArray) do
 			arr[indexArray[i]] = valueArray[i]
 		end
@@ -1386,13 +1395,13 @@ local function memoize(fn, keyGenerator)
 			key = keyGenerator(...)
 		else
 			-- Default key generation for arrays
-			local args = {...}
+			local args = { ... }
 			local parts = {}
 			for i, arg in ipairs(args) do
 				if type(arg) == 'table' then
 					-- Generate a hash for array contents
 					local hash = 0
-					for j = 1, math.min(len(arg), 10) do  -- Limit for performance
+					for j = 1, math.min(len(arg), 10) do -- Limit for performance
 						if arg[j] ~= nil then
 							hash = hash + j * (tonumber(arg[j]) or #tostring(arg[j]))
 						end
@@ -1404,7 +1413,7 @@ local function memoize(fn, keyGenerator)
 			end
 			key = table.concat(parts, "_")
 		end
-		
+
 		if memoCache[key] == nil then
 			-- Prevent cache from growing too large
 			if cacheSize >= maxCacheSize then
@@ -1425,22 +1434,22 @@ end
 function Array.benchmark(operation, iterations, warmup)
 	iterations = iterations or 1000
 	warmup = warmup or 100
-	
+
 	-- Warmup phase
 	for i = 1, warmup do
 		operation()
 	end
-	
+
 	-- Actual benchmark
 	local startTime = os.clock()
 	for i = 1, iterations do
 		operation()
 	end
 	local endTime = os.clock()
-	
+
 	local totalTime = endTime - startTime
 	local avgTime = totalTime / iterations
-	
+
 	return {
 		total_time = totalTime,
 		average_time = avgTime,
@@ -1461,12 +1470,12 @@ Array.fast = {}
 function Array.fast.map(arr, fn, useMemo)
 	checkType('Module:Array.fast.map', 1, arr, 'table')
 	checkType('Module:Array.fast.map', 2, fn, 'function')
-	
+
 	local mapFn = useMemo and memoize(fn) or fn
 	local r = {}
 	local l = 0
 	local array_len = len(arr)
-	
+
 	-- Pre-allocate result array for better performance
 	if array_len > 0 then
 		for i = 1, array_len do
@@ -1477,7 +1486,7 @@ function Array.fast.map(arr, fn, useMemo)
 			end
 		end
 	end
-	
+
 	return setmetatable(r, getmetatable(arr))
 end
 
@@ -1489,11 +1498,11 @@ end
 function Array.fast.filter(arr, fn)
 	checkType('Module:Array.fast.filter', 1, arr, 'table')
 	checkType('Module:Array.fast.filter', 2, fn, 'function')
-	
+
 	local r = {}
 	local l = 0
 	local array_len = len(arr)
-	
+
 	-- Optimized loop with minimal function calls
 	for i = 1, array_len do
 		local elem = arr[i]
@@ -1502,7 +1511,7 @@ function Array.fast.filter(arr, fn)
 			r[l] = elem
 		end
 	end
-	
+
 	return setmetatable(r, getmetatable(arr))
 end
 
@@ -1515,37 +1524,37 @@ end
 ---@return table Memory usage information
 function Array.getMemoryInfo(arr)
 	checkType('Module:Array.getMemoryInfo', 1, arr, 'table')
-	
+
 	local function sizeof(obj, visited)
 		visited = visited or {}
 		if visited[obj] then return 0 end
 		visited[obj] = true
-		
+
 		local bytes = 0
 		local objType = type(obj)
-		
+
 		if objType == "table" then
-			bytes = bytes + 40  -- Base table overhead
+			bytes = bytes + 40                                   -- Base table overhead
 			for k, v in pairs(obj) do
-				bytes = bytes + sizeof(k, visited) + sizeof(v, visited) + 32  -- Entry overhead
+				bytes = bytes + sizeof(k, visited) + sizeof(v, visited) + 32 -- Entry overhead
 			end
 		elseif objType == "string" then
-			bytes = bytes + #obj + 24  -- String overhead
+			bytes = bytes + #obj + 24 -- String overhead
 		elseif objType == "number" then
 			bytes = bytes + 8
 		elseif objType == "boolean" then
 			bytes = bytes + 1
 		else
-			bytes = bytes + 8  -- Reference size
+			bytes = bytes + 8 -- Reference size
 		end
-		
+
 		return bytes
 	end
-	
+
 	local arrayLen = len(arr)
 	local memoryUsed = sizeof(arr)
 	local efficiency = arrayLen > 0 and (arrayLen * 8) / memoryUsed or 0
-	
+
 	return {
 		length = arrayLen,
 		memory_bytes = memoryUsed,
@@ -1556,3 +1565,4 @@ function Array.getMemoryInfo(arr)
 end
 
 return Array
+-- Another test line

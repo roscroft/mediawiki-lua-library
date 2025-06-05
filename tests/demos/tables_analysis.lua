@@ -10,7 +10,7 @@ local file = io.open('/home/adher/wiki-lua/src/modules/Tables.lua', 'r')
 if file then
     local content = file:read('*all')
     file:close()
-    
+
     -- Extract function signatures
     for line in content:gmatch('[^\r\n]+') do
         if line:match('^function') then

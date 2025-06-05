@@ -41,17 +41,17 @@ local function createSimpleHtmlBuilder(tagName)
         children = {},
         text = ""
     }
-    
+
     function element:addClass(class)
         table.insert(self.classes, class)
         return self
     end
-    
+
     function element:attr(name, value)
         self.attributes[name] = value
         return self
     end
-    
+
     function element:css(name, value)
         if not self.attributes.style then
             self.attributes.style = ""
@@ -59,18 +59,18 @@ local function createSimpleHtmlBuilder(tagName)
         self.attributes.style = self.attributes.style .. name .. ":" .. value .. ";"
         return self
     end
-    
+
     function element:wikitext(text)
         self.text = tostring(text)
         return self
     end
-    
+
     function element:tag(childTagName)
         local child = createSimpleHtmlBuilder(childTagName)
         table.insert(self.children, child)
         return child
     end
-    
+
     function element:tostring()
         local attrs = {}
         if #self.classes > 0 then
@@ -79,22 +79,22 @@ local function createSimpleHtmlBuilder(tagName)
         for name, value in pairs(self.attributes) do
             table.insert(attrs, name .. '="' .. tostring(value) .. '"')
         end
-        
+
         local attrStr = #attrs > 0 and " " .. table.concat(attrs, " ") or ""
         local html = "<" .. self.tagName .. attrStr .. ">"
-        
+
         if self.text ~= "" then
             html = html .. self.text
         end
-        
+
         for _, child in ipairs(self.children) do
             html = html .. child:tostring()
         end
-        
+
         html = html .. "</" .. self.tagName .. ">"
         return html
     end
-    
+
     return element
 end
 
@@ -109,41 +109,41 @@ end
 ---@return string html Complete HTML dashboard
 function dashboard.generateHTML()
     local dashboardData = CodeStandards.getPerformanceDashboard()
-    
+
     local html = mw.html.create('div')
         :addClass('performance-dashboard')
         :attr('id', 'wiki-lua-performance-dashboard')
-    
+
     -- Header with status
     local header = html:tag('div'):addClass('dashboard-header')
     header:tag('h2'):wikitext('📊 MediaWiki Lua Performance Dashboard')
-    
+
     local statusBadge = header:tag('span')
         :addClass('status-badge')
         :addClass(dashboardData.status == 'active' and 'status-active' or 'status-inactive')
         :wikitext(dashboardData.status:upper())
-    
+
     header:tag('span')
         :addClass('uptime')
         :wikitext(string.format('Uptime: %s', dashboard.formatDuration(dashboardData.uptime)))
-    
+
     -- Metrics overview
     local metricsRow = html:tag('div'):addClass('metrics-row')
-    
+
     dashboard.addMetricCard(metricsRow, 'Total Functions', dashboardData.metrics.totalFunctions, '🔧')
     dashboard.addMetricCard(metricsRow, 'Total Calls', dashboardData.metrics.totalCalls, '📞')
-    dashboard.addMetricCard(metricsRow, 'Success Rate', 
+    dashboard.addMetricCard(metricsRow, 'Success Rate',
         string.format('%.1f%%', dashboardData.metrics.successRate), '✅')
-    dashboard.addMetricCard(metricsRow, 'Avg Response', 
+    dashboard.addMetricCard(metricsRow, 'Avg Response',
         dashboard.formatTime(dashboardData.metrics.avgResponseTime), '⚡')
-    dashboard.addMetricCard(metricsRow, 'Calls/Second', 
+    dashboard.addMetricCard(metricsRow, 'Calls/Second',
         string.format('%.2f', dashboardData.metrics.callsPerSecond), '🚀')
-    
+
     -- Alerts section
     if #dashboardData.alerts > 0 then
         local alertsSection = html:tag('div'):addClass('alerts-section')
         alertsSection:tag('h3'):wikitext('⚠️ Performance Alerts')
-        
+
         local alertsList = alertsSection:tag('ul'):addClass('alerts-list')
         for _, alert in ipairs(dashboardData.alerts) do
             local alertItem = alertsList:tag('li')
@@ -153,37 +153,37 @@ function dashboard.generateHTML()
             alertItem:tag('span'):addClass('alert-message'):wikitext(alert.message)
         end
     end
-    
+
     -- Performance charts section
     local chartsSection = html:tag('div'):addClass('charts-section')
-    
+
     -- Top performers chart
-    dashboard.addPerformanceChart(chartsSection, 'Top Performers', 
+    dashboard.addPerformanceChart(chartsSection, 'Top Performers',
         dashboardData.topPerformers, 'performance_score')
-    
+
     -- Slowest functions chart
-    dashboard.addPerformanceChart(chartsSection, 'Slowest Functions', 
+    dashboard.addPerformanceChart(chartsSection, 'Slowest Functions',
         dashboardData.slowestFunctions, 'avgTime')
-    
+
     -- Most used functions chart
-    dashboard.addPerformanceChart(chartsSection, 'Most Used Functions', 
+    dashboard.addPerformanceChart(chartsSection, 'Most Used Functions',
         dashboardData.mostUsedFunctions, 'calls')
-    
+
     -- Recent activity
     local activitySection = html:tag('div'):addClass('activity-section')
     activitySection:tag('h3'):wikitext('🕐 Recent Activity')
-    
+
     local activityTable = activitySection:tag('table')
         :addClass('activity-table')
         :addClass('wikitable')
-    
+
     local headerRow = activityTable:tag('tr')
     headerRow:tag('th'):wikitext('Function')
     headerRow:tag('th'):wikitext('Duration')
     headerRow:tag('th'):wikitext('Memory')
     headerRow:tag('th'):wikitext('Status')
     headerRow:tag('th'):wikitext('Time')
-    
+
     for _, activity in ipairs(dashboardData.recentActivity) do
         local row = activityTable:tag('tr')
         row:tag('td'):wikitext(activity.function_name)
@@ -192,13 +192,13 @@ function dashboard.generateHTML()
         row:tag('td'):wikitext(activity.success and '✅' or '❌')
         row:tag('td'):wikitext(os.date('%H:%M:%S', activity.timestamp))
     end
-    
+
     -- Add CSS styles
     html:tag('style'):wikitext(dashboard.getCSS())
-    
+
     -- Add refresh script
     html:tag('script'):wikitext(dashboard.getJavaScript())
-    
+
     return html:tostring()
 end
 
@@ -222,14 +222,14 @@ end
 function dashboard.addPerformanceChart(container, title, data, valueField)
     local chartSection = container:tag('div'):addClass('chart-section')
     chartSection:tag('h4'):wikitext(title)
-    
+
     if #data == 0 then
         chartSection:tag('p'):wikitext('No data available')
         return
     end
-    
+
     local chart = chartSection:tag('div'):addClass('performance-chart')
-    
+
     -- Simple horizontal bar chart
     local maxValue = 0
     for _, item in ipairs(data) do
@@ -237,11 +237,11 @@ function dashboard.addPerformanceChart(container, title, data, valueField)
             maxValue = item[valueField]
         end
     end
-    
+
     for _, item in ipairs(data) do
         local bar = chart:tag('div'):addClass('chart-bar')
         local percentage = maxValue > 0 and (item[valueField] / maxValue) * 100 or 0
-        
+
         bar:tag('div'):addClass('bar-label'):wikitext(item.name)
         local barFill = bar:tag('div'):addClass('bar-fill')
             :css('width', percentage .. '%')
@@ -499,10 +499,10 @@ function dashboard.getJavaScript()
         // to refresh the dashboard data
         console.log('Dashboard refresh triggered');
     }
-    
+
     // Auto-refresh every %d seconds
     setInterval(refreshDashboard, %d000);
-    
+
     // Add click handlers for interactive elements
     document.querySelectorAll('.metric-card').forEach(function(card) {
         card.style.cursor = 'pointer';
@@ -531,7 +531,7 @@ function dashboard.generateAnalysisReport()
         trends = {},
         bottlenecks = {}
     }
-    
+
     -- Analyze each function
     for name, metrics in pairs(performanceData) do
         local analysis = {
@@ -540,26 +540,26 @@ function dashboard.generateAnalysisReport()
             issues = {},
             recommendations = {}
         }
-        
+
         -- Performance analysis
         if metrics.avgTime > 0.5 then
             analysis.status = 'warning'
             table.insert(analysis.issues, 'High average response time')
             table.insert(analysis.recommendations, 'Consider optimization or caching')
         end
-        
+
         if metrics.successRate < 98 then
             analysis.status = 'critical'
             table.insert(analysis.issues, 'Low success rate')
             table.insert(analysis.recommendations, 'Review error handling and validation')
         end
-        
+
         if metrics.avgMemory > 5120 then -- 5MB
             analysis.status = 'warning'
             table.insert(analysis.issues, 'High memory usage')
             table.insert(analysis.recommendations, 'Optimize memory allocation')
         end
-        
+
         -- Identify bottlenecks
         if metrics.totalTime > 10 then -- Functions consuming >10s total
             table.insert(report.bottlenecks, {
@@ -570,26 +570,26 @@ function dashboard.generateAnalysisReport()
                 impact = 'high'
             })
         end
-        
+
         report.analysis[name] = analysis
     end
-    
+
     -- Generate global recommendations
     if #report.bottlenecks > 0 then
-        table.insert(report.recommendations, 
+        table.insert(report.recommendations,
             'Focus optimization efforts on identified bottlenecks')
     end
-    
+
     local totalCalls = 0
     for _, metrics in pairs(performanceData) do
         totalCalls = totalCalls + metrics.calls
     end
-    
+
     if totalCalls > 10000 then
         table.insert(report.recommendations,
             'Consider implementing more aggressive caching strategies')
     end
-    
+
     return report
 end
 
@@ -599,7 +599,7 @@ end
 function dashboard.exportData(format)
     format = format or 'json'
     local data = CodeStandards.getPerformanceMetrics()
-    
+
     if format == 'json' then
         return mw.text.jsonEncode(data)
     elseif format == 'csv' then
@@ -628,7 +628,7 @@ end
 ---@return table wrappedModule Module with performance monitoring
 function dashboard.instrumentModule(module, moduleName)
     local wrapped = {}
-    
+
     for name, func in pairs(module) do
         if type(func) == 'function' then
             wrapped[name] = CodeStandards.trackPerformance(
@@ -637,7 +637,7 @@ function dashboard.instrumentModule(module, moduleName)
             wrapped[name] = func
         end
     end
-    
+
     return wrapped
 end
 

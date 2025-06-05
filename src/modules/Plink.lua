@@ -68,7 +68,7 @@ function p._plinkt(link, args)
 			:ELSE()
 				:wikitext( string.format( "[[%s|%s]]", link, args.txt or link ) )
 			:END()
-	
+
 	return tostring( ret:allDone() )
 end
 

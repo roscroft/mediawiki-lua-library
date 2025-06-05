@@ -558,7 +558,7 @@ end
 ---@return table dashboard Dashboard data structure
 function standards.getPerformanceDashboard()
     local report = standards.generatePerformanceReport()
-    
+
     return {
         status = "active",
         timestamp = os.time(),
@@ -584,7 +584,7 @@ end
 function standards.getRecentActivity()
     local activity = {}
     local now = os.time()
-    
+
     for name, history in pairs(performanceHistory) do
         for _, call in ipairs(history) do
             if now - call.timestamp < 300 then -- Last 5 minutes
@@ -598,16 +598,16 @@ function standards.getRecentActivity()
             end
         end
     end
-    
+
     -- Sort by timestamp (most recent first)
     table.sort(activity, function(a, b) return a.timestamp > b.timestamp end)
-    
+
     -- Return last 20 activities
     local result = {}
     for i = 1, math.min(20, #activity) do
         table.insert(result, activity[i])
     end
-    
+
     return result
 end
 
@@ -615,7 +615,7 @@ end
 ---@return table alerts Performance alerts
 function standards.getPerformanceAlerts()
     local alerts = {}
-    
+
     for name, metrics in pairs(performanceMetrics) do
         -- Alert for slow functions (>1 second average)
         if metrics.avgTime > 1.0 then
@@ -627,7 +627,7 @@ function standards.getPerformanceAlerts()
                 value = metrics.avgTime
             })
         end
-        
+
         -- Alert for low success rate (<95%)
         if metrics.successRate < 95 and metrics.calls > 10 then
             table.insert(alerts, {
@@ -638,19 +638,19 @@ function standards.getPerformanceAlerts()
                 value = metrics.successRate
             })
         end
-        
+
         -- Alert for high memory usage (>10MB average)
         if metrics.avgMemory > 10240 then
             table.insert(alerts, {
                 type = "high_memory",
-                severity = "warning", 
+                severity = "warning",
                 message = string.format("%s is using %.1f MB on average", name, metrics.avgMemory / 1024),
                 function_name = name,
                 value = metrics.avgMemory
             })
         end
     end
-    
+
     return alerts
 end
 
