@@ -25,9 +25,9 @@
 
 local checkType, checkTypeForNamedArg
 do
-	-- Use global libraryUtil from MediaWiki environment
-	checkType = libraryUtil.checkType;
-	checkTypeForNamedArg = libraryUtil.checkTypeForNamedArg;
+	local _libraryUtil = require("libraryUtil");
+	checkType = _libraryUtil.checkType;
+	checkTypeForNamedArg = _libraryUtil.checkTypeForNamedArg;
 end
 
 --
@@ -111,7 +111,7 @@ function p.ucfirst(arg)
 	elseif arg:len() == 1 then
 		return arg:upper()
 	else
-		return arg:sub(1,1):upper() .. arg:sub(2)
+		return arg:sub(1, 1):upper() .. arg:sub(2)
 	end
 end
 
@@ -125,7 +125,7 @@ function p.ucflc(arg)
 	elseif arg:len() == 1 then
 		return arg:upper()
 	else
-		return arg:sub(1,1):upper() .. arg:sub(2):lower()
+		return arg:sub(1, 1):upper() .. arg:sub(2):lower()
 	end
 end
 

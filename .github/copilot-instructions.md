@@ -35,3 +35,4 @@
 - **NEVER edit files in `build/modules/`** - these are build artifacts (symlinks)
 - Use `src/modules/` for all code changes and fixes
 - `build/modules/` is automatically generated via symlinks for MediaWiki compatibility
+- Do not apply CodeStandards.lua integrations unless specifically requested 
