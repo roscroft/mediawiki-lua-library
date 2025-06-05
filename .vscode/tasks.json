@@ -5,7 +5,10 @@
             "label": "Start MediaWiki Container",
             "type": "shell",
             "command": "bash",
-            "args": ["-c", "cd \"${workspaceFolder}\" && bash scripts/start-mediawiki.sh"],
+            "args": [
+                "-c",
+                "cd \"${workspaceFolder}\" && bash scripts/start-mediawiki.sh"
+            ],
             "group": "build",
             "presentation": {
                 "echo": true,
@@ -22,7 +25,10 @@
             "label": "View Performance Dashboard",
             "type": "shell",
             "command": "bash",
-            "args": ["-c", "cd \"${workspaceFolder}\" && bash scripts/view-dashboard.sh"],
+            "args": [
+                "-c",
+                "cd \"${workspaceFolder}\" && bash scripts/view-dashboard.sh"
+            ],
             "group": "build",
             "presentation": {
                 "echo": true,
@@ -55,7 +61,7 @@
             "type": "shell",
             "command": "bash",
             "args": [
-                "-c", 
+                "-c",
                 "echo 'Opening Performance Dashboard in Simple Browser...' && echo 'Use Ctrl+Shift+P -> Simple Browser: Show -> file:///tmp/wiki-lua-dashboard.html'"
             ],
             "group": "build",
@@ -67,7 +73,7 @@
             }
         },
         {
-            "label": "Auto-fix Lua and Markdown", 
+            "label": "Auto-fix Lua and Markdown",
             "type": "shell",
             "command": "${workspaceFolder}/scripts/auto-fix.sh",
             "group": {
@@ -80,14 +86,35 @@
             }
         },
         {
-            "label": "Run Test Pipeline", 
+            "label": "Run Test Pipeline",
             "type": "shell",
             "command": "make",
-            "args": ["test"],
+            "args": [
+                "test"
+            ],
             "group": {
                 "kind": "test",
                 "isDefault": true
             },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Rebuild Docker Image",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/scripts/rebuild-docker-image.sh"
+            ],
+            "group": "build",
             "presentation": {
                 "echo": true,
                 "reveal": "always",

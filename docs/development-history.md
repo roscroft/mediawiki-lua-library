@@ -4,13 +4,15 @@ This document provides a comprehensive chronological overview of the MediaWiki L
 
 ## Project Overview
 
-The MediaWiki Lua Project is an advanced functional programming library ecosystem designed for MediaWiki environments. It provides comprehensive utilities for array manipulation, functional programming patterns, UI component building, and advanced computational operations with standardized error handling and performance monitoring.
+The MediaWiki Lua Project is an advanced functional programming library ecosystem designed for MediaWiki environments.
+It provides comprehensive utilities for array manipulation, functional programming patterns, UI component building,
+and advanced computational operations with standardized error handling and performance monitoring.
 
 ---
 
 ## Phase 1: Initial Development & Project Foundation
 
-### Early Develop#### 🔮 **Ready for Next Phase**
+### Early Development
 
 The project is now optimally organized and ready for:
 
@@ -577,7 +579,7 @@ package.json, Makefile, shell scripts, and VS Code tasks.
 
 **Root Directory After Cleanup**:
 
-```
+```plaintext
 /home/adher/wiki-lua/
 ├── CONTRIBUTING.md         # Contribution guidelines
 ├── LocalSettings.php       # MediaWiki configuration
@@ -824,8 +826,401 @@ requirements fulfilled. Project ready for immediate open source publication.*
 2. Alternatively, access via Command Palette (`Ctrl+Shift+P`) → "Run Test Task"
 3. Or select from the Terminal → Run Task... menu
 
-This enhancement completes the developer workflow integration, providing a seamless development experience with integrated testing, performance monitoring, and MediaWiki environment management directly from VS Code.
+This enhancement completes the developer workflow integration, providing a seamless development experience with integrated testing, performance monitoring,
+and MediaWiki environment management directly from VS Code.
 
 **Developer Workflow Status**: 🟢 **FULLY INTEGRATED**
 
 *Test Pipeline Integration completed on June 4, 2025 - All development workflows now accessible directly from VS Code.*
+
+## 2025-06-04 - Docker Management Enhancement
+
+### ✅ WORKFLOW ENHANCEMENT: Docker Image Rebuild Task
+
+**Objective**: Provide a convenient way to completely rebuild the Docker image used by the test pipeline when needed.
+
+**Enhancement Details**:
+
+- **Added VS Code Task**: Created "Rebuild Docker Image" task for on-demand Docker image rebuilding
+- **New Script**: Added `scripts/rebuild-docker-image.sh` with comprehensive image rebuilding logic:
+  1. Checks for and stops any containers using the image
+  2. Removes the existing Docker image
+  3. Rebuilds the image from scratch using the Dockerfile
+  4. Provides visual status indicators throughout the process
+- **Container Cleanup**: Automatically handles removal of dependent containers
+
+**Implementation Rationale**:
+
+After analysis, we decided to keep this task separate from the automatic test pipeline for several reasons:
+
+1. Building Docker images is resource-intensive and significantly increases test execution time
+2. The test pipeline already has intelligent Docker container management
+3. Complete image rebuilds are only necessary when:
+   - The Dockerfile changes
+   - Dependencies need updating
+   - Troubleshooting container-specific issues
+
+**Implementation**:
+
+```json
+{
+    "label": "Rebuild Docker Image",
+    "type": "shell",
+    "command": "bash",
+    "args": ["${workspaceFolder}/scripts/rebuild-docker-image.sh"],
+    "group": "build"
+}
+```
+
+**Usage Instructions**:
+
+1. Access via Command Palette (`Ctrl+Shift+P`) → "Run Task" → "Rebuild Docker Image"
+2. Run when Dockerfile changes are made
+3. Use for troubleshooting when container tests are failing unexpectedly
+
+*Docker Management Enhancement completed on June 4, 2025 - Provides developers with fine-grained control over the test environment.*
+
+## June 4, 2025 - Test Execution, Organization & Coverage Analysis
+
+### Current Test Infrastructure Assessment
+
+**Strengths:**
+
+- ✅ **4-Stage Test Pipeline**: Comprehensive testing from syntax validation to Scribunto integration
+- ✅ **Docker Integration**: Containerized testing environment for MediaWiki compatibility  
+- ✅ **25 Test Files**: Good coverage across unit, integration, and performance testing
+- ✅ **VS Code Integration**: Tasks for running tests and managing infrastructure
+- ✅ **Automated Error Detection**: Pipeline catches syntax, loading, and runtime errors
+
+**Test Coverage Breakdown:**
+
+- **Unit Tests**: 8 files covering Array, Functools, CodeStandards, Lists, validation
+- **Integration Tests**: 9 files testing cross-module interactions and workflows
+- **Performance Tests**: 3 files with benchmark and regression testing
+- **Production Tests**: 3 files validating TableTools production readiness
+- **Environment Tests**: 2 files for module loading and wiki environment
+
+### Test Execution & Organization Improvements
+
+#### 1. **Test Discovery & Running**
+
+```bash
+# Current: Manual test execution
+make test  # Runs full 4-stage pipeline
+
+# Recommended: Granular test control
+make test-unit         # Run only unit tests
+make test-integration  # Run only integration tests  
+make test-performance  # Run only performance benchmarks
+make test-docker       # Run Docker-dependent tests only
+```
+
+#### 2. **Test Organization Enhancements**
+
+- **Missing**: Property-based testing for edge cases
+- **Missing**: Mutation testing for test quality validation
+- **Missing**: Code coverage reporting with line-by-line analysis
+- **Missing**: Parallel test execution to reduce pipeline time
+
+#### 3. **Test Data Management**
+
+- **Issue**: Empty data files in `src/data/` (abilitylist.lua, shoplist.lua, etc.)
+- **Recommendation**: Restore data files or create test fixtures
+- **Enhancement**: Add data validation tests for MediaWiki-specific structures
+
+### Automation Improvements
+
+#### 1. **CI/CD Pipeline Enhancements**
+
+```yaml
+# Recommended GitHub Actions workflow
+name: Enhanced Test Pipeline
+on: [push, pull_request]
+jobs:
+  test-matrix:
+    strategy:
+      matrix:
+        stage: [syntax, unit, integration, scribunto]
+        lua-version: [5.1, 5.3]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Lua ${{ matrix.lua-version }}
+        uses: leafo/gh-actions-lua@v10
+      - name: Run ${{ matrix.stage }} tests
+        run: make test-${{ matrix.stage }}
+```
+
+#### 2. **Development Workflow Automation**
+
+- **Pre-commit Hooks**: Auto-run tests and linting on commits
+- **Auto-documentation**: Generate API docs from type annotations
+- **Performance Monitoring**: Track benchmark results over time
+- **Dependency Updates**: Automated checks for MediaWiki compatibility
+
+#### 3. **Quality Gates**
+
+- **Test Coverage**: Minimum 85% line coverage requirement
+- **Performance Regression**: Fail builds if performance drops >10%
+- **Memory Usage**: Monitor memory consumption in large operations
+- **MediaWiki Compatibility**: Automated testing against multiple MW versions
+
+### Code Coverage Analysis
+
+**Current Gaps Identified:**
+
+- **Array.lua**: Edge cases for empty arrays and sparse data
+- **Functools.lua**: Advanced combinators and monadic operations
+- **TableTools.lua**: Deprecated function error handling
+- **Lists.lua**: Error handling for invalid column configurations
+- **CodeStandards.lua**: Performance monitoring edge cases
+
+**Recommended Coverage Targets:**
+
+- **Core Modules (Array, Functools)**: 95% line coverage
+- **Domain Modules (Lists, TableTools)**: 90% line coverage  
+- **Utility Modules (CodeStandards)**: 85% line coverage
+- **Integration Workflows**: 80% path coverage
+
+### Useful Functions to Add to Functools Library
+
+#### 1. **Advanced Functional Combinators**
+
+```lua
+-- Conditional combinators
+func.when = function(predicate, fn)
+    return function(x)
+        if predicate(x) then return fn(x) else return x end
+    end
+end
+
+func.unless = function(predicate, fn)
+    return func.when(function(x) return not predicate(x) end, fn)
+end
+
+-- Function guards and validations
+func.guard = function(validator, error_msg)
+    return function(fn)
+        return function(x)
+            if not validator(x) then 
+                error(error_msg or "Guard condition failed")
+            end
+            return fn(x)
+        end
+    end
+end
+
+-- Retry combinators for resilient operations
+func.retry = function(times, delay)
+    return function(fn)
+        return function(...)
+            local last_error
+            for i = 1, times do
+                local success, result = pcall(fn, ...)
+                if success then return result end
+                last_error = result
+                if i < times and delay then 
+                    -- Simple delay simulation
+                    local start = os.clock()
+                    while os.clock() - start < delay do end
+                end
+            end
+            error("Retry failed after " .. times .. " attempts: " .. last_error)
+        end
+    end
+end
+```
+
+#### 2. **Enhanced Data Structures**
+
+```lua
+-- Immutable update operations
+func.assoc = function(key, value)
+    return function(table)
+        local result = func.merge(table)
+        result[key] = value
+        return result
+    end
+end
+
+func.dissoc = function(key)
+    return function(table)
+        local result = func.merge(table)
+        result[key] = nil
+        return result
+    end
+end
+
+-- Path-based operations for nested structures
+func.get_in = function(path)
+    return function(data)
+        local current = data
+        for _, key in ipairs(path) do
+            if type(current) ~= 'table' then return nil end
+            current = current[key]
+        end
+        return current
+    end
+end
+
+func.assoc_in = function(path, value)
+    return function(data)
+        local result = func.merge(data)
+        local current = result
+        for i = 1, #path - 1 do
+            local key = path[i]
+            if type(current[key]) ~= 'table' then
+                current[key] = {}
+            end
+            current = current[key]
+        end
+        current[path[#path]] = value
+        return result
+    end
+end
+```
+
+#### 3. **Collection Operations**
+
+```lua
+-- Grouping and partitioning
+func.group_by = function(key_fn)
+    return function(collection)
+        local groups = {}
+        for _, item in ipairs(collection) do
+            local key = key_fn(item)
+            if not groups[key] then groups[key] = {} end
+            table.insert(groups[key], item)
+        end
+        return groups
+    end
+end
+
+-- Frequency counting
+func.frequencies = function(collection)
+    local counts = {}
+    for _, item in ipairs(collection) do
+        local key = tostring(item)
+        counts[key] = (counts[key] or 0) + 1
+    end
+    return counts
+end
+
+-- Distinct values
+func.distinct = function(collection)
+    local seen = {}
+    local result = {}
+    for _, item in ipairs(collection) do
+        local key = tostring(item)
+        if not seen[key] then
+            seen[key] = true
+            table.insert(result, item)
+        end
+    end
+    return result
+end
+```
+
+#### 4. **Async-Style Operations**
+
+```lua
+-- Promise-like chaining for MediaWiki operations
+func.chain_safe = function(...)
+    local operations = {...}
+    return function(initial_value)
+        local current = func.Maybe.just(initial_value)
+        for _, op in ipairs(operations) do
+            current = func.Maybe.bind(op)(current)
+        end
+        return current
+    end
+end
+
+-- Lazy evaluation for performance
+func.lazy = function(fn)
+    local cached = false
+    local cache
+    return function(...)
+        if not cached then
+            cache = fn(...)
+            cached = true
+        end
+        return cache
+    end
+end
+```
+
+#### 5. **String and Data Processing**
+
+```lua
+-- String template processing
+func.template = function(template_str)
+    return function(data)
+        return template_str:gsub("{{(%w+)}}", function(key)
+            return tostring(data[key] or "")
+        end)
+    end
+end
+
+-- Data validation pipeline
+func.validate = function(validators)
+    return function(data)
+        local errors = {}
+        for field, validator in pairs(validators) do
+            local value = data[field]
+            local success, error_msg = pcall(validator, value)
+            if not success then
+                errors[field] = error_msg
+            end
+        end
+        if next(errors) then
+            return nil, errors
+        end
+        return data
+    end
+end
+```
+
+### Performance Optimization Recommendations
+
+#### 1. **Memoization Enhancements**
+
+- Add LRU cache with size limits to prevent memory leaks
+- Implement cache invalidation strategies
+- Add cache hit/miss metrics for performance tuning
+
+#### 2. **Lazy Loading**
+
+- Implement lazy module loading for large dependencies
+- Add streaming operations for large datasets
+- Create generator functions for memory-efficient iteration
+
+#### 3. **Benchmark Integration**
+
+- Add automated performance regression detection
+- Create performance dashboard with historical trends
+- Implement A/B testing for algorithm improvements
+
+### Implementation Priority
+
+**High Priority (Next Sprint):**
+
+1. Restore data files with proper test data
+2. Add granular test execution commands
+3. Implement basic code coverage reporting
+4. Add retry and guard combinators to Functools
+
+**Medium Priority (Next Month):**
+
+1. Enhanced CI/CD pipeline with matrix testing
+2. Property-based testing framework
+3. Performance regression monitoring
+4. Advanced collection operations in Functools
+
+**Low Priority (Future Releases):**
+
+1. Mutation testing implementation
+2. Multi-version MediaWiki compatibility testing
+3. Advanced async-style operations
+4. Comprehensive performance dashboard
+
+This analysis provides a roadmap for evolving the MediaWiki Lua Module Library into a world-class functional programming toolkit while maintaining its focus on MediaWiki compatibility and performance.

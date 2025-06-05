@@ -1,7 +1,10 @@
-FROM mediawiki:1.39
+FROM mediawiki:1.43.@sha256:2cfabe4c1de8d94b2f184a32cb9dfa8c106550f25ce3649f556434e1a3ef0451
 
-RUN apt-get update && apt-get install -y lua5.1 liblua5.1-0-dev git sqlite3 \
-    && rm -rf /var/lib/apt/lists/*
+# Update all system packages to their latest versions to reduce vulnerabilities
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends lua5.1 liblua5.1-0-dev git sqlite3 ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Scribunto extension with specific location validation
 RUN cd /var/www/html/extensions && \

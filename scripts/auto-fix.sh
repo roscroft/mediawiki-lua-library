@@ -31,8 +31,33 @@ fix_md040() {
     fi
 }
 
+# Fix trailing whitespace in Lua files
+fix_lua_whitespace() {
+    local file="$1"
+    echo "  Removing trailing whitespace from $file..."
+    
+    # Check if file has trailing whitespace
+    if grep -q '[[:space:]]$' "$file"; then
+        # Remove trailing whitespace
+        sed -i 's/[[:space:]]*$//' "$file"
+        echo "    ✓ Trailing whitespace removed"
+    else
+        echo "    ✓ No trailing whitespace found"
+    fi
+}
+
 # Fix Lua files
-echo -e "${YELLOW}Checking Lua files...${NC}"
+echo -e "${YELLOW}Processing Lua files...${NC}"
+
+# Remove trailing whitespace from all Lua files
+echo "Removing trailing whitespace from Lua files..."
+for lua_file in src/modules/*.lua src/data/*.lua tests/*.lua tests/**/*.lua examples/*.lua; do
+    if [ -f "$lua_file" ]; then
+        fix_lua_whitespace "$lua_file"
+    fi
+done
+
+# Run luacheck for linting
 if command_exists luacheck; then
     echo "Running luacheck on src/modules/"
     luacheck src/modules/*.lua --formatter plain || echo -e "${RED}Lua linting issues found${NC}"
@@ -55,15 +80,12 @@ for md_file in docs/*.md *.md; do
 done
 
 # Then run standard markdown formatting
-if command_exists prettier; then
+if command_exists markdownlint; then
     echo "Formatting markdown files in docs/ and root"
-    prettier --write docs/*.md *.md 2>/dev/null || echo "Some markdown files couldn't be formatted"
-    echo -e "${GREEN}Markdown formatting complete${NC}"
-elif command_exists markdownlint; then
-    echo "Running markdownlint"
     markdownlint docs/*.md *.md --fix --config .markdownlint.json 2>/dev/null || echo "Some markdown issues couldn't be auto-fixed"
+    echo -e "${GREEN}Markdown formatting complete${NC}"
 else
-    echo "No markdown formatter found - install prettier or markdownlint"
+    echo "markdownlint not installed - run 'npm install' to install dependencies"
 fi
 
 # Validate project structure

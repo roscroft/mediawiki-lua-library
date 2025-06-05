@@ -10,7 +10,6 @@
         "postinstall": "chmod +x scripts/*.sh"
     },
     "devDependencies": {
-        "prettier": "^3.0.0",
         "markdownlint-cli": "^0.37.0"
     }
 }
