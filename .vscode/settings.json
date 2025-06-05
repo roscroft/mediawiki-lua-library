@@ -21,5 +21,11 @@
     "[markdown]": {
         "editor.formatOnSave": true
     },
-    "markdown.validate.enabled": true
+    "markdown.validate.enabled": true,
+    "files.exclude": {
+        "build/**/*.lua": true
+    },
+    "lua.workspace.ignoreDir": [
+        "./build"
+    ]
 }

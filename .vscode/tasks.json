@@ -125,6 +125,39 @@
                 "cwd": "${workspaceFolder}"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "Generate Module Documentation",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/generate-module-docs.sh",
+            "args": [],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate Documentation for Specific Module",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/generate-module-docs.sh",
+            "args": [
+                "${input:moduleName}"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "moduleName",
+            "type": "promptString",
+            "description": "Enter the module name (without .lua extension)"
         }
     ]
 }
