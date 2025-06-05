@@ -7,7 +7,7 @@ in the enhanced Wiki Lua project after the forcible API migration.
 
 Test Coverage:
 - Cross-module integration
-- Basic functional programming workflows  
+- Basic functional programming workflows
 - Error handling standardization
 - Real-world usage scenarios with remaining modules
 
@@ -24,10 +24,10 @@ package.path = package.path .. ';../../src/modules/?.lua'
 dofile('../env/wiki-lua-env.lua')
 
 -- Module imports with proper paths
-local Array = require('../../src/modules/Array')
-local functools = require('../../src/modules/Functools')
-local funclib = require('../../src/modules/Funclib')
-local standards = require('../../src/modules/CodeStandards')
+local Array = require('Array')
+local functools = require('Functools')
+local funclib = require('Funclib')
+local standards = require('CodeStandards')
 -- Note: AdvancedFunctional module has been removed as part of API migration
 
 -- Test framework
@@ -67,7 +67,7 @@ print("Note: AdvancedFunctional module removed during API migration")
 -- ======================
 print("\n--- Array + Functools Integration ---")
 
-local arr = Array.new({1, 2, 3, 4, 5})
+local arr = Array.new({ 1, 2, 3, 4, 5 })
 local double = function(x) return x * 2 end
 local is_even = function(x) return x % 2 == 0 end
 
@@ -92,18 +92,18 @@ assert_equal(test_error.message, "Test warning", "Error object has correct messa
 
 -- Test validation
 local valid, error_msg = standards.validateParameters("test_func", {
-    {name = "param1", type = "number", required = true},
-    {name = "param2", type = "string", required = false}
-}, {42, "hello"})
+    { name = "param1", type = "number", required = true },
+    { name = "param2", type = "string", required = false }
+}, { 42, "hello" })
 assert_true(valid, "Parameter validation passes for valid inputs")
 
 local invalid, invalid_msg = standards.validateParameters("test_func", {
-    {name = "param1", type = "number", required = true}
+    { name = "param1", type = "number", required = true }
 }, {})
 assert_true(not invalid, "Parameter validation fails for missing required param")
 
 -- ======================
--- Funclib Integration  
+-- Funclib Integration
 -- ======================
 print("\n--- Funclib Integration ---")
 
@@ -113,7 +113,7 @@ local trimmed = funclib.trim(test_str)
 assert_equal(trimmed, "hello world", "Funclib trim function works")
 
 -- Test funclib with arrays
-local test_table = {a = 1, b = 2, c = 3}
+local test_table = { a = 1, b = 2, c = 3 }
 local keys = funclib.keys(test_table)
 assert_true(#keys == 3, "Funclib keys function returns correct count")
 
@@ -127,10 +127,10 @@ local process_data = function(data)
     local arr = Array.new(data)
     local doubled = arr:map(function(x) return x * 2 end)
     local filtered = doubled:filter(function(x) return x > 5 end)
-    return filtered:totable()
+    return filtered
 end
 
-local test_data = {1, 2, 3, 4, 5}
+local test_data = { 1, 2, 3, 4, 5 }
 local result = process_data(test_data)
 -- Should be: {1*2, 2*2, 3*2, 4*2, 5*2} = {2, 4, 6, 8, 10}, then filter > 5 = {6, 8, 10}
 assert_equal(#result, 3, "Combined workflow produces expected count")
@@ -158,7 +158,7 @@ print(string.format("Total: %d", passed + failed))
 if failed == 0 then
     print("✓ ALL TESTS PASSED!")
     print("✅ Cross-module integration verified")
-    print("✅ Basic functional programming workflows operational")  
+    print("✅ Basic functional programming workflows operational")
     print("✅ Error handling standardized")
     print("Note: AdvancedFunctional tests removed due to module deletion")
     return true

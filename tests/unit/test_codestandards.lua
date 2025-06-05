@@ -47,7 +47,7 @@ test("validateParameters with valid parameters", function()
         {name = 'param1', type = 'string', required = true},
         {name = 'param2', type = 'number', required = false}
     }, {'hello', 42})
-    
+
     assert_equal(valid, true)
     assert_equal(msg, nil)
 end)
@@ -56,7 +56,7 @@ test("validateParameters with missing required parameter", function()
     local valid, msg = standards.validateParameters('testFunction', {
         {name = 'param1', type = 'string', required = true}
     }, {})
-    
+
     assert_equal(valid, false)
     assert_not_nil(msg)
 end)
@@ -65,7 +65,7 @@ test("validateParameters with wrong type", function()
     local valid, msg = standards.validateParameters('testFunction', {
         {name = 'param1', type = 'string', required = true}
     }, {123})
-    
+
     assert_equal(valid, false)
     assert_not_nil(msg)
 end)
@@ -75,38 +75,38 @@ test("validateParameters with optional nil parameter", function()
         {name = 'param1', type = 'string', required = true},
         {name = 'param2', type = 'number', required = false}
     }, {'hello', nil})
-    
+
     assert_equal(valid, true)
     assert_equal(msg, nil)
 end)
 
 test("validateParameters with custom validation", function()
     local valid, msg = standards.validateParameters('testFunction', {
-        {name = 'param1', type = 'number', required = true, 
-         validate = function(x) return x > 0 end, 
+        {name = 'param1', type = 'number', required = true,
+         validate = function(x) return x > 0 end,
          validateMessage = "must be positive"}
     }, {5})
-    
+
     assert_equal(valid, true)
     assert_equal(msg, nil)
 end)
 
 test("validateParameters with failing custom validation", function()
     local valid, msg = standards.validateParameters('testFunction', {
-        {name = 'param1', type = 'number', required = true, 
-         validate = function(x) return x > 0 end, 
+        {name = 'param1', type = 'number', required = true,
+         validate = function(x) return x > 0 end,
          validateMessage = "must be positive"}
     }, {-5})
-    
+
     assert_equal(valid, false)
     assert_not_nil(msg)
 end)
 
 -- Test createError
 test("createError creates proper error object", function()
-    local err = standards.createError(standards.ERROR_LEVELS.WARNING, 
+    local err = standards.createError(standards.ERROR_LEVELS.WARNING,
         'Test error', 'TestModule', {detail = 'test'})
-    
+
     assert_equal(type(err), 'table')
     assert_equal(err.level, standards.ERROR_LEVELS.WARNING)
     assert_equal(err.message, 'Test error')
@@ -119,7 +119,7 @@ test("createError with different error levels", function()
     local warn = standards.createError(standards.ERROR_LEVELS.WARNING, 'Warning', 'Test')
     local info = standards.createError(standards.ERROR_LEVELS.INFO, 'Info', 'Test')
     local debug = standards.createError(standards.ERROR_LEVELS.DEBUG, 'Debug', 'Test')
-    
+
     assert_equal(fatal.level, 1)
     assert_equal(warn.level, 2)
     assert_equal(info.level, 3)
@@ -130,7 +130,7 @@ end)
 test("trackPerformance wraps function correctly", function()
     local original = function(x, y) return x + y end
     local wrapped = standards.trackPerformance('testAdd', original)
-    
+
     assert_equal(type(wrapped), 'function')
     assert_equal(wrapped(3, 4), 7)
 end)
@@ -138,7 +138,7 @@ end)
 test("trackPerformance handles multiple arguments and return values", function()
     local original = function(a, b, c) return a + b + c, a * b * c, a - b - c end
     local wrapped = standards.trackPerformance('testMultiple', original)
-    
+
     local sum, product, diff = wrapped(1, 2, 3)
     assert_equal(sum, 6)
     assert_equal(product, 6)
@@ -149,7 +149,7 @@ test("trackPerformance handles functions with no return value", function()
     local side_effect = false
     local original = function() side_effect = true end
     local wrapped = standards.trackPerformance('testVoid', original)
-    
+
     wrapped()
     assert_equal(side_effect, true)
 end)
@@ -174,10 +174,10 @@ test("isEmpty utility function works correctly", function()
 end)
 
 test("formatError formats messages correctly", function()
-    local err = standards.createError(standards.ERROR_LEVELS.WARNING, 
+    local err = standards.createError(standards.ERROR_LEVELS.WARNING,
         'Test message', 'TestModule', {context = 'test'})
     local formatted = standards.formatError(err)
-    
+
     assert_not_nil(formatted)
     assert_equal(type(formatted), 'string')
 end)
@@ -201,13 +201,13 @@ end)
 test("Performance monitoring overhead is minimal", function()
     local function simple_add(a, b) return a + b end
     local wrapped = standards.trackPerformance('perfTest', simple_add)
-    
+
     local start_time = os.clock()
     for i = 1, 1000 do
         wrapped(i, i + 1)
     end
     local end_time = os.clock()
-    
+
     local duration = end_time - start_time
     -- Performance monitoring should add minimal overhead (less than 0.1 seconds for 1000 calls)
     if duration > 0.1 then

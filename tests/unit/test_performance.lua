@@ -24,22 +24,22 @@ local failed = 0
 
 local function assert_performance(name, operation, max_time, iterations)
     iterations = iterations or 1000
-    
+
     print(string.format("Testing %s performance...", name))
-    
+
     local start_time = os.clock()
     for i = 1, iterations do
         operation()
     end
     local end_time = os.clock()
-    
+
     local total_time = end_time - start_time
     local avg_time = total_time / iterations
-    
+
     local status = total_time <= max_time and "PASS" or "FAIL"
-    print(string.format("%s: %s (%.4fs total, %.6fs avg, %d ops/s)", 
+    print(string.format("%s: %s (%.4fs total, %.6fs avg, %d ops/s)",
         name, status, total_time, avg_time, math.floor(iterations / total_time)))
-    
+
     if total_time <= max_time then
         passed = passed + 1
     else
@@ -71,7 +71,7 @@ assert_performance("Array.each on large array", function()
     Array.each(large_array, function(x) sum = sum + x end)
 end, 0.1)
 
--- Test Array.map optimization  
+-- Test Array.map optimization
 assert_performance("Array.map on large array", function()
     Array.map(large_array, function(x) return x * 2 end)
 end, 0.15)

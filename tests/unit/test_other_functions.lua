@@ -51,7 +51,7 @@ test("libraryUtil module loads and has expected functions", function()
     local libraryUtil = require('libraryUtil')
     assert_not_nil(libraryUtil)
     assert_type(libraryUtil, 'table')
-    
+
     -- Check for common libraryUtil functions
     assert_type(libraryUtil.checkType, 'function')
     assert_type(libraryUtil.checkTypeMulti, 'function')
@@ -80,7 +80,7 @@ test("Tables module loads and exports functions", function()
     if success then
         assert_not_nil(Tables)
         assert_type(Tables, 'table')
-        
+
         -- Check if Tables has expected structure
         local has_functions = false
         for k, v in pairs(Tables) do
@@ -101,7 +101,7 @@ test("Functools module loads and exports functions", function()
     local Functools = require('Functools')
     assert_not_nil(Functools)
     assert_type(Functools, 'table')
-    
+
     -- Functools should have functional programming utilities
     local has_functions = false
     for k, v in pairs(Functools) do
@@ -116,7 +116,7 @@ end)
 -- Test basic functional operations from Functools
 test("Functools basic operations work", function()
     local Functools = require('Functools')
-    
+
     -- Test map function if available (note: might use different parameter order)
     if Functools.map then
         local success, result = pcall(Functools.map, {1, 2, 3}, function(x) return x * 2 end)
@@ -130,7 +130,7 @@ test("Functools basic operations work", function()
             assert_type(result, 'table')
         end
     end
-    
+
     -- Test filter function if available
     if Functools.filter then
         local success, result = pcall(Functools.filter, {1, 2, 3, 4}, function(x) return x % 2 == 0 end)
@@ -151,7 +151,7 @@ test("Funclib module loads and integrates with Functools", function()
     local Funclib = require('Funclib')
     assert_not_nil(Funclib)
     assert_type(Funclib, 'table')
-    
+
     -- Funclib should have builders and utilities
     assert_not_nil(Funclib.QueryBuilder)
     assert_not_nil(Funclib.ColumnBuilder)
@@ -161,15 +161,15 @@ end)
 -- Test builder instantiation
 test("Funclib builders can be instantiated", function()
     local Funclib = require('Funclib')
-    
+
     local query_builder = Funclib.QueryBuilder:new()
     assert_not_nil(query_builder)
     assert_type(query_builder, 'table')
-    
+
     local column_builder = Funclib.ColumnBuilder:new()
     assert_not_nil(column_builder)
     assert_type(column_builder, 'table')
-    
+
     local table_builder = Funclib.TableBuilder:new()
     assert_not_nil(table_builder)
     assert_type(table_builder, 'table')
@@ -180,7 +180,7 @@ test("Modules have proper interdependencies", function()
     -- Lists should depend on Funclib
     local Lists = require('Lists')
     local Funclib = require('Funclib')
-    
+
     -- Lists should expose Funclib functionality
     assert_equal(Lists.QueryBuilder, Funclib.QueryBuilder)
     assert_equal(Lists.ColumnBuilder, Funclib.ColumnBuilder)
@@ -191,13 +191,13 @@ end)
 test("Modules handle errors gracefully", function()
     local CodeStandards = require('CodeStandards')
     local Functools = require('Functools')
-    
+
     -- Test error creation
     local err = CodeStandards.createError(1, "Test error", "TestModule")
     assert_not_nil(err)
     assert_equal(err.level, 1)
     assert_equal(err.message, "Test error")
-    
+
     -- Test that modules don't crash with invalid inputs
     local success = pcall(function()
         if Functools.map then
@@ -212,19 +212,19 @@ end)
 test("Mixed module operations perform well", function()
     local Lists = require('Lists')
     local CodeStandards = require('CodeStandards')
-    
+
     local start_time = os.clock()
-    
+
     -- Perform various operations
     for i = 1, 100 do
         local builder = Lists.QueryBuilder:new()
         local column = Lists.make_name_column({header = "Test " .. i})
         local err = CodeStandards.createError(2, "Test message " .. i, "TestModule")
     end
-    
+
     local end_time = os.clock()
     local duration = end_time - start_time
-    
+
     -- Should complete in reasonable time (less than 0.1 seconds for 100 operations)
     if duration > 0.1 then
         error(string.format("Mixed operations took too long: %.3f seconds", duration))

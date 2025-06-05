@@ -10,7 +10,7 @@ completed across all core modules in the MediaWiki Lua project.
 Integration Status:
 ✅ Array.lua - Migrated to new API (removed CodeStandards dependencies)
    - Array.new(): Now standalone without performance monitoring
-   - Array.filter(): Now standalone without parameter validation  
+   - Array.filter(): Now standalone without parameter validation
    - Array.map(): Now standalone without parameter validation
 
 ✅ Functools.lua - Migrated to new API
@@ -85,7 +85,7 @@ local standards_ok, standards = pcall(require, 'CodeStandards')
 verify(standards_ok and standards ~= nil, "CodeStandards module loads and initializes")
 
 -- Test AdvancedFunctional module - REMOVED
--- Note: AdvancedFunctional module removed during API migration  
+-- Note: AdvancedFunctional module removed during API migration
 print("AdvancedFunctional module removed during API migration - test skipped")
 
 print("")
@@ -100,16 +100,16 @@ if standards_ok then
         return valid == true
     end)
     verify(validation_ok, "Parameter validation system functional")
-    
+
     local monitoring_ok = pcall(function()
-        local wrapped = standards.trackPerformance('testFunction', 
+        local wrapped = standards.trackPerformance('testFunction',
             function() return 42 end)
         return wrapped() == 42
     end)
     verify(monitoring_ok, "Performance monitoring wrapper functional")
-    
+
     local error_ok = pcall(function()
-        local err = standards.createError(standards.ERROR_LEVELS.INFO, 
+        local err = standards.createError(standards.ERROR_LEVELS.INFO,
             "Test error", "TestModule", {})
         return type(err) == "table"
     end)
@@ -126,14 +126,14 @@ if array_ok then
         return arr ~= nil
     end)
     verify(new_ok, "Array.new basic functionality")
-    
+
     local filter_ok = pcall(function()
         local arr = Array.new({1, 2, 3, 4, 5})
         local filtered = Array.filter(arr, function(x) return x % 2 == 0 end)
         return filtered ~= nil
     end)
     verify(filter_ok, "Array.filter basic functionality")
-    
+
     local map_ok = pcall(function()
         local arr = Array.new({1, 2, 3})
         local mapped = Array.map(arr, function(x) return x * 2 end)

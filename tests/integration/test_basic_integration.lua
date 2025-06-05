@@ -68,45 +68,45 @@ print("")
 -- Test 2: Basic Array Functionality with CodeStandards Integration
 if array_ok and Array then
     print("--- Testing Array with CodeStandards Integration ---")
-    
+
     local test_data = {1, 2, 3, 4, 5}
     local arr_ok, arr = pcall(Array.new, test_data)
     test_assert(arr_ok and arr ~= nil, "Array.new works with performance monitoring")
-    
+
     if arr_ok and arr then
         local filter_ok, filtered = pcall(Array.filter, arr, function(x) return x % 2 == 0 end)
         test_assert(filter_ok and filtered ~= nil, "Array.filter works with validation and monitoring")
-        
+
         local map_ok, mapped = pcall(Array.map, arr, function(x) return x * 2 end)
         test_assert(map_ok and mapped ~= nil, "Array.map works with validation and monitoring")
     end
-    
+
     print("")
 end
 
 -- Test 3: Basic Functools Functionality with CodeStandards Integration
 if functools_ok and functools then
     print("--- Testing Functools with CodeStandards Integration ---")
-    
+
     local add = function(a, b) return a + b end
     local multiply = function(x) return x * 2 end
-    
+
     local compose_ok, composed = pcall(functools.compose, multiply, add)
-    test_assert(compose_ok and type(composed) == 'function', 
+    test_assert(compose_ok and type(composed) == 'function',
                 "functools.compose works with standardized error handling")
-    
+
     if compose_ok and composed then
         local result_ok, result = pcall(composed, 5, 3)
         test_assert(result_ok and result == 16, "Composed function executes correctly")
     end
-    
+
     print("")
 end
 
 -- Test 4: CodeStandards Core Functions
 if standards_ok and standards then
     print("--- Testing CodeStandards Core Functions ---")
-    
+
     -- Test parameter validation
     local validation_ok, validation_result = pcall(function()
         return standards.validateParameters('testFunction', {
@@ -114,54 +114,54 @@ if standards_ok and standards then
         }, {'test'})
     end)
     test_assert(validation_ok and validation_result, "Parameter validation works correctly")
-    
+
     -- Test performance monitoring wrapper - REMOVED
     -- Note: wrapWithPerformanceMonitoring API removed during migration
     print("Performance monitoring API changed during migration - test skipped")
-    
+
     print("")
 end
 
 -- Test 5: Cross-Module Integration
 if array_ok and functools_ok and standards_ok then
     print("--- Testing Cross-Module Integration ---")
-    
+
     local integration_ok = pcall(function()
         -- Create an array
         local arr = Array.new({1, 2, 3, 4, 5})
-        
+
         -- Create composed function using functools
         local double = function(x) return x * 2 end
         local add_ten = function(x) return x + 10 end
         local composed = functools.compose(add_ten, double)
-        
+
         -- Apply to array
         local result = Array.map(arr, composed)
-        
+
         return result ~= nil
     end)
-    
+
     test_assert(integration_ok, "Cross-module integration works correctly")
-    
+
     print("")
 end
 
 -- Test 6: Error Handling Integration
 if standards_ok then
     print("--- Testing Error Handling Integration ---")
-    
+
     local error_handling_ok = pcall(function()
         -- Test that invalid parameters are caught
         local is_valid, err = standards.validateParameters('testFunction', {
             {name = 'param1', type = 'string', required = true}
         }, {123})
-        
+
         -- Should fail validation
         return not is_valid
     end)
-    
+
     test_assert(error_handling_ok, "Error handling integration works correctly")
-    
+
     print("")
 end
 

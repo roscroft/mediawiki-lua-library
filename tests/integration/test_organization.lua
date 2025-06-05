@@ -25,7 +25,7 @@ end
 if not package.loaded['mw'] then
     package.loaded['mw'] = {
         html = {
-            create = function() 
+            create = function()
                 return setmetatable({}, {__index = {}})
             end
         },
@@ -58,14 +58,14 @@ print("\n== Testing Integration ==")
 local lists = require('Module:Lists')
 if lists then
     print("✓ Lists module loads with all dependencies")
-    
+
     -- Check if key functions are available
     if type(lists.build_table) == 'function' then
         print("✓ lists.build_table function is available")
     else
         print("✗ lists.build_table function is missing")
     end
-    
+
     if lists.COLUMN_PRESETS then
         print("✓ lists.COLUMN_PRESETS is available")
     else

@@ -97,7 +97,7 @@ end)
 test("isValid validates types correctly", function()
     local valid, msg = CodeStandards.isValid("hello", {type = 'string'})
     assert_true(valid)
-    
+
     local invalid, msg2 = CodeStandards.isValid(123, {type = 'string'})
     assert_false(invalid)
     assert_not_nil(msg2)
@@ -106,7 +106,7 @@ end)
 test("isValid validates string patterns", function()
     local valid, msg = CodeStandards.isValid("123", {pattern = "^%d+$"})
     assert_true(valid)
-    
+
     local invalid, msg2 = CodeStandards.isValid("abc", {pattern = "^%d+$"})
     assert_false(invalid)
     assert_not_nil(msg2)
@@ -115,11 +115,11 @@ end)
 test("isValid validates number ranges", function()
     local valid, msg = CodeStandards.isValid(5, {min = 1, max = 10})
     assert_true(valid)
-    
+
     local invalid_low, msg2 = CodeStandards.isValid(0, {min = 1, max = 10})
     assert_false(invalid_low)
     assert_not_nil(msg2)
-    
+
     local invalid_high, msg3 = CodeStandards.isValid(15, {min = 1, max = 10})
     assert_false(invalid_high)
     assert_not_nil(msg3)
@@ -128,11 +128,11 @@ end)
 test("isValid validates string lengths", function()
     local valid, msg = CodeStandards.isValid("hello", {minLength = 3, maxLength = 10})
     assert_true(valid)
-    
+
     local invalid_short, msg2 = CodeStandards.isValid("hi", {minLength = 3})
     assert_false(invalid_short)
     assert_not_nil(msg2)
-    
+
     local invalid_long, msg3 = CodeStandards.isValid("very long string", {maxLength = 5})
     assert_false(invalid_long)
     assert_not_nil(msg3)
@@ -141,7 +141,7 @@ end)
 test("isValid validates table lengths", function()
     local valid, msg = CodeStandards.isValid({1, 2, 3}, {minLength = 2, maxLength = 5})
     assert_true(valid)
-    
+
     local invalid_short, msg2 = CodeStandards.isValid({1}, {minLength = 2})
     assert_false(invalid_short)
     assert_not_nil(msg2)
@@ -149,10 +149,10 @@ end)
 
 test("isValid uses custom validation functions", function()
     local even_validator = function(x) return x % 2 == 0 end
-    
+
     local valid, msg = CodeStandards.isValid(4, {validate = even_validator})
     assert_true(valid)
-    
+
     local invalid, msg2 = CodeStandards.isValid(5, {validate = even_validator})
     assert_false(invalid)
     assert_not_nil(msg2)
@@ -165,22 +165,22 @@ test("validateParameters handles complex scenarios", function()
         {name = 'age', type = 'number', required = true, min = 0, max = 150},
         {name = 'email', type = 'string', required = false, pattern = ".+@.+%..+"}
     }
-    
+
     -- Valid case
     local valid, msg = CodeStandards.validateParameters('testFunc', params, {"John", 25, "john@example.com"})
     assert_true(valid)
     assert_equal(msg, nil)
-    
+
     -- Invalid name (too short)
     local invalid1, msg1 = CodeStandards.validateParameters('testFunc', params, {"Jo", 25, "john@example.com"})
     assert_false(invalid1)
     assert_not_nil(msg1)
-    
+
     -- Invalid age (too high)
     local invalid2, msg2 = CodeStandards.validateParameters('testFunc', params, {"John", 200, "john@example.com"})
     assert_false(invalid2)
     assert_not_nil(msg2)
-    
+
     -- Invalid email pattern
     local invalid3, msg3 = CodeStandards.validateParameters('testFunc', params, {"John", 25, "invalid-email"})
     assert_false(invalid3)
@@ -192,15 +192,15 @@ test("validateParameters handles optional parameters correctly", function()
         {name = 'required_param', type = 'string', required = true},
         {name = 'optional_param', type = 'number', required = false}
     }
-    
+
     -- With optional parameter
     local valid1, msg1 = CodeStandards.validateParameters('testFunc', params, {"hello", 42})
     assert_true(valid1)
-    
+
     -- Without optional parameter
     local valid2, msg2 = CodeStandards.validateParameters('testFunc', params, {"hello"})
     assert_true(valid2)
-    
+
     -- With nil optional parameter
     local valid3, msg3 = CodeStandards.validateParameters('testFunc', params, {"hello", nil})
     assert_true(valid3)
@@ -211,15 +211,15 @@ test("Validation handles edge cases", function()
     -- Test with empty table
     local valid1, msg1 = CodeStandards.isValid({}, {required = false})
     assert_true(valid1)
-    
+
     -- Test with zero
     local valid2, msg2 = CodeStandards.isValid(0, {type = 'number', min = 0})
     assert_true(valid2)
-    
+
     -- Test with false boolean
     local valid3, msg3 = CodeStandards.isValid(false, {type = 'boolean'})
     assert_true(valid3)
-    
+
     -- Test with empty string but no required flag
     local valid4, msg4 = CodeStandards.isValid("", {type = 'string'})
     assert_true(valid4)
@@ -228,11 +228,11 @@ end)
 -- Test libraryUtil integration
 test("libraryUtil validation functions work", function()
     -- Use global libraryUtil instead of requiring it
-    
+
     -- Test checkType
     local success1 = pcall(libraryUtil.checkType, 'test', 1, 'string', 'number')
     assert_false(success1) -- Should throw error for wrong type
-    
+
     local success2 = pcall(libraryUtil.checkType, 'test', 1, 'hello', 'string')
     assert_true(success2) -- Should pass for correct type
 end)
@@ -240,7 +240,7 @@ end)
 -- Test validation performance
 test("Validation performs efficiently", function()
     local start_time = os.clock()
-    
+
     -- Run many validation operations
     for i = 1, 1000 do
         CodeStandards.isEmpty("")
@@ -248,10 +248,10 @@ test("Validation performs efficiently", function()
         CodeStandards.isValid("test", {type = 'string', required = true})
         CodeStandards.isValid(i, {type = 'number', min = 0, max = 2000})
     end
-    
+
     local end_time = os.clock()
     local duration = end_time - start_time
-    
+
     -- Should complete quickly (less than 0.1 seconds for 4000 operations)
     if duration > 0.1 then
         error(string.format("Validation operations took too long: %.3f seconds", duration))

@@ -8,7 +8,7 @@ package.path = '/home/adher/wiki-lua/src/modules/?.lua;' .. package.path
 _G.libraryUtil = {
     checkType = function(name, argIndex, value, expectedType)
         if type(value) ~= expectedType then
-            error(string.format("bad argument #%d to '%s' (%s expected, got %s)", 
+            error(string.format("bad argument #%d to '%s' (%s expected, got %s)",
                 argIndex, name, expectedType, type(value)))
         end
     end,
@@ -25,63 +25,63 @@ local mw = {
                 attributes = {},
                 classes = {}
             }
-            
+
             function obj:tag(name)
                 local child = mw.html.create(name)
                 table.insert(self.content, child)
                 return child
             end
-            
+
             function obj:wikitext(text)
                 table.insert(self.content, tostring(text))
                 return self
             end
-            
+
             function obj:attr(name, value)
                 self.attributes[name] = value
                 return self
             end
-            
+
             function obj:addClass(class)
                 if class and class ~= "" then
                     table.insert(self.classes, class)
                 end
                 return self
             end
-            
+
             function obj:css(prop, value)
                 -- Simple CSS mock
                 return self
             end
-            
+
             function obj:done()
                 return self
             end
-            
+
             function obj:__tostring()
                 local result = "<" .. self.tagName
-                
+
                 -- Add classes
                 if #self.classes > 0 then
                     result = result .. ' class="' .. table.concat(self.classes, ' ') .. '"'
                 end
-                
+
                 -- Add attributes
                 for name, value in pairs(self.attributes) do
                     result = result .. ' ' .. name .. '="' .. tostring(value) .. '"'
                 end
-                
+
                 result = result .. ">"
-                
+
                 -- Add content
                 for _, item in ipairs(self.content) do
                     result = result .. tostring(item)
                 end
-                
+
                 result = result .. "</" .. self.tagName .. ">"
                 return result
             end
-            
+
             return obj
         end
     }
@@ -129,7 +129,7 @@ funclib.add_rows(table_elem, {rows_data[1], rows_data[2]})
 local special_row = table_elem:tag('tr')
 funclib.add_cells(special_row, {
     "Widget C",
-    "$20", 
+    "$20",
     {text = "10", class = "low-stock", attr = {style = "color: red"}}
 }, false)
 special_row:done()

@@ -52,12 +52,12 @@ print("=== Lists Module Unit Tests ===\n")
 test("Lists module exports expected API", function()
     assert_not_nil(Lists)
     assert_type(Lists, 'table')
-    
+
     -- Check main builders are exported
     assert_not_nil(Lists.QueryBuilder)
-    assert_not_nil(Lists.ColumnBuilder) 
+    assert_not_nil(Lists.ColumnBuilder)
     assert_not_nil(Lists.TableBuilder)
-    
+
     -- Check column presets are exported
     assert_not_nil(Lists.COLUMN_PRESETS)
     assert_type(Lists.COLUMN_PRESETS, 'table')
@@ -137,7 +137,7 @@ end)
 test("COLUMN_PRESETS contains expected presets", function()
     local presets = Lists.COLUMN_PRESETS
     assert_not_nil(presets)
-    
+
     -- Should have at least some common presets
     local has_presets = false
     for k, v in pairs(presets) do
@@ -155,7 +155,7 @@ test("Convenience functions return expected types", function()
     local col_result = Lists.col("test_field", "Test Header")
     assert_not_nil(col_result)
     assert_type(col_result, 'table')
-    
+
     -- Test preset function (should create preset column)
     local preset_result = Lists.preset("LEVEL", {})
     assert_not_nil(preset_result)
@@ -168,7 +168,7 @@ test("Lists delegates to Funclib properly", function()
     assert_type(Lists.cols, 'function')
     assert_type(Lists.query, 'function')
     assert_type(Lists.table, 'function')
-    
+
     -- Test basic usage without throwing errors
     local success, result = pcall(Lists.cols, {})
     -- Should not throw an error even with empty input
@@ -181,7 +181,7 @@ test("Functions handle invalid inputs gracefully", function()
     local success, result = pcall(Lists.make_preset_column, "NONEXISTENT_PRESET", {})
     -- Should either succeed with a fallback or fail gracefully
     assert_equal(type(success), 'boolean', "make_preset_column should handle invalid presets")
-    
+
     -- Test column builders with nil input
     local success2, result2 = pcall(Lists.make_column, nil, nil)
     assert_equal(type(success2), 'boolean', "make_column should handle nil inputs")
@@ -193,7 +193,7 @@ test("Lists module integrates with Funclib correctly", function()
     assert_not_nil(Lists.make_column)
     assert_not_nil(Lists.build_table)
     assert_not_nil(Lists.process_column_config)
-    
+
     -- These should be the same functions from Funclib
     assert_type(Lists.make_column, 'function')
     assert_type(Lists.build_table, 'function')
@@ -206,16 +206,16 @@ test("Lists handles complex operations", function()
     local query_builder = Lists.QueryBuilder:new()
     local column_builder = Lists.ColumnBuilder:new()
     local table_builder = Lists.TableBuilder:new()
-    
+
     assert_not_nil(query_builder)
     assert_not_nil(column_builder)
     assert_not_nil(table_builder)
-    
+
     -- Try creating multiple column configurations
     local level_col = Lists.make_level_column({header = "Level"})
     local name_col = Lists.make_name_column({header = "Name"})
     local members_col = Lists.make_members_column({header = "Members"})
-    
+
     assert_not_nil(level_col)
     assert_not_nil(name_col)
     assert_not_nil(members_col)

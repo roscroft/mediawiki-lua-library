@@ -8,13 +8,13 @@ local success, err = pcall(function()
     -- Test that we can load files as Lua modules (use relative paths)
     local array_code = assert(loadfile('src/modules/Array.lua'))
     print("✓ Array.lua loads successfully")
-    
+
     local lists_code = assert(loadfile('src/modules/Lists.lua'))
     print("✓ Lists.lua loads successfully")
-    
+
     local funclib_code = assert(loadfile('src/modules/Funclib.lua'))
     print("✓ Funclib.lua loads successfully")
-    
+
     -- Note: We can't actually execute these modules without the MediaWiki environment
     -- but we can verify they compile correctly
 end)

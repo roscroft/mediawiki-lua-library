@@ -42,7 +42,7 @@ local function assert_table_equal(actual, expected, msg)
     end
     for i = 1, #expected do
         if actual[i] ~= expected[i] then
-            error(msg or string.format("Table differs at index %d: expected %s, got %s", 
+            error(msg or string.format("Table differs at index %d: expected %s, got %s",
                 i, tostring(expected[i]), tostring(actual[i])))
         end
     end
@@ -127,13 +127,13 @@ test("Array operations performance", function()
     for i = 1, 1000 do
         large_arr[i] = i
     end
-    
+
     local start_time = os.clock()
     local arr = Array.new(large_arr)
     local filtered = Array.filter(arr, function(x) return x % 2 == 0 end)
     local mapped = Array.map(filtered, function(x) return x * 2 end)
     local end_time = os.clock()
-    
+
     local duration = end_time - start_time
     assert_equal(#mapped, 500, "Should have 500 even numbers doubled")
     -- Performance should be reasonable (less than 1 second for 1000 items)
