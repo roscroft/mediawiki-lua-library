@@ -141,11 +141,11 @@ assert_performance("Curried function calls", function()
 end, 0.001)
 
 -- Test chain_safe performance
-local safe_chain = functools.chain_safe(
+local safe_chain = functools.chain_safe({
     function(x) return functools.Maybe.just(x * 2) end,
     function(x) return functools.Maybe.just(x + 1) end,
     function(x) return functools.Maybe.just(x / 2) end
-)
+})
 
 assert_performance("Safe function chaining", function()
     safe_chain(10)

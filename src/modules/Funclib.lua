@@ -65,7 +65,6 @@ local funclib = {}
 local arr = require('Array')
 local clean = require('Clean_image')
 local checkType = libraryUtil.checkType
-local checkTypeMulti = libraryUtil.checkTypeMulti
 
 -- Import functional utilities from Functools
 local functools = require('Functools')
@@ -88,19 +87,19 @@ funclib.default_value = functools.validation.default_value -- Added from paramte
 -- Standard validation rule sets
 funclib.VALIDATION_RULES = {
     COLUMN = {
-        header = {type = 'string', required = true},
-        field = {type = 'string', required = true},
-        align = {type = 'string', required = false},
-        colspan = {type = 'number', required = false},
-        formatter = {type = 'function', required = false},
-        tooltip = {type = 'string', required = false},
-        sortable = {type = 'boolean', required = false}
+        header = { type = 'string', required = true },
+        field = { type = 'string', required = true },
+        align = { type = 'string', required = false },
+        colspan = { type = 'number', required = false },
+        formatter = { type = 'function', required = false },
+        tooltip = { type = 'string', required = false },
+        sortable = { type = 'boolean', required = false }
     }
 }
 
 function funclib.validate_column(column, index)
     -- Column must be a table
-    local valid_table = funclib.validate_value(column, {type = 'table', required = true})
+    local valid_table = funclib.validate_value(column, { type = 'table', required = true })
     if valid_table ~= true then
         return false, string.format("Column %s must be a table", index or "")
     end
@@ -183,8 +182,8 @@ function funclib.format_name(name)
     -- Use functional composition for string transformation
     return functools.pipe(
         functools.validation.default_value,
-        function(str) return str:sub(1,1):upper() .. str:sub(2) end
-    )(name, "")
+        function(str) return str:sub(1, 1):upper() .. str:sub(2) end
+    )(name)
 end
 
 -- String manipulation utilities
@@ -288,13 +287,14 @@ function funclib.make_preset_column(preset, options)
 end
 
 function funclib.process_column_config(config, defaults)
-    local paramtest = require('Module:Paramtest')
+    -- Remove dependency on Paramtest module
     defaults = defaults or funclib.DEFAULTS
 
-    config.align = paramtest.default_to(config.align, defaults.ALIGN)
+    -- Use functools validation instead
+    config.align = functools.validation.default_value(config.align, defaults.ALIGN)
     config.sortable = config.sortable ~= false
 
-    local classes = {funclib.FORMAT.TABLE.CLASS.BASE}
+    local classes = { funclib.FORMAT.TABLE.CLASS.BASE }
     if config.sortable then
         table.insert(classes, funclib.FORMAT.TABLE.CLASS.SORTABLE)
     end
@@ -302,7 +302,7 @@ function funclib.process_column_config(config, defaults)
     table.insert(classes, string.format(
         funclib.FORMAT.TABLE.CLASS.ALIGN,
         config.align,
-        paramtest.default_to(config.colspan, 1)
+        functools.validation.default_value(config.colspan, 1)
     ))
 
     config.classes = table.concat(classes, " ")
@@ -313,10 +313,10 @@ end
 function funclib.make_column(header, options, defaults)
     -- Use CodeStandards for standardized parameter validation and monitoring
     local isValid, errorMessage = standards.validateParameters('make_column', {
-        {name = 'header', type = 'string', required = true},
-        {name = 'options', type = 'table', required = false},
-        {name = 'defaults', type = 'table', required = false}
-    }, {header, options, defaults})
+        { name = 'header',   type = 'string', required = true },
+        { name = 'options',  type = 'table',  required = false },
+        { name = 'defaults', type = 'table',  required = false }
+    }, { header, options, defaults })
 
     if not isValid then
         local err = standards.createError(
@@ -325,7 +325,7 @@ function funclib.make_column(header, options, defaults)
             'Module:Funclib'
         )
         standards.logError(err)
-        return {header = header or "", align = "left", sortable = false}
+        return { header = header or "", align = "left", sortable = false }
     end
 
     return standards.trackPerformance('Module:Funclib.make_column', function()
@@ -437,7 +437,7 @@ function TableBuilder.new(columns)
     local self = setmetatable({
         columns = columns,
         rows = {},
-        classes = {funclib.FORMAT.TABLE.CLASS.BASE},
+        classes = { funclib.FORMAT.TABLE.CLASS.BASE },
         attributes = {},
         current_row = nil
     }, TableBuilder)
@@ -621,10 +621,10 @@ funclib.QueryBuilder = QueryBuilder
 function funclib.build_table(columns, rows, options)
     -- Use CodeStandards for comprehensive parameter validation and monitoring
     local isValid, errorMessage = standards.validateParameters('build_table', {
-        {name = 'columns', type = 'table', required = true},
-        {name = 'rows', type = 'table', required = true},
-        {name = 'options', type = 'table', required = false}
-    }, {columns, rows, options})
+        { name = 'columns', type = 'table', required = true },
+        { name = 'rows',    type = 'table', required = true },
+        { name = 'options', type = 'table', required = false }
+    }, { columns, rows, options })
 
     if not isValid then
         local err = standards.createError(
@@ -641,33 +641,33 @@ function funclib.build_table(columns, rows, options)
 
         local builder = TableBuilder.new(columns)
 
-    if options.classes then
-        for _, class in ipairs(options.classes) do
-            builder:add_class(class)
+        if options.classes then
+            for _, class in ipairs(options.classes) do
+                builder:add_class(class)
+            end
         end
-    end
 
-    if options.attributes then
-        for name, value in pairs(options.attributes) do
-            builder:set_attribute(name, value)
+        if options.attributes then
+            for name, value in pairs(options.attributes) do
+                builder:set_attribute(name, value)
+            end
         end
-    end
 
         for _, row in ipairs(rows) do
-        builder:start_row()
-        for _, col in ipairs(columns) do
-            local cell_value = row[col.field]
+            builder:start_row()
+            for _, col in ipairs(columns) do
+                local cell_value = row[col.field]
 
-            if col.formatter then
-                cell_value = col.formatter(cell_value, row)
+                if col.formatter then
+                    cell_value = col.formatter(cell_value, row)
+                end
+
+                builder:add_cell(cell_value, {})
             end
-
-            builder:add_cell(cell_value, {})
+            builder:end_row()
         end
-        builder:end_row()
-    end
 
-    return builder:build()
+        return builder:build()
     end)()
 end
 
@@ -676,46 +676,46 @@ end
 ---@param config table Table configuration
 ---@return string HTML table
 function funclib.build_table_from_frame(frame, config)
-	checkType('build_table_from_frame', 1, frame, 'table')
-	checkType('build_table_from_frame', 2, config, 'table')
+    checkType('build_table_from_frame', 1, frame, 'table')
+    checkType('build_table_from_frame', 2, config, 'table')
 
-	-- Process frame arguments with sophisticated handling
-	local args_config = {
-		trim = true,
-		removeBlanks = true,
-		wrappers = config.wrappers,
-		translate = config.arg_translate,
-		required = config.required_args or {},
-		optional = config.optional_args or {},
-		defaults = config.arg_defaults
-	}
+    -- Process frame arguments with sophisticated handling
+    local args_config = {
+        trim = true,
+        removeBlanks = true,
+        wrappers = config.wrappers,
+        translate = config.arg_translate,
+        required = config.required_args or {},
+        optional = config.optional_args or {},
+        defaults = config.arg_defaults
+    }
 
-	local args = funclib.process_frame_args(frame, args_config)
+    local args = funclib.process_frame_args(frame, args_config)
 
-	-- Build columns using functional composition
-	local columns = functools.pipe(
-		function(cols)
-			return functools.map(function(col_config)
-				if type(col_config) == 'string' then
-					return funclib.make_column(col_config, {})
-				else
-					return funclib.make_column(col_config.header, col_config)
-				end
-			end, cols)
-		end
-	)(config.columns or {})
+    -- Build columns using functional composition
+    local columns = functools.pipe(
+        function(cols)
+            return functools.map(function(col_config)
+                if type(col_config) == 'string' then
+                    return funclib.make_column(col_config, {})
+                else
+                    return funclib.make_column(col_config.header, col_config)
+                end
+            end, cols)
+        end
+    )(config.columns or {})
 
-	-- Process data using functional transformations
-	local data = config.data or {}
-	if config.data_transformations then
-		data = funclib.create_pipeline(config.data_transformations)(data)
-	end
+    -- Process data using functional transformations
+    local data = config.data or {}
+    if config.data_transformations then
+        data = funclib.create_pipeline(config.data_transformations)(data)
+    end
 
-	-- Build table with enhanced options
-	return funclib.build_table(columns, data, {
-		classes = config.classes,
-		attributes = config.attributes
-	})
+    -- Build table with enhanced options
+    return funclib.build_table(columns, data, {
+        classes = config.classes,
+        attributes = config.attributes
+    })
 end
 
 -- ======================
@@ -726,40 +726,40 @@ end
 ---@param processors function[] Array of column processors
 ---@return function Pipeline function for column processing
 function funclib.create_column_pipeline(processors)
-	checkType('create_column_pipeline', 1, processors, 'table')
+    checkType('create_column_pipeline', 1, processors, 'table')
 
-	return functools.compose(unpack(processors))
+    return functools.compose(unpack(processors))
 end
 
 ---Column processor: Apply tooltip to column headers
 ---@param tooltip_map table Map of column headers to tooltips
 ---@return function Column processor function
 function funclib.apply_tooltips(tooltip_map)
-	return function(columns)
-		return functools.map(function(col)
-			if tooltip_map[col.header] then
-				col.header = funclib.tooltip(col.header, tooltip_map[col.header])
-			end
-			return col
-		end, columns)
-	end
+    return function(columns)
+        return functools.map(function(col)
+            if tooltip_map[col.header] then
+                col.header = funclib.tooltip(col.header, tooltip_map[col.header])
+            end
+            return col
+        end, columns)
+    end
 end
 
 ---Column processor: Apply consistent formatting
 ---@param format_config table Formatting configuration
 ---@return function Column processor function
 function funclib.apply_formatting(format_config)
-	return function(columns)
-		return functools.map(function(col)
-			if format_config.align then
-				col.align = col.align or format_config.align
-			end
-			if format_config.sortable ~= nil then
-				col.sortable = col.sortable ~= false and format_config.sortable
-			end
-			return col
-		end, columns)
-	end
+    return function(columns)
+        return functools.map(function(col)
+            if format_config.align then
+                col.align = col.align or format_config.align
+            end
+            if format_config.sortable ~= nil then
+                col.sortable = col.sortable ~= false and format_config.sortable
+            end
+            return col
+        end, columns)
+    end
 end
 
 -- ======================
@@ -778,13 +778,8 @@ funclib.members_col = function(opts) return funclib.make_preset_column("MEMBERS"
 funclib.name_col = function(opts) return funclib.make_preset_column("NAME", opts) end
 
 -- Quick builders
-funclib.cols = ColumnBuilder.new            -- Quick column builder
-funclib.query = QueryBuilder.new            -- Quick query builder
-
--- Simple table helpers (alternative to Tables.lua)
-funclib.add_cells = funclib.add_cells       -- Add cells to table row
-funclib.add_rows = funclib.add_rows         -- Add rows to table
-funclib.simple_table = funclib.simple_table -- Create simple tables
+funclib.cols = ColumnBuilder.new -- Quick column builder
+funclib.query = QueryBuilder.new -- Quick query builder
 
 -- ======================
 -- ADVANCED PERFORMANCE OPTIMIZATIONS
@@ -796,7 +791,7 @@ local maxColumnCacheSize = 500
 
 ---Clear the column processing cache
 function funclib.clearColumnCache()
-	columnCache = {}
+    columnCache = {}
 end
 
 ---Optimized column builder with caching for repeated configurations
@@ -805,53 +800,53 @@ end
 ---@param defaults? table Default options
 ---@return table Processed column configuration
 function funclib.fast_column(header, options, defaults)
-	options = options or {}
-	defaults = defaults or {}
+    options = options or {}
+    defaults = defaults or {}
 
-	-- Generate cache key using simple approach
-	local options_keys = {}
-	for k, _ in pairs(options) do table.insert(options_keys, tostring(k)) end
-	local defaults_keys = {}
-	for k, _ in pairs(defaults) do table.insert(defaults_keys, tostring(k)) end
+    -- Generate cache key using simple approach
+    local options_keys = {}
+    for k, _ in pairs(options) do table.insert(options_keys, tostring(k)) end
+    local defaults_keys = {}
+    for k, _ in pairs(defaults) do table.insert(defaults_keys, tostring(k)) end
 
-	local key = string.format("%s_%s_%s",
-		header or "",
-		table.concat(options_keys, "_"),
-		table.concat(defaults_keys, "_")
-	)
+    local key = string.format("%s_%s_%s",
+        header or "",
+        table.concat(options_keys, "_"),
+        table.concat(defaults_keys, "_")
+    )
 
-	if columnCache[key] then
-		return columnCache[key]
-	end
+    if columnCache[key] then
+        return columnCache[key]
+    end
 
-	-- Prevent cache overflow by counting cache entries
-	local cache_count = 0
-	for _ in pairs(columnCache) do cache_count = cache_count + 1 end
-	if cache_count >= maxColumnCacheSize then
-		funclib.clearColumnCache()
-	end
+    -- Prevent cache overflow by counting cache entries
+    local cache_count = 0
+    for _ in pairs(columnCache) do cache_count = cache_count + 1 end
+    if cache_count >= maxColumnCacheSize then
+        funclib.clearColumnCache()
+    end
 
-	local result = funclib.make_column(header, options, defaults)
-	columnCache[key] = result
-	return result
+    local result = funclib.make_column(header, options, defaults)
+    columnCache[key] = result
+    return result
 end
 
 ---Batch column creation with performance optimizations
 ---@param column_configs table[] Array of column configurations
 ---@return table[] Array of processed columns
 function funclib.batch_columns(column_configs)
-	checkType('batch_columns', 1, column_configs, 'table')
+    checkType('batch_columns', 1, column_configs, 'table')
 
-	local result = {}
-	for i, config in ipairs(column_configs) do
-		if type(config) == 'string' then
-			result[i] = funclib.fast_column(config, {})
-		else
-			result[i] = funclib.fast_column(config.header, config.options, config.defaults)
-		end
-	end
+    local result = {}
+    for i, config in ipairs(column_configs) do
+        if type(config) == 'string' then
+            result[i] = funclib.fast_column(config, {})
+        else
+            result[i] = funclib.fast_column(config.header, config.options, config.defaults)
+        end
+    end
 
-	return result
+    return result
 end
 
 -- ======================
@@ -863,66 +858,66 @@ end
 ---@param config table Processing configuration
 ---@return table Processed parameters
 function funclib.process_frame_args(frame, config)
-	checkType('process_frame_args', 1, frame, 'table')
-	checkType('process_frame_args', 2, config, 'table')
+    checkType('process_frame_args', 1, frame, 'table')
+    checkType('process_frame_args', 2, config, 'table')
 
-	-- Set up Arguments options based on config
-	local args_options = {
-		trim = config.trim ~= false,  -- Default to true
-		removeBlanks = config.removeBlanks ~= false,  -- Default to true
-		readOnly = config.readOnly or false,
-		noOverwrite = config.noOverwrite or false,
-		wrappers = config.wrappers,
-		valueFunc = config.valueFunc
-	}
+    -- Set up Arguments options based on config
+    local args_options = {
+        trim = config.trim ~= false,                 -- Default to true
+        removeBlanks = config.removeBlanks ~= false, -- Default to true
+        readOnly = config.readOnly or false,
+        noOverwrite = config.noOverwrite or false,
+        wrappers = config.wrappers,
+        valueFunc = config.valueFunc
+    }
 
-	-- Use Arguments module for sophisticated frame processing
-	local args = arguments.getArgs(frame, args_options)
-	local result = {}
+    -- Use Arguments module for sophisticated frame processing
+    local args = arguments.getArgs(frame, args_options)
+    local result = {}
 
-	-- Process required parameters
-	if config.required then
-		for _, param in ipairs(config.required) do
-			local value = args[param]
-			if not value then
-				error(string.format("Required parameter '%s' is missing", param))
-			end
-			result[param] = value
-		end
-	end
+    -- Process required parameters
+    if config.required then
+        for _, param in ipairs(config.required) do
+            local value = args[param]
+            if not value then
+                error(string.format("Required parameter '%s' is missing", param))
+            end
+            result[param] = value
+        end
+    end
 
-	-- Process optional parameters with defaults
-	if config.optional then
-		for _, param in ipairs(config.optional) do
-			local value = args[param]
-			if value then
-				result[param] = value
-			elseif config.defaults and config.defaults[param] then
-				result[param] = config.defaults[param]
-			end
-		end
-	end
+    -- Process optional parameters with defaults
+    if config.optional then
+        for _, param in ipairs(config.optional) do
+            local value = args[param]
+            if value then
+                result[param] = value
+            elseif config.defaults and config.defaults[param] then
+                result[param] = config.defaults[param]
+            end
+        end
+    end
 
-	-- Apply type conversions if specified
-if config.types then
-		for param, target_type in pairs(config.types) do
-			if result[param] then
-				result[param] = funclib.convert_type(result[param], target_type)
-			end
-		end
-	end
+    -- Apply type conversions if specified
+    if config.types then
+        for param, target_type in pairs(config.types) do
+            if result[param] then
+                result[param] = funclib.convert_type(result[param], target_type)
+            end
+        end
+    end
 
-	-- Apply argument translation if specified
-	if config.translate then
-		local translated_result = {}
-		for param, value in pairs(result) do
-			local translated_param = config.translate[param] or param
-			translated_result[translated_param] = value
-		end
-		result = translated_result
-	end
+    -- Apply argument translation if specified
+    if config.translate then
+        local translated_result = {}
+        for param, value in pairs(result) do
+            local translated_param = config.translate[param] or param
+            translated_result[translated_param] = value
+        end
+        result = translated_result
+    end
 
-	return result
+    return result
 end
 
 -- ======================
@@ -934,40 +929,40 @@ end
 ---@param config table Processing configuration
 ---@return table Processed parameters
 function funclib.process_template_params(args, config)
-	checkType('process_template_params', 1, args, 'table')
-	checkType('process_template_params', 2, config, 'table')
+    checkType('process_template_params', 1, args, 'table')
+    checkType('process_template_params', 2, config, 'table')
 
-	local result = {}
+    local result = {}
 
-	-- Process required parameters using functional validation
-	if config.required then
-		for _, param in ipairs(config.required) do
-			local value = args[param]
-			if not functools.validation.default_value(value, nil) then
-				error(string.format("Required parameter '%s' is missing", param))
-			end
-			result[param] = value
-		end
-	end
+    -- Process required parameters using functional validation
+    if config.required then
+        for _, param in ipairs(config.required) do
+            local value = args[param]
+            if not functools.validation.default_value(value, nil) then
+                error(string.format("Required parameter '%s' is missing", param))
+            end
+            result[param] = value
+        end
+    end
 
-	-- Process optional parameters with defaults using functional approach
-	if config.optional then
-		for _, param in ipairs(config.optional) do
-			local default_val = config.defaults and config.defaults[param] or ""
-			result[param] = functools.validation.default_value(args[param], default_val)
-		end
-	end
+    -- Process optional parameters with defaults using functional approach
+    if config.optional then
+        for _, param in ipairs(config.optional) do
+            local default_val = config.defaults and config.defaults[param] or ""
+            result[param] = functools.validation.default_value(args[param], default_val)
+        end
+    end
 
-	-- Process with type conversion
-	if config.types then
-		for param, target_type in pairs(config.types) do
-			if result[param] then
-				result[param] = funclib.convert_type(result[param], target_type)
-			end
-		end
-	end
+    -- Process with type conversion
+    if config.types then
+        for param, target_type in pairs(config.types) do
+            if result[param] then
+                result[param] = funclib.convert_type(result[param], target_type)
+            end
+        end
+    end
 
-	return result
+    return result
 end
 
 ---Convert string values to appropriate types
@@ -975,18 +970,18 @@ end
 ---@param target_type string Target type ('number', 'boolean', 'table')
 ---@return any Converted value
 function funclib.convert_type(value, target_type)
-	if target_type == 'number' then
-		local num = tonumber(value)
-		return num or 0
-	elseif target_type == 'boolean' then
-		return value == 'true' or value == '1' or value == 'yes'
-	elseif target_type == 'table' then
-		-- Try to decode as JSON, fallback to split by comma
-		local success, result = pcall(mw.text.jsonDecode, value)
-		if success then return result end
-		return mw.text.split(value, ',')
-	end
-	return value
+    if target_type == 'number' then
+        local num = tonumber(value)
+        return num or 0
+    elseif target_type == 'boolean' then
+        return value == 'true' or value == '1' or value == 'yes'
+    elseif target_type == 'table' then
+        -- Try to decode as JSON, fallback to split by comma
+        local success, result = pcall(mw.text.jsonDecode, value)
+        if success then return result end
+        return mw.text.split(value, ',')
+    end
+    return value
 end
 
 -- ======================
@@ -997,62 +992,62 @@ end
 ---@param generators table[] Array of generator functions
 ---@return string Generated wikitext
 function funclib.compose_wikitext(generators)
-	checkType('compose_wikitext', 1, generators, 'table')
+    checkType('compose_wikitext', 1, generators, 'table')
 
-	local parts = arr.map(generators, function(gen)
-		return type(gen) == 'function' and gen() or tostring(gen)
-	end)
+    local parts = arr.map(generators, function(gen)
+        return type(gen) == 'function' and gen() or tostring(gen)
+    end)
 
-	return table.concat(arr.filter(parts, function(part)
-		return part and part ~= ""
-	end), '\n')
+    return table.concat(arr.filter(parts, function(part)
+        return part and part ~= ""
+    end), '\n')
 end
 
 ---Create a template invocation builder
 ---@param template_name string Name of the template
 ---@return table Builder object
 function funclib.template_builder(template_name)
-	checkType('template_builder', 1, template_name, 'string')
+    checkType('template_builder', 1, template_name, 'string')
 
-	local builder = {
-		name = template_name,
-		params = {}
-	}
+    local builder = {
+        name = template_name,
+        params = {}
+    }
 
-	function builder:param(name, value)
-		if value and value ~= "" then
-			self.params[name] = value
-		end
-		return self
-	end
+    function builder:param(name, value)
+        if value and value ~= "" then
+            self.params[name] = value
+        end
+        return self
+    end
 
-	function builder:numbered_param(value)
-		if value and value ~= "" then
-			table.insert(self.params, value)
-		end
-		return self
-	end
+    function builder:numbered_param(value)
+        if value and value ~= "" then
+            table.insert(self.params, value)
+        end
+        return self
+    end
 
-	function builder:build()
-		local parts = {'{{' .. self.name}
+    function builder:build()
+        local parts = { '{{' .. self.name }
 
-		-- Add numbered parameters first
-		for i, value in ipairs(self.params) do
-			table.insert(parts, '|' .. value)
-		end
+        -- Add numbered parameters first
+        for i, value in ipairs(self.params) do
+            table.insert(parts, '|' .. value)
+        end
 
-		-- Add named parameters
-		for name, value in pairs(self.params) do
-			if type(name) ~= 'number' then
-				table.insert(parts, string.format('|%s=%s', name, value))
-			end
-		end
+        -- Add named parameters
+        for name, value in pairs(self.params) do
+            if type(name) ~= 'number' then
+                table.insert(parts, string.format('|%s=%s', name, value))
+            end
+        end
 
-		table.insert(parts, '}}')
-		return table.concat(parts)
-	end
+        table.insert(parts, '}}')
+        return table.concat(parts)
+    end
 
-	return builder
+    return builder
 end
 
 -- ======================
@@ -1063,68 +1058,68 @@ end
 ---@param transformations function[] Array of transformation functions
 ---@return function Pipeline function
 function funclib.create_pipeline(transformations)
-	checkType('create_pipeline', 1, transformations, 'table')
+    checkType('create_pipeline', 1, transformations, 'table')
 
-	return function(data)
-		local result = data
+    return function(data)
+        local result = data
 
-		for i, transform in ipairs(transformations) do
-			local success, new_result = pcall(transform, result)
-			if not success then
-				error(string.format("Pipeline stage %d failed: %s", i, new_result))
-			end
-			result = new_result
-		end
+        for i, transform in ipairs(transformations) do
+            local success, new_result = pcall(transform, result)
+            if not success then
+                error(string.format("Pipeline stage %d failed: %s", i, new_result))
+            end
+            result = new_result
+        end
 
-		return result
-	end
+        return result
+    end
 end
 
 ---Common data transformations
 funclib.transforms = {
-	-- Filter out empty values
-	filter_empty = function(data)
-		return arr.filter(data, function(item)
-			return item and item ~= ""
-		end)
-	end,
+    -- Filter out empty values
+    filter_empty = function(data)
+        return arr.filter(data, function(item)
+            return item and item ~= ""
+        end)
+    end,
 
-	-- Sort by field
-	sort_by = function(field)
-		return function(data)
-			table.sort(data, function(a, b)
-				return (a[field] or "") < (b[field] or "")
-			end)
-			return data
-		end
-	end,
+    -- Sort by field
+    sort_by = function(field)
+        return function(data)
+            table.sort(data, function(a, b)
+                return (a[field] or "") < (b[field] or "")
+            end)
+            return data
+        end
+    end,
 
-	-- Group by field
-	group_by = function(field)
-		return function(data)
-			local groups = {}
-			for _, item in ipairs(data) do
-				local key = item[field] or "unknown"
-				if not groups[key] then
-					groups[key] = {}
-				end
-				table.insert(groups[key], item)
-			end
-			return groups
-		end
-	end,
+    -- Group by field
+    group_by = function(field)
+        return function(data)
+            local groups = {}
+            for _, item in ipairs(data) do
+                local key = item[field] or "unknown"
+                if not groups[key] then
+                    groups[key] = {}
+                end
+                table.insert(groups[key], item)
+            end
+            return groups
+        end
+    end,
 
-	-- Map field values
-	map_field = function(field, mapper)
-		return function(data)
-			return arr.map(data, function(item)
-				if item[field] then
-					item[field] = mapper(item[field])
-				end
-				return item
-			end)
-		end
-	end
+    -- Map field values
+    map_field = function(field, mapper)
+        return function(data)
+            return arr.map(data, function(item)
+                if item[field] then
+                    item[field] = mapper(item[field])
+                end
+                return item
+            end)
+        end
+    end
 }
 
 -- ======================
@@ -1136,31 +1131,31 @@ funclib.transforms = {
 ---@param use_cache? boolean Whether to use query caching
 ---@return table Query results
 function funclib.semantic_query(query, use_cache)
-	checkType('semantic_query', 1, query, 'string')
+    checkType('semantic_query', 1, query, 'string')
 
-	-- Simple cache based on query hash
-	local query_hash = mw.hash('md5', query)
-	if use_cache and columnCache['query_' .. query_hash] then
-		return columnCache['query_' .. query_hash]
-	end
+    -- Simple cache based on query hash
+    local query_hash = mw.hash('md5', query)
+    if use_cache and columnCache['query_' .. query_hash] then
+        return columnCache['query_' .. query_hash]
+    end
 
-	local success, result = pcall(mw.smw.ask, query)
-	if not success then
-		error("Semantic query failed: " .. result)
-	end
+    local success, result = pcall(mw.smw.ask, query)
+    if not success then
+        error("Semantic query failed: " .. result)
+    end
 
-	if use_cache then
-		columnCache['query_' .. query_hash] = result
-	end
+    if use_cache then
+        columnCache['query_' .. query_hash] = result
+    end
 
-	return result or {}
+    return result or {}
 end
 
 ---Build semantic query string with fluent interface
 ---@param category string Category to query
 ---@return table Query builder
 function funclib.semantic_builder(category)
-	return funclib.QueryBuilder.new(category)
+    return funclib.QueryBuilder.new(category)
 end
 
 -- ======================

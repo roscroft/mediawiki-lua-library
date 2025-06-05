@@ -125,6 +125,34 @@ function func.lift2(f) return function(g) return function(h) return function(x) 
 ---@return fun(g: fun(x: A): B): fun(x: A): fun(y: A): C Function that applies f(g(x))(g(y))
 function func.on(f) return function(g) return function(x) return function(y) return func.c2(f)(g(x))(g(y)) end end end end
 
+---Phoenix combinator - (a → b → c → d) → (a → b) → (a → c) → a → d
+---@generic A, B, C, D
+---@param f fun(a: A): fun(b: B): fun(c: C): D Three-argument function
+---@return fun(g: fun(a: A): B): fun(h: fun(a: A): C): fun(a: A): D Phoenix combinator
+function func.phoenix(f)
+    return function(g)
+        return function(h)
+            return function(x)
+                return func.c3(f)(x)(g(x))(h(x))
+            end
+        end
+    end
+end
+
+---Blackbird combinator - (c → d) → (a → b → c) → a → b → d
+---@generic A, B, C, D
+---@param f fun(c: C): D Unary function
+---@return fun(g: fun(a: A): fun(b: B): C): fun(a: A): fun(b: B): D Blackbird combinator
+function func.blackbird(f)
+    return function(g)
+        return function(x)
+            return function(y)
+                return f(func.c2(g)(x)(y))
+            end
+        end
+    end
+end
+
 ---@class Combinators
 ---@field id function Identity function
 ---@field const function Constant function
@@ -137,6 +165,8 @@ function func.on(f) return function(g) return function(x) return function(y) ret
 ---@field chain function Chain combinator
 ---@field lift2 function Converge function
 ---@field on function Psi combinator
+---@field phoenix function Phoenix combinator
+---@field blackbird function Blackbird combinator
 
 -- Expose combinators at top level for easy access
 func.combinators = {
@@ -150,7 +180,9 @@ func.combinators = {
     ap = func.ap,
     chain = func.chain,
     lift2 = func.lift2,
-    on = func.on
+    on = func.on,
+    phoenix = func.phoenix,
+    blackbird = func.blackbird
 }
 
 -- ======================
@@ -196,6 +228,38 @@ function func.c3(f) return function(x) return function(y) return function(z) ret
 ---@param f fun(x: A, y: B, z: C, a: D): R Function to curry
 ---@return fun(x: A): fun(y: B): fun(z: C): fun(a: D): R Curried function
 function func.c4(f) return function(x) return function(y) return function(z) return function(a) return f(x, y, z, a) end end end end end
+
+-- Add to currying section
+
+---Auto-curry a function based on its expected arity
+---@param f function Function to curry
+---@param arity number Expected number of arguments
+---@return function Auto-curried function
+function func.auto_curry(f, arity)
+    local function curried(args)
+        return function(...)
+            local new_args = func.merge(args or {}, { ... })
+            if #new_args >= arity then
+                return f(unpack(new_args))
+            else
+                return curried(new_args)
+            end
+        end
+    end
+    return curried({})
+end
+
+---Create a partial application with fixed first arguments
+---@param f function Function to partially apply
+---@vararg any Arguments to fix
+---@return function Partially applied function
+function func.partial(f, ...)
+    local fixed_args = { ... }
+    return function(...)
+        local all_args = func.merge(fixed_args, { ... })
+        return f(unpack(all_args))
+    end
+end
 
 -- ======================
 -- FUNCTION COMPOSITION & TRANSFORMATION
@@ -548,6 +612,63 @@ function func.deep_flatten(nested_array)
     end, {}, unpack(nested_array))
 end
 
+-- Add after sequence operations
+
+---Create a lazy sequence generator
+---@generic T
+---@param generator fun(): T|nil Generator function
+---@return table Lazy sequence object
+function func.lazy(generator)
+    return {
+        map = function(f)
+            return func.lazy(function()
+                local val = generator()
+                return val and f(val) or nil
+            end)
+        end,
+        filter = function(pred)
+            return func.lazy(function()
+                local val
+                repeat
+                    val = generator()
+                until val == nil or pred(val)
+                return val
+            end)
+        end,
+        take = function(n)
+            local count = 0
+            return func.lazy(function()
+                if count >= n then return nil end
+                count = count + 1
+                return generator()
+            end)
+        end,
+        to_array = function()
+            local result = {}
+            local val = generator()
+            while val ~= nil do
+                table.insert(result, val)
+                val = generator()
+            end
+            return result
+        end
+    }
+end
+
+---Create infinite sequence from initial value and step function
+---@generic T
+---@param initial T Starting value
+---@param step_fn fun(x: T): T Function to generate next value
+---@return table Infinite lazy sequence
+function func.iterate(initial, step_fn)
+    local current = initial
+    return func.lazy(function()
+        local val = current
+        current = step_fn(current)
+        return val
+    end)
+end
+
 -- ======================
 -- PAIR & TUPLE UTILITIES - Working with paired data structures
 -- ======================
@@ -753,6 +874,42 @@ function func.Maybe.fromMaybe(default)
             return default
         end
     end
+end
+
+-- Add to Maybe module
+
+---Sequence a list of Maybe values
+---@generic T
+---@param maybes Maybe<T>[] Array of Maybe values
+---@return Maybe<T[]> Maybe containing array of values or Nothing if any is Nothing
+function func.Maybe.sequence(maybes)
+    local result = {}
+    for i, maybe in ipairs(maybes) do
+        if func.Maybe.isNothing(maybe) then
+            return func.Maybe.nothing
+        end
+        result[i] = maybe.value
+    end
+    return func.Maybe.just(result)
+end
+
+---Traverse an array applying a function that returns Maybe
+---@generic T, U
+---@param f fun(x: T): Maybe<U> Function that returns Maybe
+---@param xs T[] Array to traverse
+---@return Maybe<U[]> Maybe containing array of results
+function func.Maybe.traverse(f, xs)
+    local maybes = func.map(f, xs)
+    return func.Maybe.sequence(maybes)
+end
+
+---Alternative operation - return first Just value or Nothing if all are Nothing
+---@generic T
+---@param m1 Maybe<T> First Maybe
+---@param m2 Maybe<T> Second Maybe
+---@return Maybe<T> First Just value or Nothing
+function func.Maybe.alt(m1, m2)
+    return func.Maybe.isJust(m1) and m1 or m2
 end
 
 -- Short aliases for common operations
@@ -984,6 +1141,97 @@ func.is_table = func.is_type("table")
 func.is_string = func.is_type("string")
 func.is_number = func.is_type("number")
 func.is_boolean = func.is_type("boolean")
+
+-- Add to utility functions
+
+---Group array elements by a key function
+---@generic T, K
+---@param key_fn fun(x: T): K Function to extract grouping key
+---@param xs T[] Array to group
+---@return table<K, T[]> Table mapping keys to arrays of values
+function func.group_by(key_fn, xs)
+    local groups = {}
+    for _, x in ipairs(xs) do
+        local key = key_fn(x)
+        if not groups[key] then
+            groups[key] = {}
+        end
+        table.insert(groups[key], x)
+    end
+    return groups
+end
+
+---Create a function that applies multiple functions to same input
+---@vararg function Functions to apply
+---@return function Function that returns array of results
+function func.juxt(...)
+    local fns = { ... }
+    return function(x)
+        return func.map(function(f) return f(x) end, fns)
+    end
+end
+
+---Conditional function application
+---@generic T
+---@param predicate fun(x: T): boolean Condition to check
+---@param then_fn fun(x: T): T Function to apply if true
+---@param else_fn? fun(x: T): T Function to apply if false (optional)
+---@return fun(x: T): T Conditional function
+function func.cond(predicate, then_fn, else_fn)
+    else_fn = else_fn or func.id
+    return function(x)
+        return predicate(x) and then_fn(x) or else_fn(x)
+    end
+end
+
+---Thread-first macro (->)
+---@param x any Initial value
+---@vararg function Functions to thread through
+---@return any Final result
+function func.thread_first(x, ...)
+    local fns = { ... }
+    local result = x
+    for _, f in ipairs(fns) do
+        if type(f) == "function" then
+            result = f(result)
+        elseif type(f) == "table" and f[1] then
+            -- Handle [func, arg2, arg3, ...] format
+            local fn = f[1]
+            local args = { result }
+            for i = 2, #f do
+                table.insert(args, f[i])
+            end
+            result = fn(unpack(args))
+        end
+    end
+    return result
+end
+
+---Time a function execution
+---@param f function Function to time
+---@return function Wrapped function that logs execution time
+function func.time_fn(f)
+    return function(...)
+        local start = os.clock()
+        local result = f(...)
+        local elapsed = os.clock() - start
+        print(string.format("Function executed in %.4f seconds", elapsed))
+        return result
+    end
+end
+
+---Count function calls
+---@param f function Function to wrap
+---@return function, function Wrapped function and counter function
+function func.count_calls(f)
+    local count = 0
+    local wrapped = function(...)
+        count = count + 1
+        return f(...)
+    end
+    local get_count = function() return count end
+    return wrapped, get_count
+end
 
 -- ======================
 -- ADVANCED UTILITIES - Lenses and Transducers
