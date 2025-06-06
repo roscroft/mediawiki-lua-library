@@ -4,3 +4,6 @@ globals = {
     "mw",
     "libraryUtil"
 }
+exclude_files = {
+    "build/**/*.lua"
+}
