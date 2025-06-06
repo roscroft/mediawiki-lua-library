@@ -1500,12 +1500,21 @@ func.not_empty = func.complement(func.is_empty)
 func.is_nil = function(x) return x == nil end
 func.not_nil = func.complement(func.is_nil)
 func.is_array = function(x) return type(x) == "table" and #x > 0 end
+func.pconcat = func.c2(func.concat)
+
+function func.binop_on_pair(op)
+    return function(p)
+        return op(pair.first(p), pair.second(p))
+    end
+end
+
+-- Fold operations for pairs of values
+func.fold_div = func.binop_on_pair(func.ops.div)
+func.fold_or = func.binop_on_pair(function(a, b) return a or b end)
+func.fold_append = func.binop_on_pair(func.ops.ap)
 
 -- Curried sequence operations
 func.pzip = func.c2(func.zip)
-
--- Curried version
-func.pconcat = func.c2(func.concat)
 
 -- ======================
 -- MODULE EXPORT
