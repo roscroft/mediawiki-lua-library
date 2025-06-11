@@ -41,19 +41,11 @@ Relates to #(issue_number)
 - [ ] CI pipeline passes locally (`make ci-test`)
 - [ ] Performance testing (if applicable)
 
-<<<<<<< HEAD
 ### Test Evidence
 <!-- Include command output or screenshots -->
 ```bash
 # Paste test command output here
 ```
-=======
-### Test Environment
-
-- **Lua Version**: 5.1
-- **MediaWiki Version**: (if applicable)
-- **Testing Method**: [ ] Local / [ ] Docker / [ ] MediaWiki instance
->>>>>>> e48a467 (🧹 Complete project cleanup after wiki migration)
 
 ## 🔒 Security & Quality
 
