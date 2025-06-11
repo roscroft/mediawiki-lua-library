@@ -7,9 +7,9 @@
 set -e
 
 # Configuration
-DOCS_GENERATOR_DIR="../tools/docs-generator"  # Relative to scripts directory
-SOURCE_DIR="../src/modules"                   # Relative to scripts directory  
-OUTPUT_DIR="../src/module-docs"               # Relative to scripts directory
+DOCS_GENERATOR_DIR="tools/docs-generator"     # Relative to project root
+SOURCE_DIR="src/modules"                      # Relative to project root  
+OUTPUT_DIR="src/module-docs"                  # Relative to project root
 DEFAULT_STYLE="refactored"
 DEFAULT_FORMAT="html"
 
@@ -161,12 +161,19 @@ main() {
     
     # Execute documentation generator
     echo -e "${GREEN}🚀 Generating documentation...${NC}"
+    
+    # Change to project root (parent of scripts directory)
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+    cd "$PROJECT_ROOT"
+    
+    # Now change to docs generator directory
     cd "$DOCS_GENERATOR_DIR"
     
     if lua bin/generate-docs.lua $ARGS; then
         echo ""
         echo -e "${GREEN}✅ Documentation generation completed successfully!${NC}"
-        echo -e "${BLUE}📁 Output written to: ../$OUTPUT${NC}"
+        echo -e "${BLUE}📁 Output written to: $OUTPUT${NC}"
     else
         echo ""
         echo -e "${RED}❌ Documentation generation failed!${NC}"
