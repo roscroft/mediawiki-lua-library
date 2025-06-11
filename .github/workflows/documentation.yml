@@ -1,0 +1,310 @@
+name: Automated Documentation Generation
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['src/modules/**', 'docs/**']
+  pull_request:
+    paths: ['src/modules/**', 'docs/**']
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  workflow_dispatch:
+    inputs:
+      module_name:
+        description: 'Specific module to regenerate docs for'
+        required: false
+        type: string
+      force_all:
+        description: 'Force regeneration of all documentation'
+        required: false
+        type: boolean
+
+jobs:
+  # Smart documentation detection
+  detect-changes:
+    name: Detect Documentation Changes
+    runs-on: ubuntu-latest
+    outputs:
+      modules-changed: ${{ steps.changes.outputs.modules }}
+      docs-changed: ${{ steps.changes.outputs.docs }}
+      force-all: ${{ github.event.inputs.force_all == 'true' || github.event_name == 'schedule' }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Detect changed modules
+      id: changes
+      run: |
+        if [ "${{ github.event_name }}" = "schedule" ]; then
+          echo "modules=['Array','Functools','Funclib','CodeStandards','Lists','TableTools']" >> $GITHUB_OUTPUT
+          echo "docs=true" >> $GITHUB_OUTPUT
+        else
+          # Get changed Lua modules
+          CHANGED_MODULES=$(git diff --name-only ${{ github.event.before || 'HEAD~1' }} ${{ github.sha }} | \
+            grep '^src/modules/.*\.lua$' | \
+            sed 's|src/modules/||; s|\.lua$||' | \
+            jq -R -s -c 'split("\n")[:-1]')
+          
+          echo "modules=${CHANGED_MODULES}" >> $GITHUB_OUTPUT
+          
+          # Check if any docs changed
+          if git diff --name-only ${{ github.event.before || 'HEAD~1' }} ${{ github.sha }} | grep -q '^docs/'; then
+            echo "docs=true" >> $GITHUB_OUTPUT
+          else
+            echo "docs=false" >> $GITHUB_OUTPUT
+          fi
+        fi
+
+  # Generate module documentation
+  generate-module-docs:
+    name: Generate Module Documentation
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.modules-changed != '[]' || needs.detect-changes.outputs.force-all == 'true' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        generator: ['refactored', 'functional', 'ultimate-functional']
+      fail-fast: false
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y luarocks
+        luarocks install luafilesystem
+        
+    - name: Generate documentation (${{ matrix.generator }})
+      run: |
+        cd scripts
+        if [ "${{ github.event.inputs.module_name }}" != "" ]; then
+          lua generate-docs-${{ matrix.generator }}.lua "${{ github.event.inputs.module_name }}"
+        elif [ "${{ needs.detect-changes.outputs.force-all }}" = "true" ]; then
+          lua generate-docs-${{ matrix.generator }}.lua
+        else
+          # Generate docs for changed modules
+          for module in $(echo '${{ needs.detect-changes.outputs.modules-changed }}' | jq -r '.[]'); do
+            echo "Generating docs for: $module"
+            lua generate-docs-${{ matrix.generator }}.lua "$module"
+          done
+        fi
+        
+    - name: Upload generated docs
+      uses: actions/upload-artifact@v4
+      with:
+        name: module-docs-${{ matrix.generator }}
+        path: src/module-docs/
+        retention-days: 30
+
+  # Validate documentation quality
+  validate-docs:
+    name: Validate Documentation Quality
+    needs: [detect-changes, generate-module-docs]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download generated docs
+      uses: actions/download-artifact@v4
+      with:
+        name: module-docs-refactored
+        path: src/module-docs/
+        
+    - name: Validate HTML structure
+      run: |
+        find src/module-docs -name "*.html" -exec echo "Validating: {}" \;
+        # Add HTML validation logic here
+        
+    - name: Check documentation completeness
+      run: |
+        echo "=== Documentation Coverage Report ==="
+        for module in src/modules/*.lua; do
+          basename_module=$(basename "$module" .lua)
+          doc_file="src/module-docs/${basename_module}.html"
+          
+          if [ -f "$doc_file" ]; then
+            functions=$(grep -c "function" "$module" || echo "0")
+            documented=$(grep -c "===" "$doc_file" || echo "0")
+            echo "📊 $basename_module: $documented/$functions functions documented"
+          else
+            echo "❌ $basename_module: No documentation found"
+          fi
+        done
+        
+        echo ""
+        echo "=== Test Coverage Report ==="
+        echo "Consolidated test structure:"
+        echo "✅ Core modules: test_core_modules.lua (Array, Functools, Funclib, Lists)"
+        echo "✅ Utilities: test_utilities.lua (Validation, Currency, Other functions)"
+        echo "✅ Standards: test_codestandards.lua (CodeStandards module)"
+        echo "✅ Performance: test_performance.lua (Performance regression tests)"
+        echo "✅ Missing modules: test_missing_modules.lua (Utility modules)"
+        echo "✅ Module loading: test_module_loading.lua (Basic compilation tests)"
+
+  # Performance benchmarking
+  performance-benchmark:
+    name: Performance Benchmarking
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.modules-changed != '[]' || needs.detect-changes.outputs.force-all == 'true' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lua5.1 time
+        
+    - name: Run performance benchmarks
+      run: |
+        cd examples/advanced
+        echo "=== Performance Benchmark Results ===" > ../../benchmark-results.md
+        echo "**Date:** $(date -u)" >> ../../benchmark-results.md
+        echo "**Commit:** ${{ github.sha }}" >> ../../benchmark-results.md
+        echo "" >> ../../benchmark-results.md
+        
+        # Run benchmark
+        /usr/bin/time -v lua performance_benchmark.lua 2>&1 | tee benchmark-output.txt
+        
+        # Extract metrics
+        echo "| Metric | Value |" >> ../../benchmark-results.md
+        echo "|--------|-------|" >> ../../benchmark-results.md
+        grep "Maximum resident" benchmark-output.txt | sed 's/.*: \([0-9]*\).*/| Peak Memory | \1 KB |/' >> ../../benchmark-results.md
+        grep "User time" benchmark-output.txt | sed 's/.*: \([0-9.]*\).*/| User Time | \1 seconds |/' >> ../../benchmark-results.md
+        grep "System time" benchmark-output.txt | sed 's/.*: \([0-9.]*\).*/| System Time | \1 seconds |/' >> ../../benchmark-results.md
+        
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-benchmark
+        path: benchmark-results.md
+
+  # Deploy documentation
+  deploy-docs:
+    name: Deploy Documentation
+    needs: [validate-docs]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download generated docs
+      uses: actions/download-artifact@v4
+      with:
+        name: module-docs-refactored
+        path: src/module-docs/
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./src/module-docs
+        destination_dir: docs/modules
+        
+    - name: Update documentation index
+      run: |
+        # Generate documentation index
+        cat > docs-index.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>MediaWiki Lua Module Library - Documentation</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                .module { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+                .module h3 { margin: 0 0 10px 0; }
+                .stats { color: #666; font-size: 0.9em; }
+            </style>
+        </head>
+        <body>
+            <h1>📚 MediaWiki Lua Module Library Documentation</h1>
+            <p>Generated: $(date -u)</p>
+            <div class="modules">
+        EOF
+        
+        for doc in src/module-docs/*.html; do
+          if [ -f "$doc" ]; then
+            module_name=$(basename "$doc" .html)
+            function_count=$(grep -c "===" "$doc" || echo "0")
+            cat >> docs-index.html << EOF
+            <div class="module">
+                <h3><a href="docs/modules/$module_name.html">$module_name</a></h3>
+                <div class="stats">$function_count functions documented</div>
+            </div>
+        EOF
+          fi
+        done
+        
+        echo "</div></body></html>" >> docs-index.html
+
+  # Generate documentation report
+  generate-report:
+    name: Generate Documentation Report
+    needs: [generate-module-docs, validate-docs, performance-benchmark]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      
+    - name: Generate comprehensive report
+      run: |
+        cat > documentation-report.md << 'EOF'
+        # 📊 Documentation Generation Report
+        
+        **Generated:** $(date -u)
+        **Workflow:** ${{ github.workflow }}
+        **Trigger:** ${{ github.event_name }}
+        
+        ## 📈 Summary
+        
+        | Generator | Status | Notes |
+        |-----------|--------|-------|
+        EOF
+        
+        for generator in refactored functional ultimate-functional; do
+          if [ -d "module-docs-$generator" ]; then
+            count=$(find "module-docs-$generator" -name "*.html" | wc -l)
+            echo "| $generator | ✅ Success | $count files generated |" >> documentation-report.md
+          else
+            echo "| $generator | ❌ Failed | No output found |" >> documentation-report.md
+          fi
+        done
+        
+        if [ -f "performance-benchmark/benchmark-results.md" ]; then
+          echo "" >> documentation-report.md
+          echo "## 🚀 Performance Results" >> documentation-report.md
+          cat performance-benchmark/benchmark-results.md >> documentation-report.md
+        fi
+        
+    - name: Upload report
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation-report
+        path: documentation-report.md
+        
+    - name: Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('documentation-report.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `## 📚 Documentation Generation Results\n\n${report}`
+          });

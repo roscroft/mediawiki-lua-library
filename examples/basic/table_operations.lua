@@ -4,10 +4,8 @@
 -- Setup module path (run from project root: lua examples/basic/table_operations.lua)
 package.path = package.path .. ';src/modules/?.lua'
 
--- Setup MediaWiki environment
-local env = dofile('tests/env/wiki-lua-env.lua')
-_G.mw = env.mw
-_G.libraryUtil = env.libraryUtil
+-- Auto-initialize MediaWiki environment (eliminates conditional imports)
+require('MediaWikiAutoInit')
 
 -- Load the libraries
 local TableTools = require('TableTools')

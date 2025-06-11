@@ -49,9 +49,9 @@ Performance Verification:
 
 -- Setup environment
 package.path = package.path .. ';src/modules/?.lua'
-local env = dofile('tests/env/wiki-lua-env.lua')
-_G.mw = env.mw
-_G.libraryUtil = env.libraryUtil
+
+-- Auto-initialize MediaWiki environment (eliminates conditional imports)
+require('MediaWikiAutoInit')
 
 print("=== MediaWiki Lua Project - CodeStandards Integration Verification ===\n")
 

@@ -1,0 +1,37 @@
+{{Documentation}}
+{{Helper module
+|name = Helper_module
+
+|fname1 = <nowiki>p._main(&nbsp;modn, func_list, example, showModuleName&nbsp;)</nowiki>
+|ftype1 = <samp>list: string</samp><br><samp>-> string</samp>
+|fuse1 = Format function names with code formatting
+
+|fname2 = <nowiki>p.escapePipes(&nbsp;text&nbsp;)</nowiki>
+|ftype2 = <samp>text: string</samp><br><samp>-> string</samp>
+|fuse2 = Pipe escaping with MediaWiki-specific handling
+
+|fname3 = <nowiki>p.formatCodeBlock(&nbsp;code, language, options&nbsp;)</nowiki>
+|ftype3 = <samp>code: string</samp><br><samp>language: string?</samp><br><samp>options: table?</samp><br><samp>-> string</samp>
+|fuse3 = Format MediaWiki code blocks with proper escaping
+
+|fname4 = <nowiki>p.formatDescription(&nbsp;description, options&nbsp;)</nowiki>
+|ftype4 = <samp>description: string{{({{)}}{{)}}{{({{)}}{{)}}!{{)}}{{)}}table</samp><br><samp>options: table?</samp><br><samp>-> string</samp>
+|fuse4 = Format description text with MediaWiki markup conversion
+
+|fname5 = <nowiki>p.formatFunctionEntry(&nbsp;funcData, index, moduleName&nbsp;)</nowiki>
+|ftype5 = <samp>funcData: table</samp><br><samp>index: number</samp><br><samp>moduleName: string?</samp><br><samp>-> table</samp>
+|fuse5 = Format a complete function entry for Helper module template
+
+|fname6 = <nowiki>p.formatFunctionSignature(&nbsp;funcData, options&nbsp;)</nowiki>
+|ftype6 = <samp>funcData: table</samp><br><samp>options: table?</samp><br><samp>-> string</samp>
+|fuse6 = Format function signature with consistent styling
+
+|fname7 = <nowiki>p.formatParameterList(&nbsp;params, options&nbsp;)</nowiki>
+|ftype7 = <samp>params: table</samp><br><samp>options: table?</samp><br><samp>-> string</samp>
+|fuse7 = Format a list of parameters with consistent MediaWiki styling
+
+|example =
+<syntaxhighlight lang='lua'>
+    -- Example usage of Helper_module will be added manually
+</syntaxhighlight>
+}}

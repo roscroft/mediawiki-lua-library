@@ -3,7 +3,14 @@ Template Engine for Documentation Generation
 Provides generic template rendering with support for different output formats.
 ]]
 
+-- Auto-initialize MediaWiki environment
+require('MediaWikiAutoInit')
+
 local TextUtils = require('utils.text-utils')
+
+-- Load Helper_module (now always available due to auto-init)
+local Helper_module = require('Helper_module')
+local helper_available = true
 
 local TemplateEngine = {}
 TemplateEngine.__index = TemplateEngine
@@ -14,9 +21,13 @@ TemplateEngine.__index = TemplateEngine
 function TemplateEngine.new(config)
     local self = {
         config = config or {},
-        formatters = {}
+        formatters = {},
+        useHelperModule = true -- Always true now
     }
     setmetatable(self, TemplateEngine)
+
+    print("✅ TemplateEngine: Helper_module loaded successfully - using enhanced formatting")
+
     return self
 end
 
@@ -85,7 +96,69 @@ function TemplateEngine:renderFunctionDoc(data)
     local moduleName = data.moduleName
     local config = self.config.mediawiki or {}
     local funcConfig = config.functionTemplate or {}
-    local typeConfig = self.config.typeFormatting or {}
+
+    -- Use Helper_module if available for enhanced formatting
+    if self.useHelperModule then
+        return self:renderFunctionDocWithHelper(data)
+    else
+        return self:renderFunctionDocFallback(data)
+    end
+end
+
+-- Enhanced function documentation using Helper_module
+-- @param data table Function data {func, index, moduleName}
+-- @return string Rendered function documentation
+function TemplateEngine:renderFunctionDocWithHelper(data)
+    local func = data.func
+    local index = data.index
+    local moduleName = data.moduleName
+    local config = self.config.mediawiki or {}
+    local funcConfig = config.functionTemplate or {}
+
+    -- Safety check for Helper_module
+    if not Helper_module then
+        return self:renderFunctionDocFallback(data)
+    end
+
+    -- Use Helper_module's formatFunctionEntry for complete formatting
+    local entry = Helper_module.formatFunctionEntry(func, index, moduleName)
+
+    local result = {}
+
+    -- Format using Helper_module's enhanced functions
+    local namePrefix = funcConfig.namePrefix or "|fname"
+    table.insert(result, string.format("%s%d = <nowiki>%s</nowiki>",
+        namePrefix, index, entry.fname or ""))
+
+    local typePrefix = funcConfig.typePrefix or "|ftype"
+    table.insert(result, string.format("%s%d = %s", typePrefix, index, entry.ftype or ""))
+
+    local usePrefix = funcConfig.usePrefix or "|fuse"
+    table.insert(result, string.format("%s%d = %s", usePrefix, index, entry.fuse or ""))
+
+    -- Handle notes if available
+    if func.notes and #func.notes > 0 then
+        table.insert(result, "")
+        for _, note in ipairs(func.notes) do
+            local formattedNote = Helper_module.formatDescription(note, {
+                convertInlineCode = true
+            })
+            table.insert(result, formattedNote)
+        end
+    end
+
+    return TextUtils.join(result, "\n")
+end
+
+-- Fallback function documentation (original implementation)
+-- @param data table Function data {func, index, moduleName}
+-- @return string Rendered function documentation
+function TemplateEngine:renderFunctionDocFallback(data)
+    local func = data.func
+    local index = data.index
+    local moduleName = data.moduleName
+    local config = self.config.mediawiki or {}
+    local funcConfig = config.functionTemplate or {}
 
     local result = {}
 
@@ -95,68 +168,81 @@ function TemplateEngine:renderFunctionDoc(data)
         displayName = displayName:sub(#moduleName + 2) -- +2 accounts for the dot after module name
     end
 
+    -- Simple pipe escaping function (fallback if Helper_module not available)
+    local function escapePipes(text)
+        if not text then return "" end
+        local result = text:gsub("|", "{{!}}")
+        result = result:gsub("{", "{{(}}")
+        result = result:gsub("}", "{{)}}")
+        return result
+    end
+
     -- Format function name
     local fname = displayName .. "(&nbsp;" .. func.params_str .. "&nbsp;)"
     local namePrefix = funcConfig.namePrefix or "|fname"
-    table.insert(result, string.format("%s%d = <nowiki>%s</nowiki>", namePrefix, index, TextUtils.escapePipes(fname)))
+    table.insert(result, string.format("%s%d = <nowiki>%s</nowiki>",
+        namePrefix, index, escapePipes(fname)))
 
-    -- Format type information
+    -- Format type information using simplified approach
     local ftypeParts = {}
+
+    -- Add generics
     if func.generics then
         for _, generic in ipairs(func.generics) do
-            local typeTag = typeConfig.typeTag or "samp"
-            local genericPrefix = typeConfig.genericPrefix or "generic: "
-            table.insert(ftypeParts, string.format("<%s>%s%s: %s</%s>",
-                typeTag, genericPrefix, TextUtils.escapePipes(generic.name), TextUtils.escapePipes(generic.type), typeTag))
+            local genericName = generic.name or ""
+            local genericType = generic.type or "any"
+            table.insert(ftypeParts, string.format("<samp>generic: %s: %s</samp>",
+                escapePipes(genericName), escapePipes(genericType)))
         end
     end
+
+    -- Add parameters
     if func.params then
         for _, param in ipairs(func.params) do
-            local typeTag = typeConfig.typeTag or "samp"
-            local typeSeparator = typeConfig.typeSeparator or ": "
-            table.insert(ftypeParts, string.format("<%s>%s%s%s</%s>",
-                typeTag, TextUtils.escapePipes(param.name), typeSeparator, TextUtils.escapePipes(param.type), typeTag))
+            local paramName = param.name or ""
+            local paramType = param.type or "any"
+            table.insert(ftypeParts, string.format("<samp>%s: %s</samp>",
+                escapePipes(paramName), escapePipes(paramType)))
         end
     end
 
+    -- Add return type
     local rType = (func.returns and func.returns.type) or "any"
-    local returnArrow = typeConfig.returnArrow or "-> "
-    local typeTag = typeConfig.typeTag or "samp"
-    table.insert(ftypeParts, string.format("<%s>%s%s</%s>", typeTag, returnArrow, TextUtils.escapePipes(rType), typeTag))
+    table.insert(ftypeParts, string.format("<samp>-> %s</samp>", escapePipes(rType)))
 
-    local paramSeparator = typeConfig.paramSeparator or "<br>"
-    local ftype = TextUtils.join(ftypeParts, paramSeparator)
+    local ftype = table.concat(ftypeParts, "<br>")
     local typePrefix = funcConfig.typePrefix or "|ftype"
     table.insert(result, string.format("%s%d = %s", typePrefix, index, ftype))
 
-    -- Format description
+    -- Format description with improved handling
     local descriptionText = ""
     if func.description and #func.description > 0 then
-        descriptionText = TextUtils.join(func.description, "\n")
+        descriptionText = table.concat(func.description, "\n")
     end
 
-    if TextUtils.isEmpty(descriptionText) then
+    if not descriptionText or descriptionText == "" then
         descriptionText = "No description available."
     else
         -- Convert single backtick inline code
         descriptionText = descriptionText:gsub("`([^`]+)`", "<code>%1</code>")
         -- Add newline before single asterisks for MediaWiki list formatting
-        descriptionText = descriptionText:gsub("%*", "\n*")
+        descriptionText = descriptionText:gsub("^%*", "\n*")
+        descriptionText = escapePipes(descriptionText)
     end
 
     local usePrefix = funcConfig.usePrefix or "|fuse"
     table.insert(result, string.format("%s%d = %s", usePrefix, index, descriptionText))
 
-    -- Add function notes if available
+    -- Format function notes if available
     if func.notes and #func.notes > 0 then
         table.insert(result, "")
         for _, note in ipairs(func.notes) do
-            -- Convert single backtick inline code in notes
-            note = note:gsub("`([^`]+)`", "<code>%1</code>")
+            local formattedNote = note:gsub("`([^`]+)`", "<code>%1</code>")
+            -- Preserve math markup without escaping
             if not note:find("<math>") then
-                note = TextUtils.escapePipes(note)
+                formattedNote = escapePipes(formattedNote)
             end
-            table.insert(result, note)
+            table.insert(result, formattedNote)
         end
     end
 

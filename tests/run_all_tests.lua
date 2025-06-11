@@ -7,15 +7,12 @@ Runs all unit tests, integration tests, and performance benchmarks
 -- Test configuration
 local TEST_CONFIG = {
     unit_tests = {
-        "tests/unit/test_array.lua",
-        "tests/unit/test_lists.lua",
-        "tests/unit/test_lists_enhanced.lua",
-        "tests/unit/test_functools.lua",
-        "tests/unit/test_funclib.lua",
-        "tests/unit/test_currency.lua",
-        "tests/unit/test_validation.lua",
-        "tests/unit/test_module_loading.lua",
-        "tests/unit/test_performance.lua"
+        "tests/unit/test_core_modules.lua",
+        "tests/unit/test_utilities.lua",
+        "tests/unit/test_codestandards.lua",
+        "tests/unit/test_performance.lua",
+        "tests/unit/test_missing_modules.lua",
+        "tests/unit/test_module_loading.lua"
     },
     integration_tests = {
         "tests/integration/test_basic_integration.lua",

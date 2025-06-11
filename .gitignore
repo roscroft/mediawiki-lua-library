@@ -145,3 +145,43 @@ luacov.stats.out
 *.orig
 *.rej
 .directory
+
+### Project Cleanup Prevention ###
+# Wiki migration artifacts (prevent re-accumulation)
+scripts/wiki-content/
+scripts/wiki-ready/
+scripts/archive-*/
+*-wiki-deploy.sh
+*-migration.sh
+migrate-to-wiki.sh
+generate-wiki-docs.lua
+
+# One-time setup/analysis files
+*-SETUP-GUIDE.md
+*-SOLUTION.md
+*-ENABLEMENT-GUIDE.md
+*-PLAN.md
+*-ANALYSIS.md
+CONVERSION_EXAMPLE.md
+DEPENDENCY_SIMPLIFICATION_*
+
+# Temporary documentation (use wiki instead)
+docs/README.md
+docs/usage.md
+docs/testing.md
+docs/development-history.md
+docs/github-actions-guide.md
+docs/PROJECT_STATUS.md
+docs/SECURITY.md
+docs/code-refactoring-analysis.md
+docs/PERFORMANCE_DASHBOARD_STATUS.md
+docs/*_REPORT.md
+docs/*_COMPLETE.md
+
+# Obsolete script versions
+scripts/*-refactored.*
+scripts/*-old.*
+scripts/final-*
+scripts/migration-*
+scripts/test-functional-*
+scripts/demo-*-system.*

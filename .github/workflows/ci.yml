@@ -100,8 +100,16 @@ jobs:
         
     - name: Run unit tests
       run: |
-        echo "=== Running Unit Tests ==="
+        echo "=== Running Consolidated Unit Tests ==="
         cd tests && lua run_all_tests.lua
+        echo ""
+        echo "Test structure:"
+        echo "✅ Core modules: test_core_modules.lua (Array, Functools, Funclib, Lists)"
+        echo "✅ Utilities: test_utilities.lua (Validation, Currency, Other functions)"
+        echo "✅ Standards: test_codestandards.lua (CodeStandards module)"
+        echo "✅ Performance: test_performance.lua (Performance regression tests)"
+        echo "✅ Missing modules: test_missing_modules.lua (Utility modules)"
+        echo "✅ Module loading: test_module_loading.lua (Basic compilation tests)"
 
   # Stage 3: Mocked Environment Testing
   mocked-environment-tests:

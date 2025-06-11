@@ -1,5 +1,8 @@
 # MediaWiki Lua Module Library
 
+📚 **[Complete Documentation on Wiki →](https://github.com/roscroft/mediawiki-lua-library/wiki)**
+
+
 A comprehensive functional programming library ecosystem for MediaWiki environments, providing advanced utilities for array manipulation, functional programming patterns, and UI component building with standardized error handling and performance monitoring.
 
 ## 🚀 Quick Start
@@ -92,14 +95,17 @@ bash tests/scripts/test-pipeline.sh
 
 ## 📚 Documentation
 
-Complete documentation is available in the [`docs/`](docs/) directory:
+📚 **[Complete Documentation on Wiki →](https://github.com/roscroft/mediawiki-lua-library/wiki)**
 
-- **[Usage Guide](docs/usage.md)** - Testing and usage instructions
-- **[Development History](docs/development-history.md)** - Complete project timeline
-- **[GitHub Actions Guide](docs/github-actions-guide.md)** - CI/CD pipeline setup and usage
-- **[Security Setup](docs/SECURITY.md)** - Security configuration and best practices
-- **[Testing Documentation](docs/testing.md)** - Testing infrastructure details
-- **[Project Status](docs/PROJECT_STATUS.md)** - Current module status and features
+All comprehensive documentation has been moved to the GitHub Wiki for better organization and navigation:
+
+- **[Getting Started](https://github.com/roscroft/mediawiki-lua-library/wiki/Getting-Started)** - Installation, setup, and usage instructions
+- **[Development Guide](https://github.com/roscroft/mediawiki-lua-library/wiki/Development-Guide)** - Complete project timeline and patterns
+- **[GitHub Actions](https://github.com/roscroft/mediawiki-lua-library/wiki/GitHub-Actions)** - CI/CD pipeline setup and usage  
+- **[Security](https://github.com/roscroft/mediawiki-lua-library/wiki/Security)** - Security configuration and best practices
+- **[Testing](https://github.com/roscroft/mediawiki-lua-library/wiki/Testing)** - Testing infrastructure and procedures
+- **[Project Status](https://github.com/roscroft/mediawiki-lua-library/wiki/Project-Status)** - Current module status and features
+- **[API Documentation](https://github.com/roscroft/mediawiki-lua-library/wiki/API-Documentation)** - Complete module API reference
 
 ## 🛠️ Development Workflow
 
@@ -141,14 +147,37 @@ The project includes comprehensive GitHub Actions workflows:
 - **🤖 Dependency Updates**: Automated dependency update PRs via Dependabot
 
 **Pipeline Stages**:
+
 1. **Syntax Validation**: Lua syntax checking and linting
 2. **Basic Execution**: Module compilation and unit tests
 3. **Mocked Environment**: Docker-based MediaWiki environment testing
 4. **Scribunto Integration**: Full MediaWiki + Scribunto integration testing
 
-See [docs/github-actions-guide.md](docs/github-actions-guide.md) for complete setup and usage instructions.
+See the **[GitHub Wiki](https://github.com/roscroft/mediawiki-lua-library/wiki/GitHub-Actions)** for complete CI/CD setup and usage instructions.
 
 ## 🏗️ Project Architecture
+
+### Clean Repository Structure
+
+This repository has been optimized for maintainability and clarity:
+
+```text
+📁 Essential Structure:
+├── src/modules/           # Source code (authoritative files)
+├── build/modules/         # Build artifacts (symlinks for MediaWiki)
+├── scripts/               # Core development scripts (unified)
+├── tests/                 # Comprehensive test suite
+├── examples/              # Usage examples and demos
+├── .github/workflows/     # CI/CD automation
+└── 📚 Wiki               # All documentation (linked below)
+```
+
+**Key Principles:**
+
+- **Source of Truth**: `src/modules/` contains authoritative code
+- **Unified Scripts**: Consolidated tools replace multiple variants  
+- **Wiki Documentation**: Comprehensive docs moved to GitHub Wiki
+- **Clean History**: Temporary files and completed migrations removed
 
 ### Module Structure
 
@@ -196,7 +225,7 @@ src/modules/
 - 🔌 **Extension Ecosystem**: Additional MediaWiki-specific modules
 - 🌐 **Community Integration**: MediaWiki.org deployment preparation
 
-For detailed development history and technical documentation, see the [`docs/`](docs/) directory.
+For detailed development history and technical documentation, see the **[GitHub Wiki](https://github.com/roscroft/mediawiki-lua-library/wiki)**.
 
 ---
 
