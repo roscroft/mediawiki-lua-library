@@ -36,6 +36,7 @@
         "ftype",
         "Functools",
         "Funclib",
-        "samp"
+        "samp",
+        "combinators"
     ]
 }
