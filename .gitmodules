@@ -1,3 +1,0 @@
-[submodule "tools/docs-generator"]
-	path = tools/docs-generator
-	url = https://github.com/roscroft/mediawiki-lua-docs-generator.git
