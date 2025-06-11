@@ -141,7 +141,7 @@ test("Table utilities", function()
     assert(copy.b.c == 3, "Copy should be modified")
 
     assert(isEmpty({}) == true, "Empty table should be empty")
-    assert(isEmpty({a = 1}) == false, "Non-empty table should not be empty")
+    assert(isEmpty({ a = 1 }) == false, "Non-empty table should not be empty")
 end)
 
 test("Error handling utilities", function()
