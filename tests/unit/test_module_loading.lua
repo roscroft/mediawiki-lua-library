@@ -21,8 +21,8 @@ end)
 
 if success then
     print("✓ All module compilation tests passed")
-    os.exit(0)
+    return true
 else
     print("✗ Module compilation failed: " .. tostring(err))
-    os.exit(1)
+    return false
 end

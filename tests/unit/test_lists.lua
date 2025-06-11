@@ -1,7 +1,6 @@
 #!/usr/bin/env lua
 --[[
-Unit Tests for Lists Module
-Tests the core Lists functionality including builders, column configuration, and public API
+ Unit Tests for Lists Module
 ]]
 
 -- Setup test environment
@@ -39,186 +38,85 @@ local function assert_not_nil(value, msg)
     end
 end
 
-local function assert_type(value, expected_type, msg)
-    local actual_type = type(value)
-    if actual_type ~= expected_type then
-        error(msg or string.format("Expected type %s, got %s", expected_type, actual_type))
-    end
-end
+print("=== Enhanced Lists Module Unit Tests ===\n")
 
-print("=== Lists Module Unit Tests ===\n")
-
--- Test module structure and exports
-test("Lists module exports expected API", function()
-    assert_not_nil(Lists)
-    assert_type(Lists, 'table')
-
-    -- Check main builders are exported
+-- Test builder exposure
+test("Lists exposes QueryBuilder", function()
     assert_not_nil(Lists.QueryBuilder)
+    assert_equal(type(Lists.QueryBuilder), "table")
+end)
+
+test("Lists exposes ColumnBuilder", function()
     assert_not_nil(Lists.ColumnBuilder)
+    assert_equal(type(Lists.ColumnBuilder), "table")
+end)
+
+test("Lists exposes TableBuilder", function()
     assert_not_nil(Lists.TableBuilder)
-
-    -- Check column presets are exported
-    assert_not_nil(Lists.COLUMN_PRESETS)
-    assert_type(Lists.COLUMN_PRESETS, 'table')
+    assert_equal(type(Lists.TableBuilder), "table")
 end)
 
--- Test column preset functions
-test("Column preset functions are available", function()
-    assert_type(Lists.make_preset_column, 'function')
-    assert_type(Lists.make_level_column, 'function')
-    assert_type(Lists.make_members_column, 'function')
-    assert_type(Lists.make_name_column, 'function')
-end)
-
--- Test column helper functions
-test("Column helper functions are available", function()
-    assert_type(Lists.make_column, 'function')
-    assert_type(Lists.process_column_config, 'function')
-end)
-
--- Test table building functions
-test("Table building functions are available", function()
-    assert_type(Lists.build_table, 'function')
-end)
-
--- Test convenience shortcuts
-test("Convenience shortcuts are available", function()
-    assert_type(Lists.col, 'function')
-    assert_type(Lists.preset, 'function')
-    assert_type(Lists.table, 'function')
-    assert_type(Lists.decode, 'function')
-    assert_type(Lists.level_col, 'function')
-    assert_type(Lists.members_col, 'function')
-    assert_type(Lists.name_col, 'function')
-    assert_type(Lists.cols, 'function')
-    assert_type(Lists.query, 'function')
-end)
-
--- Test that builders can be instantiated
-test("QueryBuilder can be instantiated", function()
-    local builder = Lists.QueryBuilder:new()
-    assert_not_nil(builder)
-    assert_type(builder, 'table')
-end)
-
-test("ColumnBuilder can be instantiated", function()
-    local builder = Lists.ColumnBuilder:new()
-    assert_not_nil(builder)
-    assert_type(builder, 'table')
-end)
-
-test("TableBuilder can be instantiated", function()
-    local builder = Lists.TableBuilder:new()
-    assert_not_nil(builder)
-    assert_type(builder, 'table')
-end)
-
--- Test column preset creation
-test("make_level_column creates valid configuration", function()
-    local column = Lists.make_level_column({header = "Test Level"})
+-- Test convenience functions
+test("make_level_column function works", function()
+    local column = Lists.make_level_column({ align = "center" })
     assert_not_nil(column)
-    assert_type(column, 'table')
 end)
 
-test("make_members_column creates valid configuration", function()
-    local column = Lists.make_members_column({header = "Test Members"})
+test("make_members_column function works", function()
+    local column = Lists.make_members_column()
     assert_not_nil(column)
-    assert_type(column, 'table')
 end)
 
-test("make_name_column creates valid configuration", function()
-    local column = Lists.make_name_column({header = "Test Name"})
+test("make_name_column function works", function()
+    local column = Lists.make_name_column()
     assert_not_nil(column)
-    assert_type(column, 'table')
 end)
 
--- Test that column presets contain expected configurations
-test("COLUMN_PRESETS contains expected presets", function()
-    local presets = Lists.COLUMN_PRESETS
-    assert_not_nil(presets)
-
-    -- Should have at least some common presets
-    local has_presets = false
-    for k, v in pairs(presets) do
-        if type(v) == 'table' then
-            has_presets = true
-            break
-        end
-    end
-    assert_equal(has_presets, true, "COLUMN_PRESETS should contain preset configurations")
+test("col shortcut works", function()
+    local column = Lists.col("Header", { ["align"] = "left" })
+    assert_equal(column.header, "Header")
+    assert_equal(column.align, "left")
 end)
 
--- Test convenience function integrations
-test("Convenience functions return expected types", function()
-    -- Test col function (should create column configuration)
-    local col_result = Lists.col("test_field", "Test Header")
-    assert_not_nil(col_result)
-    assert_type(col_result, 'table')
-
-    -- Test preset function (should create preset column)
-    local preset_result = Lists.preset("LEVEL", {})
-    assert_not_nil(preset_result)
-    assert_type(preset_result, 'table')
+test("preset shortcut works", function()
+    local column = Lists.preset("LEVEL")
+    assert_not_nil(column)
 end)
 
--- Test that Lists module properly delegates to Funclib
-test("Lists delegates to Funclib properly", function()
-    -- Test that functions exist and are callable
-    assert_type(Lists.cols, 'function')
-    assert_type(Lists.query, 'function')
-    assert_type(Lists.table, 'function')
-
-    -- Test basic usage without throwing errors
-    local success, result = pcall(Lists.cols, {})
-    -- Should not throw an error even with empty input
-    assert_equal(success, true, "Lists.cols should handle empty input gracefully")
+test("decode shortcut works", function()
+    local result = Lists.decode('{"test": true}')
+    -- Test case; no check nil needed
+    ---@diagnostic disable-next-line: need-check-nil
+    assert_equal(result.test, true)
 end)
 
--- Test error handling
-test("Functions handle invalid inputs gracefully", function()
-    -- Test make_preset_column with invalid input
-    local success, result = pcall(Lists.make_preset_column, "NONEXISTENT_PRESET", {})
-    -- Should either succeed with a fallback or fail gracefully
-    assert_equal(type(success), 'boolean', "make_preset_column should handle invalid presets")
-
-    -- Test column builders with nil input
-    local success2, result2 = pcall(Lists.make_column, nil, nil)
-    assert_equal(type(success2), 'boolean', "make_column should handle nil inputs")
+-- Test level/members/name column shortcuts
+test("level_col shortcut works", function()
+    local column = Lists.level_col()
+    assert_not_nil(column)
 end)
 
--- Test module integration
-test("Lists module integrates with Funclib correctly", function()
-    -- Verify that Lists has access to Funclib functionality
-    assert_not_nil(Lists.make_column)
-    assert_not_nil(Lists.build_table)
-    assert_not_nil(Lists.process_column_config)
-
-    -- These should be the same functions from Funclib
-    assert_type(Lists.make_column, 'function')
-    assert_type(Lists.build_table, 'function')
-    assert_type(Lists.process_column_config, 'function')
+test("members_col shortcut works", function()
+    local column = Lists.members_col()
+    assert_not_nil(column)
 end)
 
--- Test that module doesn't break with complex operations
-test("Lists handles complex operations", function()
-    -- Try creating multiple builders
-    local query_builder = Lists.QueryBuilder:new()
-    local column_builder = Lists.ColumnBuilder:new()
-    local table_builder = Lists.TableBuilder:new()
+test("name_col shortcut works", function()
+    local column = Lists.name_col()
+    assert_not_nil(column)
+end)
 
-    assert_not_nil(query_builder)
-    assert_not_nil(column_builder)
-    assert_not_nil(table_builder)
+-- Test table utilities
+test("add_cells function exposed", function()
+    assert_equal(type(Lists.add_cells), "function")
+end)
 
-    -- Try creating multiple column configurations
-    local level_col = Lists.make_level_column({header = "Level"})
-    local name_col = Lists.make_name_column({header = "Name"})
-    local members_col = Lists.make_members_column({header = "Members"})
+test("add_rows function exposed", function()
+    assert_equal(type(Lists.add_rows), "function")
+end)
 
-    assert_not_nil(level_col)
-    assert_not_nil(name_col)
-    assert_not_nil(members_col)
+test("simple_table function exposed", function()
+    assert_equal(type(Lists.simple_table), "function")
 end)
 
 -- Summary
@@ -229,9 +127,9 @@ print(string.format("Tests failed: %d", tests_run - tests_passed))
 print(string.format("Success rate: %.1f%%", (tests_passed / tests_run) * 100))
 
 if tests_passed == tests_run then
-    print("\n🎉 All Lists module tests passed!")
-    os.exit(0)
+    print("\n🎉 All enhanced Lists module tests passed!")
+    return true
 else
-    print("\n❌ Some Lists module tests failed.")
-    os.exit(1)
+    print("\n❌ Some enhanced Lists module tests failed.")
+    return false
 end

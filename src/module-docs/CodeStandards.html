@@ -1,0 +1,106 @@
+{{Documentation}}
+{{Helper module
+|name = CodeStandards
+
+|fname1 = <nowiki>standards.clearPerformanceMetrics(&nbsp;&nbsp;)</nowiki>
+|ftype1 = <samp>-> any</samp>
+|fuse1 = Clear all performance metrics
+
+|fname2 = <nowiki>standards.createError(&nbsp;level, message, source, details&nbsp;)</nowiki>
+|ftype2 = <samp>level: number</samp><br><samp>message: string</samp><br><samp>source?: string</samp><br><samp>details?: table</samp><br><samp>-> table error</samp>
+|fuse2 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+********************************************************************************** 
+********************************************************************************** 
+* Create a structured error object
+
+|fname3 = <nowiki>standards.debugInfo(&nbsp;value, options&nbsp;)</nowiki>
+|ftype3 = <samp>value: any</samp><br><samp>options?: table</samp><br><samp>-> string debugInfo</samp>
+|fuse3 = Create debug information about a value
+
+|fname4 = <nowiki>standards.formatError(&nbsp;err, includeDetails, colorize&nbsp;)</nowiki>
+|ftype4 = <samp>err: table</samp><br><samp>includeDetails?: boolean</samp><br><samp>colorize?: boolean</samp><br><samp>-> string formattedError</samp>
+|fuse4 = Format an error object as a string
+
+|fname5 = <nowiki>standards.generatePerformanceReport(&nbsp;&nbsp;)</nowiki>
+|ftype5 = <samp>-> table report</samp>
+|fuse5 = Generate a comprehensive performance report
+
+|fname6 = <nowiki>standards.getPerformanceAlerts(&nbsp;&nbsp;)</nowiki>
+|ftype6 = <samp>-> table alerts</samp>
+|fuse6 = Generate performance alerts
+
+|fname7 = <nowiki>standards.getPerformanceDashboard(&nbsp;&nbsp;)</nowiki>
+|ftype7 = <samp>-> table dashboard</samp>
+|fuse7 = Get real-time performance dashboard data
+
+|fname8 = <nowiki>standards.getPerformanceHistory(&nbsp;name&nbsp;)</nowiki>
+|ftype8 = <samp>name: string</samp><br><samp>-> table history</samp>
+|fuse8 = Get performance history for a specific function
+
+|fname9 = <nowiki>standards.getPerformanceMetrics(&nbsp;&nbsp;)</nowiki>
+|ftype9 = <samp>-> table metrics</samp>
+|fuse9 = Get performance metrics for all functions
+
+|fname10 = <nowiki>standards.getRecentActivity(&nbsp;&nbsp;)</nowiki>
+|ftype10 = <samp>-> table activity</samp>
+|fuse10 = Get recent performance activity
+
+|fname11 = <nowiki>standards.isEmpty(&nbsp;value&nbsp;)</nowiki>
+|ftype11 = <samp>value: any</samp><br><samp>-> boolean isEmpty</samp>
+|fuse11 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+* Check if a value is empty (nil, empty string, or empty table)
+
+|fname12 = <nowiki>standards.isValid(&nbsp;value, options&nbsp;)</nowiki>
+|ftype12 = <samp>value: any</samp><br><samp>options: table</samp><br><samp>-> string? errorMessage</samp>
+|fuse12 = Check if a value is valid
+
+|fname13 = <nowiki>standards.logError(&nbsp;err, level&nbsp;)</nowiki>
+|ftype13 = <samp>err: table{{!}}string</samp><br><samp>level?: number</samp><br><samp>-> nil</samp>
+|fuse13 = Log an error to MediaWiki's logging system
+
+|fname14 = <nowiki>standards.recordMetric(&nbsp;name, metric&nbsp;)</nowiki>
+|ftype14 = <samp>name: string</samp><br><samp>metric: table</samp><br><samp>-> any</samp>
+|fuse14 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+* Record a performance metric
+
+|fname15 = <nowiki>standards.tableKeys(&nbsp;t&nbsp;)</nowiki>
+|ftype15 = <samp>t: table</samp><br><samp>-> table keys</samp>
+|fuse15 = Get all keys from a table
+
+|fname16 = <nowiki>standards.throwError(&nbsp;err, level&nbsp;)</nowiki>
+|ftype16 = <samp>err: table{{!}}string</samp><br><samp>level?: number</samp><br><samp>-> any</samp>
+|fuse16 = Throw a formatted error that halts execution
+
+|fname17 = <nowiki>standards.trackPerformance(&nbsp;name, func&nbsp;)</nowiki>
+|ftype17 = <samp>name: string</samp><br><samp>func: function</samp><br><samp>-> function wrappedFunc</samp>
+|fuse17 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+* Performance tracking utility with detailed metrics collection
+
+|fname18 = <nowiki>standards.validateParameters(&nbsp;name, parameters, args&nbsp;)</nowiki>
+|ftype18 = <samp>name: string</samp><br><samp>parameters: table</samp><br><samp>args: table</samp><br><samp>-> string? errorMessage</samp>
+|fuse18 = Function parameter validation
+
+|fname19 = <nowiki>standards.wrapFunction(&nbsp;name, func, options&nbsp;)</nowiki>
+|ftype19 = <samp>name: string</samp><br><samp>func: function</samp><br><samp>options?: table</samp><br><samp>-> any</samp>
+|fuse19 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+* Wrap a function with error handling
+
+|fname20 = <nowiki>standards.wrapModule(&nbsp;module, options&nbsp;)</nowiki>
+|ftype20 = <samp>module: table</samp><br><samp>options?: table</samp><br><samp>-> table wrappedModule</samp>
+|fuse20 = Create an error-handling version of a module
+
+|example =
+<syntaxhighlight lang='lua'>
+    -- Example usage of CodeStandards will be added manually
+</syntaxhighlight>
+}}

@@ -1,5 +1,6 @@
 -- .luacheckrc
 std = "lua51"
+indent = 4
 globals = {
     "mw",
     "libraryUtil"

@@ -1,0 +1,87 @@
+{{Documentation}}
+{{Helper module
+|name = Funclib
+
+|fname1 = <nowiki>funclib.add_cells(&nbsp;row, cells, is_header&nbsp;)</nowiki>
+|ftype1 = <samp>row: table</samp><br><samp>cells: table{{!}}string[]</samp><br><samp>is_header: boolean</samp><br><samp>-> table</samp>
+|fuse1 = Simple helper to add cells to a table row (alternative to Tables._row)
+
+|fname2 = <nowiki>funclib.add_rows(&nbsp;table_element, rows&nbsp;)</nowiki>
+|ftype2 = <samp>table_element: table</samp><br><samp>rows: table[]</samp><br><samp>-> table</samp>
+|fuse2 = Simple helper to build a table from data (alternative to Tables._table)
+
+|fname3 = <nowiki>funclib.apply_formatting(&nbsp;format_config&nbsp;)</nowiki>
+|ftype3 = <samp>format_config: table</samp><br><samp>-> function</samp>
+|fuse3 = Column processor: Apply consistent formatting
+
+|fname4 = <nowiki>funclib.apply_tooltips(&nbsp;tooltip_map&nbsp;)</nowiki>
+|ftype4 = <samp>tooltip_map: table</samp><br><samp>-> function</samp>
+|fuse4 = Column processor: Apply tooltip to column headers
+
+|fname5 = <nowiki>funclib.batch_columns(&nbsp;column_configs&nbsp;)</nowiki>
+|ftype5 = <samp>column_configs: table[]</samp><br><samp>-> table[]</samp>
+|fuse5 = Batch column creation with performance optimizations
+
+|fname6 = <nowiki>funclib.build_table_from_frame(&nbsp;frame, config&nbsp;)</nowiki>
+|ftype6 = <samp>frame: table</samp><br><samp>config: table</samp><br><samp>-> string HTML table</samp>
+|fuse6 = Create enhanced table builder with Arguments integration
+
+|fname7 = <nowiki>funclib.clearColumnCache(&nbsp;&nbsp;)</nowiki>
+|ftype7 = <samp>-> any</samp>
+|fuse7 = Performance-optimized column processing with memoization
+
+* Clear the column processing cache
+
+|fname8 = <nowiki>funclib.compose_wikitext(&nbsp;generators&nbsp;)</nowiki>
+|ftype8 = <samp>generators: table[]</samp><br><samp>-> string</samp>
+|fuse8 = Generate optimized wikitext with functional composition
+
+|fname9 = <nowiki>funclib.convert_type(&nbsp;value, target_type&nbsp;)</nowiki>
+|ftype9 = <samp>value: string</samp><br><samp>target_type: string</samp><br><samp>-> any</samp>
+|fuse9 = Convert string values to appropriate types
+
+|fname10 = <nowiki>funclib.create_column_pipeline(&nbsp;processors&nbsp;)</nowiki>
+|ftype10 = <samp>processors: function[]</samp><br><samp>-> function</samp>
+|fuse10 = Create column processing pipeline using functional composition
+
+|fname11 = <nowiki>funclib.create_pipeline(&nbsp;transformations&nbsp;)</nowiki>
+|ftype11 = <samp>transformations: function[]</samp><br><samp>-> function</samp>
+|fuse11 = Create a data transformation pipeline with error handling
+
+|fname12 = <nowiki>funclib.fast_column(&nbsp;header, options, defaults&nbsp;)</nowiki>
+|ftype12 = <samp>header: string</samp><br><samp>options: table</samp><br><samp>defaults?: table</samp><br><samp>-> table</samp>
+|fuse12 = Optimized column builder with caching for repeated configurations
+
+|fname13 = <nowiki>filter_empty(&nbsp;data&nbsp;)</nowiki>
+|ftype13 = <samp>-> any</samp>
+|fuse13 = Common data transformations
+
+|fname14 = <nowiki>funclib.process_frame_args(&nbsp;frame, config&nbsp;)</nowiki>
+|ftype14 = <samp>frame: table</samp><br><samp>config: table</samp><br><samp>-> table</samp>
+|fuse14 = Enhanced template parameter processing using Arguments module
+
+|fname15 = <nowiki>funclib.process_template_params(&nbsp;args, config&nbsp;)</nowiki>
+|ftype15 = <samp>args: table</samp><br><samp>config: table</samp><br><samp>-> table</samp>
+|fuse15 = Process MediaWiki template parameters with validation and defaults
+
+|fname16 = <nowiki>funclib.semantic_builder(&nbsp;category&nbsp;)</nowiki>
+|ftype16 = <samp>category: string</samp><br><samp>-> table</samp>
+|fuse16 = Build semantic query string with fluent interface
+
+|fname17 = <nowiki>funclib.semantic_query(&nbsp;query, use_cache&nbsp;)</nowiki>
+|ftype17 = <samp>query: string</samp><br><samp>use_cache?: boolean</samp><br><samp>-> table</samp>
+|fuse17 = Execute semantic query with error handling and caching
+
+|fname18 = <nowiki>funclib.simple_table(&nbsp;data, options&nbsp;)</nowiki>
+|ftype18 = <samp>data: table[]</samp><br><samp>options: table</samp><br><samp>-> string HTML table string</samp>
+|fuse18 = Ultra-simple table creator (combines both helpers)
+
+|fname19 = <nowiki>funclib.template_builder(&nbsp;template_name&nbsp;)</nowiki>
+|ftype19 = <samp>template_name: string</samp><br><samp>-> table</samp>
+|fuse19 = Create a template invocation builder
+
+|example =
+<syntaxhighlight lang='lua'>
+    -- Example usage of Funclib will be added manually
+</syntaxhighlight>
+}}

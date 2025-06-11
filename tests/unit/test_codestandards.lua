@@ -44,9 +44,9 @@ print("=== CodeStandards Module Unit Tests ===\n")
 -- Test validateParameters
 test("validateParameters with valid parameters", function()
     local valid, msg = standards.validateParameters('testFunction', {
-        {name = 'param1', type = 'string', required = true},
-        {name = 'param2', type = 'number', required = false}
-    }, {'hello', 42})
+        { name = 'param1', type = 'string', required = true },
+        { name = 'param2', type = 'number', required = false }
+    }, { 'hello', 42 })
 
     assert_equal(valid, true)
     assert_equal(msg, nil)
@@ -54,7 +54,7 @@ end)
 
 test("validateParameters with missing required parameter", function()
     local valid, msg = standards.validateParameters('testFunction', {
-        {name = 'param1', type = 'string', required = true}
+        { name = 'param1', type = 'string', required = true }
     }, {})
 
     assert_equal(valid, false)
@@ -63,8 +63,8 @@ end)
 
 test("validateParameters with wrong type", function()
     local valid, msg = standards.validateParameters('testFunction', {
-        {name = 'param1', type = 'string', required = true}
-    }, {123})
+        { name = 'param1', type = 'string', required = true }
+    }, { 123 })
 
     assert_equal(valid, false)
     assert_not_nil(msg)
@@ -72,9 +72,9 @@ end)
 
 test("validateParameters with optional nil parameter", function()
     local valid, msg = standards.validateParameters('testFunction', {
-        {name = 'param1', type = 'string', required = true},
-        {name = 'param2', type = 'number', required = false}
-    }, {'hello', nil})
+        { name = 'param1', type = 'string', required = true },
+        { name = 'param2', type = 'number', required = false }
+    }, { 'hello', nil })
 
     assert_equal(valid, true)
     assert_equal(msg, nil)
@@ -82,10 +82,14 @@ end)
 
 test("validateParameters with custom validation", function()
     local valid, msg = standards.validateParameters('testFunction', {
-        {name = 'param1', type = 'number', required = true,
-         validate = function(x) return x > 0 end,
-         validateMessage = "must be positive"}
-    }, {5})
+        {
+            name = 'param1',
+            type = 'number',
+            required = true,
+            validate = function(x) return x > 0 end,
+            validateMessage = "must be positive"
+        }
+    }, { 5 })
 
     assert_equal(valid, true)
     assert_equal(msg, nil)
@@ -93,10 +97,14 @@ end)
 
 test("validateParameters with failing custom validation", function()
     local valid, msg = standards.validateParameters('testFunction', {
-        {name = 'param1', type = 'number', required = true,
-         validate = function(x) return x > 0 end,
-         validateMessage = "must be positive"}
-    }, {-5})
+        {
+            name = 'param1',
+            type = 'number',
+            required = true,
+            validate = function(x) return x > 0 end,
+            validateMessage = "must be positive"
+        }
+    }, { -5 })
 
     assert_equal(valid, false)
     assert_not_nil(msg)
@@ -105,7 +113,7 @@ end)
 -- Test createError
 test("createError creates proper error object", function()
     local err = standards.createError(standards.ERROR_LEVELS.WARNING,
-        'Test error', 'TestModule', {detail = 'test'})
+        'Test error', 'TestModule', { detail = 'test' })
 
     assert_equal(type(err), 'table')
     assert_equal(err.level, standards.ERROR_LEVELS.WARNING)
@@ -161,7 +169,7 @@ test("isEmpty detects empty values", function()
     assert_equal(standards.isEmpty('   '), true)
     assert_equal(standards.isEmpty({}), true)
     assert_equal(standards.isEmpty('hello'), false)
-    assert_equal(standards.isEmpty({1}), false)
+    assert_equal(standards.isEmpty({ 1 }), false)
 end)
 
 test("isEmpty utility function works correctly", function()
@@ -170,12 +178,12 @@ test("isEmpty utility function works correctly", function()
     assert_equal(standards.isEmpty('   '), true)
     assert_equal(standards.isEmpty({}), true)
     assert_equal(standards.isEmpty('hello'), false)
-    assert_equal(standards.isEmpty({1}), false)
+    assert_equal(standards.isEmpty({ 1 }), false)
 end)
 
 test("formatError formats messages correctly", function()
     local err = standards.createError(standards.ERROR_LEVELS.WARNING,
-        'Test message', 'TestModule', {context = 'test'})
+        'Test message', 'TestModule', { context = 'test' })
     local formatted = standards.formatError(err)
 
     assert_not_nil(formatted)
@@ -224,8 +232,8 @@ print(string.format("Success rate: %.1f%%", (tests_passed / tests_run) * 100))
 
 if tests_passed == tests_run then
     print("\n🎉 All CodeStandards module tests passed!")
-    os.exit(0)
+    return true
 else
     print("\n❌ Some CodeStandards module tests failed.")
-    os.exit(1)
+    return false
 end

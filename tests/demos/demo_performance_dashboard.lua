@@ -37,7 +37,7 @@ print("\n2. Running sample operations to generate performance data...")
 
 -- Generate test data
 local testData = Array.range(1, 1000)
-local smallData = {1, 2, 3, 4, 5}
+local smallData = { 1, 2, 3, 4, 5 }
 
 -- Perform various operations to generate metrics
 for i = 1, 50 do
@@ -68,7 +68,7 @@ for i = 1, 50 do
         local memoryOp = CodeStandards.trackPerformance('memory_intensive', function()
             local bigTable = {}
             for j = 1, 1000 do
-                bigTable[j] = {data = "memory test " .. j, values = Array.range(1, 100)}
+                bigTable[j] = { data = "memory test " .. j, values = Array.range(1, 100) }
             end
             return #bigTable
         end)

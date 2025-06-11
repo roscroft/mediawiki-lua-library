@@ -119,10 +119,10 @@ test("Functools basic operations work", function()
 
     -- Test map function if available (note: might use different parameter order)
     if Functools.map then
-        local success, result = pcall(Functools.map, {1, 2, 3}, function(x) return x * 2 end)
+        local success, result = pcall(Functools.map, { 1, 2, 3 }, function(x) return x * 2 end)
         if not success then
             -- Try alternate parameter order
-            success, result = pcall(Functools.map, function(x) return x * 2 end, {1, 2, 3})
+            success, result = pcall(Functools.map, function(x) return x * 2 end, { 1, 2, 3 })
         end
         assert_equal(success, true, "map function should work with some parameter order")
         if success then
@@ -133,10 +133,10 @@ test("Functools basic operations work", function()
 
     -- Test filter function if available
     if Functools.filter then
-        local success, result = pcall(Functools.filter, {1, 2, 3, 4}, function(x) return x % 2 == 0 end)
+        local success, result = pcall(Functools.filter, { 1, 2, 3, 4 }, function(x) return x % 2 == 0 end)
         if not success then
             -- Try alternate parameter order
-            success, result = pcall(Functools.filter, function(x) return x % 2 == 0 end, {1, 2, 3, 4})
+            success, result = pcall(Functools.filter, function(x) return x % 2 == 0 end, { 1, 2, 3, 4 })
         end
         assert_equal(success, true, "filter function should work with some parameter order")
         if success then
@@ -201,6 +201,8 @@ test("Modules handle errors gracefully", function()
     -- Test that modules don't crash with invalid inputs
     local success = pcall(function()
         if Functools.map then
+            -- Expected param type mismatch; test case
+            ---@diagnostic disable-next-line: param-type-mismatch
             Functools.map(nil, function(x) return x end)
         end
     end)
@@ -218,7 +220,7 @@ test("Mixed module operations perform well", function()
     -- Perform various operations
     for i = 1, 100 do
         local builder = Lists.QueryBuilder:new()
-        local column = Lists.make_name_column({header = "Test " .. i})
+        local column = Lists.make_name_column({ header = "Test " .. i })
         local err = CodeStandards.createError(2, "Test message " .. i, "TestModule")
     end
 
@@ -240,8 +242,8 @@ print(string.format("Success rate: %.1f%%", (tests_passed / tests_run) * 100))
 
 if tests_passed == tests_run then
     print("\n🎉 All other function tests passed!")
-    os.exit(0)
+    return true
 else
     print("\n❌ Some other function tests failed.")
-    os.exit(1)
+    return false
 end

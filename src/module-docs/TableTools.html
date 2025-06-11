@@ -1,0 +1,157 @@
+{{Documentation}}
+{{Helper module
+|name = TableTools
+
+|fname1 = <nowiki>p.affixNums(&nbsp;t, prefix, suffix&nbsp;)</nowiki>
+|ftype1 = <samp>t: table</samp><br><samp>prefix?: string</samp><br><samp>suffix?: string</samp><br><samp>-> integer[] affixedNumbers #</samp>
+|fuse1 = Extract numeric keys from string keys with given prefix/suffix pattern
+
+|fname2 = <nowiki>p.all(&nbsp;t, predicate&nbsp;)</nowiki>
+|ftype2 = <samp>t: table</samp><br><samp>predicate: function</samp><br><samp>-> boolean allMatch</samp>
+|fuse2 = Check if all elements in a table match a predicate
+
+|fname3 = <nowiki>p.any(&nbsp;t, predicate&nbsp;)</nowiki>
+|ftype3 = <samp>t: table</samp><br><samp>predicate: function</samp><br><samp>-> boolean anyMatch</samp>
+|fuse3 = Check if any element in a table matches a predicate
+
+|fname4 = <nowiki>p.compressSparseArray(&nbsp;t&nbsp;)</nowiki>
+|ftype4 = <samp>t: table</samp><br><samp>-> table compressedArray</samp>
+|fuse4 = Remove nil values from sparse array while preserving order
+
+|fname5 = <nowiki>p.count(&nbsp;t, predicate&nbsp;)</nowiki>
+|ftype5 = <samp>t: table</samp><br><samp>predicate: function</samp><br><samp>-> integer count</samp>
+|fuse5 = Count elements that match a predicate function
+
+|fname6 = <nowiki>p.deepCopy(&nbsp;orig, noMetatable, already_seen&nbsp;)</nowiki>
+|ftype6 = <samp>orig: any</samp><br><samp>includeMetatable: boolean</samp><br><samp>already_seen: table<table,</samp><br><samp>orig: any</samp><br><samp>noMetatable?: boolean</samp><br><samp>already_seen?: table<table,</samp><br><samp>-> any copy #</samp>
+|fuse6 = Internal recursive function for deep copying
+
+* Create a deep copy of a table with MediaWiki-specific metatable handling
+
+|fname7 = <nowiki>p.find(&nbsp;t, predicate&nbsp;)</nowiki>
+|ftype7 = <samp>t: table</samp><br><samp>predicate: function</samp><br><samp>-> any{{!}}nil value</samp>
+|fuse7 = Find the first element that matches a predicate
+
+|fname8 = <nowiki>p.first(&nbsp;t&nbsp;)</nowiki>
+|ftype8 = <samp>t: table</samp><br><samp>-> any{{!}}nil value</samp>
+|fuse8 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+* Get the first key-value pair from a table
+
+|fname9 = <nowiki>p.invert(&nbsp;array&nbsp;)</nowiki>
+|ftype9 = <samp>array: table</samp><br><samp>-> table<any, integer> invertedMap</samp>
+|fuse9 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+* Create a reverse mapping from array values to their indices
+
+|fname10 = <nowiki>p.isArray(&nbsp;t&nbsp;)</nowiki>
+|ftype10 = <samp>t: table</samp><br><samp>-> boolean isArray #</samp>
+|fuse10 = Check if a table is a proper array (consecutive integer keys starting from 1)
+
+|fname11 = <nowiki>p.isEmpty(&nbsp;t&nbsp;)</nowiki>
+|ftype11 = <samp>t: table</samp><br><samp>-> boolean isEmpty</samp>
+|fuse11 = Check if a table is empty
+
+|fname12 = <nowiki>p.isNan(&nbsp;num&nbsp;)</nowiki>
+|ftype12 = <samp>num: any</samp><br><samp>-> boolean isNaN #</samp>
+|fuse12 = Check if a value is NaN (Not a Number)
+
+|fname13 = <nowiki>p.isPositiveInteger(&nbsp;num&nbsp;)</nowiki>
+|ftype13 = <samp>num: any</samp><br><samp>-> boolean isPositiveInteger #</samp>
+|fuse13 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+********************************************************************************** 
+********************************************************************************** 
+* Check if a value is a positive integer
+
+|fname14 = <nowiki>p.keys(&nbsp;t&nbsp;)</nowiki>
+|ftype14 = <samp>t: table</samp><br><samp>-> any[] keys</samp>
+|fuse14 = Get all keys from a table
+
+|fname15 = <nowiki>p.keysToList(&nbsp;t, keySort, checked&nbsp;)</nowiki>
+|ftype15 = <samp>item1: any</samp><br><samp>item2: any</samp><br><samp>t: table</samp><br><samp>keySort?: function{{!}}boolean</samp><br><samp>checked?: boolean</samp><br><samp>-> any[] keysList</samp>
+|fuse15 = Default comparison function for sorting keys
+
+* Convert table keys to a sorted list
+
+|fname16 = <nowiki>p.length(&nbsp;t&nbsp;)</nowiki>
+|ftype16 = <samp>t: table</samp><br><samp>-> integer length</samp>
+|fuse16 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+* Get length of a sparse table (highest numeric index)
+
+|fname17 = <nowiki>p.listToSet(&nbsp;t&nbsp;)</nowiki>
+|ftype17 = <samp>t: table</samp><br><samp>-> table<any, true> set</samp>
+|fuse17 = Convert an array to a set (values become keys with true values)
+
+|fname18 = <nowiki>p.numData(&nbsp;t, compress&nbsp;)</nowiki>
+|ftype18 = <samp>t: table</samp><br><samp>compress?: boolean</samp><br><samp>-> table structuredData</samp>
+|fuse18 = Convert a table with numbered keys into a more structured format
+
+|fname19 = <nowiki>p.numKeys(&nbsp;t&nbsp;)</nowiki>
+|ftype19 = <samp>t: table</samp><br><samp>-> integer[] numericKeys #</samp>
+|fuse19 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+* Get all positive integer keys from a table, sorted
+
+|fname20 = <nowiki>p.opairs(&nbsp;t&nbsp;)</nowiki>
+|ftype20 = <samp>t: table</samp><br><samp>-> function iterator</samp>
+|fuse20 = Iterator for ordered pairs (keys sorted by type, then value)
+
+|fname21 = <nowiki>p.ospairs(&nbsp;t&nbsp;)</nowiki>
+|ftype21 = <samp>t: table</samp><br><samp>-> function iterator</samp>
+|fuse21 = Iterator for ordered string pairs (string keys only, sorted)
+
+|fname22 = <nowiki>p.shallowClone(&nbsp;t&nbsp;)</nowiki>
+|ftype22 = <samp>t: table</samp><br><samp>-> table clonedTable #</samp>
+|fuse22 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+* Create a shallow copy of a table
+
+|fname23 = <nowiki>p.size(&nbsp;t&nbsp;)</nowiki>
+|ftype23 = <samp>t: table</samp><br><samp>-> integer size</samp>
+|fuse23 = Get total number of key-value pairs in a table
+
+* For arrays, use Array.len() instead for better performance
+
+|fname24 = <nowiki>p.sortedPairs(&nbsp;t, keySort&nbsp;)</nowiki>
+|ftype24 = <samp>t: table</samp><br><samp>keySort?: function</samp><br><samp>-> function iterator</samp>
+|fuse24 = Iterator that traverses table in sorted key order
+
+|fname25 = <nowiki>p.sortedPairsByValue(&nbsp;t, valueSort&nbsp;)</nowiki>
+|ftype25 = <samp>t: table</samp><br><samp>valueSort?: fun(a:</samp><br><samp>-> integer index</samp>
+|fuse25 = Iterator that traverses table sorted by values
+
+|fname26 = <nowiki>p.spairs(&nbsp;t&nbsp;)</nowiki>
+|ftype26 = <samp>t: table</samp><br><samp>-> nil initial</samp>
+|fuse26 = Iterator for string keys only
+
+|fname27 = <nowiki>p.sparseConcat(&nbsp;t, sep, i, j&nbsp;)</nowiki>
+|ftype27 = <samp>t: table</samp><br><samp>sep?: string</samp><br><samp>i?: integer</samp><br><samp>j?: integer</samp><br><samp>-> string concatenated</samp>
+|fuse27 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+* Concatenate values from a sparse table (skipping nils)
+
+|fname28 = <nowiki>p.sparseIpairs(&nbsp;t&nbsp;)</nowiki>
+|ftype28 = <samp>t: table</samp><br><samp>-> function iterator</samp>
+|fuse28 = ---------------------------------------------------------------------------------
+
+********************************************************************************** 
+* Iterator for sparse arrays (arrays with gaps)
+
+|fname29 = <nowiki>p.values(&nbsp;t&nbsp;)</nowiki>
+|ftype29 = <samp>t: table</samp><br><samp>-> any[] values</samp>
+|fuse29 = Get all values from a table
+
+|example =
+<syntaxhighlight lang='lua'>
+    -- Example usage of TableTools will be added manually
+</syntaxhighlight>
+}}

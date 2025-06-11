@@ -343,7 +343,7 @@ function p.sparseIpairs(t)
     local index = 0
     local limit = #nums
 
-    return function ()
+    return function()
         index = index + 1
         if index <= limit then
             local key = nums[index]
@@ -519,7 +519,7 @@ function p.sortedPairsByValue(t, valueSort)
 
     local elements = {}
     for k, v in pairs(t) do
-        table.insert(elements, {key = k, value = v})
+        table.insert(elements, { key = k, value = v })
     end
 
     local sortFunc = valueSort or function(a, b)

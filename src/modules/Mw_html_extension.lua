@@ -1,9 +1,9 @@
 -- <nowiki>
 local p = {}
-local checkType = require( 'libraryUtil' ).checkType
-local mwHtml = getmetatable( mw.html.create() ).__index  -- Trick to get acces to the mw.html class
-local stack = {}  -- Used to keep track of nested IF-END tags
-local noOp = {}  -- This object is returned by IF(false) tag
+local checkType = require('libraryUtil').checkType
+local mwHtml = getmetatable(mw.html.create()).__index   -- Trick to get acces to the mw.html class
+local stack = {}                                        -- Used to keep track of nested IF-END tags
+local noOp = {}                                         -- This object is returned by IF(false) tag
 
 function mwHtml:addClassIf(cond, ...)
     if cond then
@@ -29,7 +29,7 @@ function mwHtml:wikitextIf(cond, ...)
     end
 end
 
-function mwHtml:doneIf( cond )
+function mwHtml:doneIf(cond)
     if cond then
         return self:done()
     else
@@ -54,14 +54,14 @@ function mwHtml:cssIf(cond, ...)
 end
 
 function mwHtml:na()
-    return self:tag( 'td' )
-            :attr( 'data-sort-value', 0 )
-            :attr( 'class', 'table-na' )
-            :wikitext( '<small>N/A</small>' )
+    return self:tag('td')
+        :attr('data-sort-value', 0)
+        :attr('class', 'table-na')
+        :wikitext('<small>N/A</small>')
         :done()
 end
 
-function mwHtml:naIf( cond )
+function mwHtml:naIf(cond)
     if cond then
         return self:na()
     else
@@ -69,109 +69,109 @@ function mwHtml:naIf( cond )
     end
 end
 
-local function addValues( self, settings )
+local function addValues(self, settings)
     -- wikitext and addClass are no-ops when their argument is nil
-    self:wikitext( settings[1] or settings.wikitext )
-    self:addClass( settings.class or settings.addClass )
+    self:wikitext(settings[1] or settings.wikitext)
+    self:addClass(settings.class or settings.addClass)
 
     if settings.attr then
         if settings.attr[1] and settings.attr[2] then
-            self:attr( settings.attr[1], settings.attr[2] )
+            self:attr(settings.attr[1], settings.attr[2])
         else
-            self:attr( settings.attr )
+            self:attr(settings.attr)
         end
     end
 
     if settings.css then
         if settings.css[1] and settings.css[2] then
-            self:css( settings.css[1], settings.css[2] )
+            self:css(settings.css[1], settings.css[2])
         else
-            self:css( settings.css )
+            self:css(settings.css)
         end
     end
 
     if settings.cssText then
-        self:cssText( settings.cssText )
+        self:cssText(settings.cssText)
     end
 end
 
-function mwHtml:tr( settings )
+function mwHtml:tr(settings)
     if self.tagName == 'tr' then
-        self = self:done():tag( 'tr' )
+        self = self:done():tag('tr')
     elseif self.tagName == 'th' or self.tagName == 'td' then
-        self = self:done():done():tag( 'tr' )
+        self = self:done():done():tag('tr')
     else
-        self = self:tag( 'tr' )
+        self = self:tag('tr')
     end
 
-    if type( settings ) == 'table' then
-        addValues( self, settings )
-    end
-
-    return self
-end
-
-function mwHtml:th( settings )
-    if self.tagName == 'th' or self.tagName == 'td' then
-        self = self:done():tag( 'th' )
-    else
-        self = self:tag( 'th' )
-    end
-
-    if type( settings ) == 'table' then
-        addValues( self, settings )
-    else
-        self = self:wikitext( settings )
+    if type(settings) == 'table' then
+        addValues(self, settings)
     end
 
     return self
 end
 
-function mwHtml:td( settings )
+function mwHtml:th(settings)
     if self.tagName == 'th' or self.tagName == 'td' then
-        self = self:done():tag( 'td' )
+        self = self:done():tag('th')
     else
-        self = self:tag( 'td' )
+        self = self:tag('th')
     end
 
-    if type( settings ) == 'table' then
-        addValues( self, settings )
+    if type(settings) == 'table' then
+        addValues(self, settings)
     else
-        self = self:wikitext( settings )
+        self = self:wikitext(settings)
+    end
+
+    return self
+end
+
+function mwHtml:td(settings)
+    if self.tagName == 'th' or self.tagName == 'td' then
+        self = self:done():tag('td')
+    else
+        self = self:tag('td')
+    end
+
+    if type(settings) == 'table' then
+        addValues(self, settings)
+    else
+        self = self:wikitext(settings)
     end
 
     return self
 end
 
 -- nicely formatted lists
-function mwHtml:tdl( settings )
+function mwHtml:tdl(settings)
     if self.tagName == 'th' or self.tagName == 'td' then
-        self = self:done():tag( 'td' )
+        self = self:done():tag('td')
     else
-        self = self:tag( 'td' )
+        self = self:tag('td')
     end
 
-    if type( settings ) == 'table' then
-        addValues( self, settings )
+    if type(settings) == 'table' then
+        addValues(self, settings)
     else
-        self = self:wikitext( "\n"..settings )
+        self = self:wikitext("\n" .. settings)
     end
 
     return self
 end
 
-function mwHtml:IF( cond )
+function mwHtml:IF(cond)
     if cond then
-        table.insert( stack, { obj=noOp, trueCaseCompleted=true } )
+        table.insert(stack, { obj = noOp, trueCaseCompleted = true })
         return self
     else
-        table.insert( stack, { obj=self, trueCaseCompleted=false } )
+        table.insert(stack, { obj = self, trueCaseCompleted = false })
         return noOp
     end
 end
 
-function mwHtml:ELSEIF( cond )
-    if #stack == 0 then error( 'Missing IF tag', 2 ) end
+function mwHtml:ELSEIF(cond)
+    if #stack == 0 then error('Missing IF tag', 2) end
     local last = stack[#stack]
 
     if cond and not last.trueCaseCompleted then
@@ -188,13 +188,13 @@ function mwHtml:ELSEIF( cond )
 end
 
 function mwHtml:ELSE()
-    return self:ELSEIF( true )
+    return self:ELSEIF(true)
 end
 
 function mwHtml:END()
-    if #stack == 0 then error( 'Missing IF tag', 2 ) end
+    if #stack == 0 then error('Missing IF tag', 2) end
 
-    local res = table.remove( stack )  -- Pop element from the end
+    local res = table.remove(stack)   -- Pop element from the end
     if res.obj == noOp then
         return self
     else
@@ -207,7 +207,7 @@ end
 ---@param none_values? table Optional table of values to treat as none/empty
 ---@return self
 function mwHtml:addCell(content, none_values)
-    none_values = none_values or {"None"}
+    none_values = none_values or { "None" }
 
     -- Check if content is nil or matches none values
     local is_empty = content == nil
@@ -227,14 +227,14 @@ function mwHtml:addCell(content, none_values)
     end
 end
 
-function mwHtml:exec( func, ... )
-    checkType( 'exec', 1, func, 'function' )
-    return func( self, ... )
+function mwHtml:exec(func, ...)
+    checkType('exec', 1, func, 'function')
+    return func(self, ...)
 end
 
-function p.addFunction( func, name )
-    checkType( 'addFunction', 1, func, 'function' )
-    checkType( 'addFunction', 2, name, 'string' )
+function p.addFunction(func, name)
+    checkType('addFunction', 1, func, 'function')
+    checkType('addFunction', 2, name, 'string')
     mwHtml[name] = func
 end
 
@@ -242,20 +242,20 @@ noOp.IF = mwHtml.IF
 noOp.ELSEIF = mwHtml.ELSEIF
 noOp.ELSE = mwHtml.ELSE
 noOp.END = mwHtml.END
-setmetatable( noOp, {
-    __index = function( self )
+setmetatable(noOp, {
+    __index = function(self)
         return self
     end,
-    __call = function( self )
+    __call = function(self)
         return self
     end,
     __tostring = function()
-        error( 'Attempting to convert no-op object into a string. Check for unbalanced IF-END tags', 2 )
+        error('Attempting to convert no-op object into a string. Check for unbalanced IF-END tags', 2)
     end,
     __concat = function()
-        error( 'Attempting to concatenate a no-op object. Check for unbalanced IF-END tags', 2 )
+        error('Attempting to concatenate a no-op object. Check for unbalanced IF-END tags', 2)
     end
-} )
+})
 
 return p
 -- </nowiki>

@@ -6,8 +6,6 @@ Provides purely functional programming utilities, combinators, and function comp
 - **Function Composition**: Pipe and compose operations for function chaining
 - **Maybe Monad**: Safe computation handling with Maybe type
 - **Array Operations**: Map, filter, fold operations with functional style
-- **Maybe Monad**: Safe computation handling with Maybe type
-- **Array Operations**: Map, filter, fold operations with functional style
 - **Type Safety**: Comprehensive type annotations for development tooling
 
 ## Usage Examples:
@@ -189,65 +187,117 @@ func.combinators = {
 -- CURRYING UTILITIES - Transform multi-argument functions into single-argument chains
 -- ======================
 
----Curry a function with 1 argument (this is just function application)
----
----## Example:
----```lua
----local identity = func.c1(function(x) return x end)
----print(identity(42)) --> 42
----```
----@generic A, R
----@param f fun(x: A): R Function to curry
----@return fun(x: A): R Curried function
-function func.c1(f) return function(x) return f(x) end end
+---Generic curry function with performance optimizations and no variable redefinition
+---@param fn function The function to curry
+---@param target_arity integer? Optional number of arguments expected (defaults to 2)
+---@return function Curried function
+function func.curry(fn, target_arity)
+    -- Default to 2 arguments if not specified
+    target_arity = target_arity or 2
 
----Curry a function with 2 arguments
----
----Transforms a function `f(x, y)` into `f(x)(y)` for partial application.
----
----## Example:
----```lua
----local add = func.c2(function(x, y) return x + y end)
----local add5 = add(5)
----print(add5(3)) --> 8
----print(add5(7)) --> 12
----```
----@generic A, B, R
----@param f fun(x: A, y: B): R Function to curry
----@return fun(x: A): fun(y: B): R Curried function
-function func.c2(f) return function(x) return function(y) return f(x, y) end end end
+    -- Fast path for arity 1 (just return the function)
+    if target_arity == 1 then
+        return fn
+    end
 
----Curry a function with 3 arguments
----@generic A, B, C, R
----@param f fun(x: A, y: B, z: C): R Function to curry
----@return fun(x: A): fun(y: B): fun(z: C): R Curried function
-function func.c3(f) return function(x) return function(y) return function(z) return f(x, y, z) end end end end
-
----Curry a function with 4 arguments
----@generic A, B, C, D, R
----@param f fun(x: A, y: B, z: C, a: D): R Function to curry
----@return fun(x: A): fun(y: B): fun(z: C): fun(a: D): R Curried function
-function func.c4(f) return function(x) return function(y) return function(z) return function(a) return f(x, y, z, a) end end end end end
-
--- Add to currying section
-
----Auto-curry a function based on its expected arity
----@param f function Function to curry
----@param arity number Expected number of arguments
----@return function Auto-curried function
-function func.auto_curry(f, arity)
-    local function curried(args)
-        return function(...)
-            local new_args = func.merge(args or {}, { ... })
-            if #new_args >= arity then
-                return f(unpack(new_args))
+    -- Fast path for arity 2 (most common case)
+    if target_arity == 2 then
+        return function(a, b)
+            if b ~= nil then
+                -- Both arguments provided, call directly
+                return fn(a, b)
             else
-                return curried(new_args)
+                -- Return optimized single-argument closure
+                return function(b_inner) return fn(a, b_inner) end
             end
         end
     end
-    return curried({})
+
+    -- Handle arity 3 specially (common in functional code)
+    if target_arity == 3 then
+        return function(a, b, c)
+            if c ~= nil then
+                -- All three arguments provided
+                return fn(a, b, c)
+            elseif b ~= nil then
+                -- Two arguments provided
+                return function(c_inner) return fn(a, b, c_inner) end
+            else
+                -- One argument provided
+                return function(b_inner, c_inner)
+                    if c_inner ~= nil then
+                        return fn(a, b_inner, c_inner)
+                    else
+                        return function(c_final) return fn(a, b_inner, c_final) end
+                    end
+                end
+            end
+        end
+    end
+
+    -- General case for arity > 3
+    local function curried_general(...)
+        local current_args_count = select('#', ...)
+
+        if current_args_count >= target_arity then
+            -- All arguments provided
+            if current_args_count == target_arity then
+                return fn(...)
+            else
+                -- Too many arguments, limit to required arity
+                local current_args = { ... }
+                local needed_args = {}
+                for i = 1, target_arity do
+                    needed_args[i] = current_args[i]
+                end
+                return fn(unpack(needed_args))
+            end
+        end
+
+        -- Handle partial application
+        local collected_args = { ... }
+
+        -- Return function that captures current args
+        return function(...)
+            local additional_args_count = select('#', ...)
+            local total_args_count = current_args_count + additional_args_count
+
+            -- Fast path: if this completes the arguments
+            if total_args_count == target_arity then
+                if current_args_count == 1 then
+                    return fn(collected_args[1], ...)
+                elseif current_args_count == 2 then
+                    return fn(collected_args[1], collected_args[2], ...)
+                end
+            end
+
+            -- Need to combine arguments
+            local combined_args = {}
+            for i = 1, current_args_count do
+                combined_args[i] = collected_args[i]
+            end
+
+            local additional_args = { ... }
+            for i = 1, additional_args_count do
+                combined_args[current_args_count + i] = additional_args[i]
+            end
+
+            -- Either call with all arguments or recurse
+            if total_args_count >= target_arity then
+                return fn(unpack(combined_args, 1, target_arity))
+            else
+                return curried_general(unpack(combined_args))
+            end
+        end
+    end
+
+    return curried_general
 end
+
+-- Backwards compatibility for existing c2, c3 functions
+func.c2 = function(fn) return func.curry(fn, 2) end
+func.c3 = function(fn) return func.curry(fn, 3) end
+func.c4 = function(fn) return func.curry(fn, 4) end
 
 ---Create a partial application with fixed first arguments
 ---@param f function Function to partially apply
@@ -365,7 +415,7 @@ end
 
 ---Map function over array elements
 ---@generic T, U
----@param f fun(x: T): U Function to apply to each element
+---@param f fun(x: T,  i?: integer): U Function to apply to each element
 ---@param xs T[] Array to map over
 ---@return U[] Mapped array
 function func.map(f, xs)
@@ -373,22 +423,22 @@ function func.map(f, xs)
     checkType('Module:Functools.map', 2, xs, 'table')
     local result = {}
     for i, x in ipairs(xs) do
-        result[i] = f(x)
+        result[i] = f(x, i)
     end
     return result
 end
 
 ---Filter array elements based on predicate
 ---@generic T
----@param predicate fun(x: T): boolean Predicate function
+---@param predicate fun(x: T,  i?: integer): boolean Predicate function
 ---@param xs T[] Array to filter
 ---@return T[] Filtered array
 function func.filter(predicate, xs)
     checkType('Module:Functools.filter', 1, predicate, 'function')
     checkType('Module:Functools.filter', 2, xs, 'table')
     local result = {}
-    for _, x in ipairs(xs) do
-        if predicate(x) then
+    for i, x in ipairs(xs) do
+        if predicate(x, i) then
             table.insert(result, x)
         end
     end
@@ -397,7 +447,7 @@ end
 
 ---Reduce array to single value (fold left)
 ---@generic T, U
----@param f fun(acc: U, x: T): U Reduction function
+---@param f fun(acc: U, x: T,  i?: integer): U Reduction function
 ---@param init U Initial accumulator value
 ---@param xs T[] Array to reduce
 ---@return U Reduced value
@@ -405,8 +455,8 @@ function func.reduce(f, init, xs)
     checkType('Module:Functools.reduce', 1, f, 'function')
     checkType('Module:Functools.reduce', 3, xs, 'table')
     local acc = init
-    for _, x in ipairs(xs) do
-        acc = f(acc, x)
+    for i, x in ipairs(xs) do
+        acc = f(acc, x, i)
     end
     return acc
 end
@@ -711,14 +761,20 @@ func.pair = pair
 ---Apply function to left element of pair
 ---@generic A, B, C
 ---@param left_f fun(x: A): C Function to apply to left element
----@return fun(p: table): table Function that transforms pair
-function pair.send_left(left_f) return function(pair) return func.to_table(left_f(pair[1]), pair[2]) end end
+---@param pair table<1, A, 2, B> Pair as table
+---@return table<1, C, 2, B> Transformed pair
+pair.send_left = func.curry(function(left_f, pair)
+    return func.to_table(left_f(pair[1]), pair[2])
+end)
 
 ---Apply function to right element of pair
 ---@generic A, B, C
 ---@param right_f fun(x: B): C Function to apply to right element
----@return fun(p: table): table Function that transforms pair
-function pair.send_right(right_f) return function(pair) return func.to_table(pair[1], right_f(pair[2])) end end
+---@param pair table<1, A, 2, B> Pair as table
+---@return table<1, A, 2, C> Transformed pair
+pair.send_right = func.curry(function(right_f, pair)
+    return func.to_table(pair[1], right_f(pair[2]))
+end)
 
 ---Apply functions to both elements of pair
 ---@generic A, B, C, D
@@ -810,19 +866,18 @@ function func.Maybe.isNothing(maybe)
     return not maybe or maybe.isNothing or maybe.value == nil
 end
 
--- Improve function signatures to better specify Maybe types
+---Map a function over a Maybe value
 ---@generic T, U
 ---@param f fun(x: T): U Function to map
----@return fun(m: Maybe<T>): Maybe<U> Function that maps over Maybe
-function func.Maybe.map(f)
-    return function(m)
-        if func.Maybe.isJust(m) then
-            return func.Maybe.just(f(m.value))
-        else
-            return func.Maybe.nothing
-        end
+---@param m Maybe<T> Maybe to map over
+---@return Maybe<U> Mapped Maybe
+func.Maybe.map = func.curry(function(f, m)
+    if func.Maybe.isJust(m) then
+        return func.Maybe.just(f(m.value))
+    else
+        return func.Maybe.nothing
     end
-end
+end)
 
 ---Monadic bind operation for Maybe (flatMap)
 ---@generic T, U
@@ -911,6 +966,20 @@ end
 function func.Maybe.alt(m1, m2)
     return func.Maybe.isJust(m1) and m1 or m2
 end
+
+---Apply function to Maybe value or return default if Nothing
+---@generic T, U
+---@param default U Default value for Nothing case
+---@param f fun(x: T): U Function to apply to Just value
+---@param m Maybe<T> Maybe value to process
+---@return U Result or default
+func.Maybe.maybe = func.curry(function(default, f, m)
+    if func.Maybe.isJust(m) then
+        return f(m.value)
+    else
+        return default
+    end
+end)
 
 -- Short aliases for common operations
 func.getOrElse = func.Maybe.fromMaybe
@@ -1029,6 +1098,28 @@ function func.memoize(f)
     end
 end
 
+---Memoize a function with multiple arguments
+---@generic A..., B
+---@param f fun(...: A): B Function to memoize
+---@return fun(...: A): B Memoized function
+function func.memoize_multi(f)
+    local cache = {}
+    return function(...)
+        -- Create a composite key from all arguments
+        local args = { ... }
+        local key_parts = {}
+        for i = 1, select("#", ...) do
+            table.insert(key_parts, tostring(args[i]))
+        end
+        local key = table.concat(key_parts, "||")
+
+        if cache[key] == nil then
+            cache[key] = f(...)
+        end
+        return cache[key]
+    end
+end
+
 ---Add trampolining for stack safety in recursive calls with functional improvements
 ---@generic A, R
 ---@param f fun(...: A): R|function Function that may return another function for trampolining
@@ -1116,6 +1207,20 @@ function func.deep_clone(obj)
     end)(obj)
 end
 
+---Append element to array without mutation
+---@generic T
+---@param arr T[] Array to append to
+---@param element T Element to append
+---@return T[] New array with element appended
+function func.append(arr, element)
+    local result = {}
+    for i = 1, #arr do
+        result[i] = arr[i]
+    end
+    result[#arr + 1] = element
+    return result
+end
+
 ---Complement a predicate function
 ---@generic T
 ---@param predicate fun(x: T): boolean Predicate to complement
@@ -1123,6 +1228,23 @@ end
 function func.complement(predicate)
     return function(x)
         return not predicate(x)
+    end
+end
+
+---Apply a sequence of predicates, returning first match or default
+---@generic T, U
+---@param pairs table<function, function> Predicate-action pairs
+---@param default U Default value
+---@return fun(x: T): U Function that selects based on predicates
+function func.cond_multi(pairs, default)
+    return function(x)
+        for _, pair in ipairs(pairs) do
+            local predicate, action = pair[1], pair[2]
+            if predicate(x) then
+                return action(x)
+            end
+        end
+        return default
     end
 end
 
@@ -1155,8 +1277,6 @@ func.is_table = func.is_type("table")
 func.is_string = func.is_type("string")
 func.is_number = func.is_type("number")
 func.is_boolean = func.is_type("boolean")
-
--- Add to utility functions
 
 ---Group array elements by a key function
 ---@generic T, K
@@ -1245,6 +1365,16 @@ function func.count_calls(f)
     end
     local get_count = function() return count end
     return wrapped, get_count
+end
+
+---Safely unwrap the result of a function call
+---@generic T, E
+---@param result {[1]: boolean, [2]: T|E} Result from pcall
+---@param default T Default value if error
+---@return T Value or default
+function func.unwrap_or(result, default)
+    local success, value = result[1], result[2]
+    return success and value or default
 end
 
 -- ======================
@@ -1367,6 +1497,41 @@ function func.compose_t(...)
     end
 end
 
+---Take transducer for limiting result count
+---@param n number Number of items to take
+---@return function Take transducer
+function func.take_t(n)
+    return func.transducer(function(reducer)
+        local count = 0
+        return function(acc, input)
+            count = count + 1
+            if count <= n then
+                return reducer(acc, input)
+            else
+                return acc
+            end
+        end
+    end)
+end
+
+---Flatten transducer for nested arrays
+---@return function Flatten transducer
+function func.flatten_t()
+    return func.transducer(function(reducer)
+        return function(acc, input)
+            if type(input) == "table" and #input > 0 then
+                -- Flatten one level
+                for _, item in ipairs(input) do
+                    acc = reducer(acc, item)
+                end
+                return acc
+            else
+                return reducer(acc, input)
+            end
+        end
+    end)
+end
+
 -- ======================
 -- SAFE OPERATIONS & ERROR HANDLING - Defensive programming utilities
 -- ======================
@@ -1408,6 +1573,42 @@ function func.chain_safe(operations)
         end, func.Maybe.just(initial_value), unpack(operations))
     end
 end
+
+---@class Result<T, E>
+---@field success boolean Whether operation succeeded
+---@field value T|nil The value if successful
+---@field error E|nil The error if failed
+
+func.Result = {}
+
+---Create a successful result
+---@generic T, E
+---@param value T The success value
+---@return Result<T, E> Success result
+function func.Result.ok(value)
+    return { success = true, value = value, error = nil }
+end
+
+---Create a failed result
+---@generic T, E
+---@param error E The error value
+---@return Result<T, E> Error result
+function func.Result.err(error)
+    return { success = false, value = nil, error = error }
+end
+
+---Map over a successful result
+---@generic T, U, E
+---@param f fun(x: T): U Function to apply
+---@param result Result<T, E> Result to map over
+---@return Result<U, E> Mapped result
+func.Result.map = func.curry(function(f, result)
+    if result.success then
+        return func.Result.ok(f(result.value))
+    else
+        return result -- Propagate error
+    end
+end)
 
 -- ======================
 -- VALIDATION MODULE - Input validation and type checking
@@ -1468,27 +1669,26 @@ end
 -- ======================
 
 -- Curried versions with 'p' prefix (partial application)
-func.pmap = func.c2(func.map)
-func.pfilter = func.c2(func.filter)
-func.preduce = func.c3(func.reduce)
+func.pmap = func.curry(func.map)
+func.pfilter = func.curry(func.filter)
+func.preduce = func.curry(func.reduce, 3)
 
 -- Curried operations
-func.add = func.c2(func.ops.add)
-func.mul = func.c2(func.ops.mul)
-func.sub = func.c2(func.ops.sub)
-func.div = func.c2(func.ops.div)
-func.mod = func.c2(func.ops.mod)
-func.pow = func.c2(func.ops.pow)
-func.eq = func.c2(func.ops.eq)
-func.lt = func.c2(func.ops.lt)
-func.gt = func.c2(func.ops.gt)
-func.ap = func.c2(func.ops.ap)
+func.add = func.curry(func.ops.add)
+func.mul = func.curry(func.ops.mul)
+func.sub = func.curry(func.ops.sub)
+func.div = func.curry(func.ops.div)
+func.mod = func.curry(func.ops.mod)
+func.pow = func.curry(func.ops.pow)
+func.eq = func.curry(func.ops.eq)
+func.lt = func.curry(func.ops.lt)
+func.gt = func.curry(func.ops.gt)
+func.ap = func.curry(func.ops.ap)
+func.pconcat = func.curry(func.concat)
+func.pzip = func.curry(func.zip)
 
 -- Using thrush combinator for flip application
 func.tap = func.flip(func.apply)
-
--- Using flip and composition for property access
-func.prop = func.flip(func.comp(func.id))
 
 -- Using currying for simplified versions
 func.add1 = func.add(1)
@@ -1500,7 +1700,6 @@ func.not_empty = func.complement(func.is_empty)
 func.is_nil = function(x) return x == nil end
 func.not_nil = func.complement(func.is_nil)
 func.is_array = function(x) return type(x) == "table" and #x > 0 end
-func.pconcat = func.c2(func.concat)
 
 function func.binop_on_pair(op)
     return function(p)
@@ -1513,8 +1712,14 @@ func.fold_div = func.binop_on_pair(func.ops.div)
 func.fold_or = func.binop_on_pair(function(a, b) return a or b end)
 func.fold_append = func.binop_on_pair(func.ops.ap)
 
--- Curried sequence operations
-func.pzip = func.c2(func.zip)
+---Get a property from an object with currying support
+---@generic K, V, T
+---@param key K The property key to access
+---@param obj? T The object to access (optional for currying)
+---@return V|function Value at the key or accessor function if obj is nil
+func.prop = func.curry(function(key, obj)
+    return obj and obj[key]
+end)
 
 -- ======================
 -- MODULE EXPORT

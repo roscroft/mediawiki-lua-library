@@ -21,7 +21,7 @@ Test Coverage:
 package.path = package.path .. ';../../src/modules/?.lua'
 
 -- Load environment setup
-dofile('../env/wiki-lua-env.lua')
+dofile('tests/env/wiki-lua-env.lua')
 
 -- Module imports with proper paths
 local Array = require('Array')
@@ -72,10 +72,14 @@ local double = function(x) return x * 2 end
 local is_even = function(x) return x % 2 == 0 end
 
 -- Test array operations with functional composition
+-- Map is defined in the base array module
+---@diagnostic disable-next-line: undefined-field
 local doubled_arr = arr:map(double)
 assert_equal(doubled_arr:get(1), 2, "Array map with function")
 assert_equal(doubled_arr:get(3), 6, "Array map preserves order")
 
+-- Filter is defined in the base array module
+---@diagnostic disable-next-line: undefined-field
 local even_arr = arr:filter(is_even)
 assert_equal(even_arr:get(1), 2, "Array filter works correctly")
 assert_equal(even_arr:get(2), 4, "Array filter preserves filtered items")
@@ -124,8 +128,10 @@ print("\n--- Combined Workflow Test ---")
 
 -- Create a simple data processing workflow
 local process_data = function(data)
-    local arr = Array.new(data)
-    local doubled = arr:map(function(x) return x * 2 end)
+    local _arr = Array.new(data)
+    -- Map is defined in the base array module
+    ---@diagnostic disable-next-line: undefined-field
+    local doubled = _arr:map(function(x) return x * 2 end)
     local filtered = doubled:filter(function(x) return x > 5 end)
     return filtered
 end

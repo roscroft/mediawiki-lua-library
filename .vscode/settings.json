@@ -15,9 +15,6 @@
         "source.fixAll": "explicit"
     },
     "editor.formatOnSave": true,
-    "[lua]": {
-        "editor.formatOnSave": true
-    },
     "[markdown]": {
         "editor.formatOnSave": true
     },
@@ -27,5 +24,33 @@
     },
     "lua.workspace.ignoreDir": [
         "./build"
-    ]
+    ],
+    "Lua.runtime.version": "Lua 5.1",
+    "Lua.workspace.library": [
+        "/home/adher/wiki-lua/src/modules"
+    ],
+    "Lua.diagnostics.globals": [
+        "mw",
+        "type",
+        "select",
+        "unpack"
+    ],
+    "Lua.diagnostics.enable": true,
+    "Lua.diagnostics.neededFileStatus": {
+        "codestyle-check": "Any"
+    },
+    "Lua.workspace.checkThirdParty": false,
+    "Lua.completion.callSnippet": "Both",
+    "Lua.hint.enable": true,
+    "Lua.hint.paramType": true,
+    "Lua.typeFormat.config": {
+        "format_line": "on"
+    },
+    "Lua.hover.expandAlias": true,
+    "[lua]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+        "editor.detectIndentation": false,
+        "editor.formatOnSave": true
+    }
 }

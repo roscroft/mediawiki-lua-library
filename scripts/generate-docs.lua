@@ -86,6 +86,71 @@ local function trimLeadingNonWordChars(str)
     return str:sub(firstWordPos)
 end
 
+-- Parse complex return types with nested parentheses support
+-- Handles complex function types like: fun(g: fun(a: A): B): fun(h: fun(a: A): C): fun(a: A): D
+local function parseComplexReturnType(commentText)
+    -- Extract the part after @return
+    local afterReturn = commentText:match("^@return%s+(.*)$")
+    if not afterReturn then
+        return nil, nil
+    end
+
+    -- For complex nested function types, we need to be very careful about parsing
+    -- Look for actual descriptive words at the end, not type keywords
+    local typeEnd = #afterReturn
+    local words = {}
+
+    -- Split into words and identify the boundary between type and description
+    for word in afterReturn:gmatch("%S+") do
+        table.insert(words, word)
+    end
+
+    -- Work backwards from the end to find where the description starts
+    local descStartIndex = nil
+    for i = #words, 1, -1 do
+        local word = words[i]
+
+        -- Check if this word looks like a description word (not a type)
+        -- Common description starters
+        if word:match("^[A-Z][a-z]+") and not word:match("^(Maybe|Result|Array|Function|Table|String|Number|Boolean|Any|Nil)") then
+            -- This looks like the start of a description
+            descStartIndex = i
+        elseif word:match("^(that|which|to|for|with|by|using|when|if|returns|applies|creates|performs|computes|calculates|generates|transforms)$") then
+            -- Common description words
+            descStartIndex = i
+            break
+        end
+    end
+
+    local returnType, returnDesc
+
+    if descStartIndex then
+        -- Reconstruct the type from words 1 to descStartIndex-1
+        local typeWords = {}
+        for i = 1, descStartIndex - 1 do
+            table.insert(typeWords, words[i])
+        end
+        returnType = table.concat(typeWords, " ")
+
+        -- Reconstruct the description from descStartIndex onwards
+        local descWords = {}
+        for i = descStartIndex, #words do
+            table.insert(descWords, words[i])
+        end
+        returnDesc = table.concat(descWords, " ")
+    else
+        -- No clear description found, treat the whole thing as type
+        returnType = afterReturn
+        returnDesc = ""
+    end
+
+    -- Clean up whitespace
+    returnType = returnType:gsub("^%s*(.-)%s*$", "%1")
+    returnDesc = returnDesc:gsub("^%s*(.-)%s*$", "%1")
+
+    return returnType, returnDesc
+end
+
 -- Parse function documentation from Lua comments
 -- Returns a table of functions with their documentation
 local function parseFunctionDocs(content)
@@ -143,7 +208,7 @@ local function parseFunctionDocs(content)
                     })
                 end
             elseif commentText:match("^@return%s+") then
-                local returnType, returnDesc = commentText:match("^@return%s+([%S]+)%s*(.*)")
+                local returnType, returnDesc = parseComplexReturnType(commentText)
                 if returnType then
                     currentFunction.returns.type = returnType
                     currentFunction.returns.description = returnDesc or ""
@@ -304,6 +369,147 @@ local function formatFunctionDoc(func, index, moduleName)
     return table.concat(result, "\n")
 end
 
+-- Helper function to detect main object names from function names
+local function detectObjectNames(functions)
+    local objectCounts = {}
+    local totalFunctions = 0
+
+    for _, func in ipairs(functions) do
+        totalFunctions = totalFunctions + 1
+        local fullName = func.name
+
+        -- Extract potential object names (before first dot)
+        local objectName = fullName:match("^([^%.]+)%.")
+        if objectName then
+            objectCounts[objectName] = (objectCounts[objectName] or 0) + 1
+        end
+    end
+
+    -- Find the primary object name (most frequently used, minimum 30% of functions)
+    local primaryObject = nil
+    local maxCount = 0
+    local threshold = math.floor(totalFunctions * 0.3)
+
+    for objName, count in pairs(objectCounts) do
+        if count > maxCount and count >= threshold then
+            maxCount = count
+            primaryObject = objName
+        end
+    end
+
+    return primaryObject, objectCounts
+end
+
+-- Helper function to parse hierarchical function name structure
+local function parseHierarchicalName(functionName, primaryObject)
+    -- Remove module prefix if present (e.g., "Module.func.ops.add" -> "func.ops.add")
+    local cleanName = functionName:gsub("^[^%.]*%.", "", 1)
+
+    -- Split by dots to get hierarchy levels
+    local parts = {}
+    for part in cleanName:gmatch("[^%.]+") do
+        table.insert(parts, part)
+    end
+
+    if #parts == 0 then
+        return {
+            depth = 0,
+            objectPath = "",
+            subPath = "",
+            functionName = functionName,
+            sortKey = "0000_" .. functionName
+        }
+    end
+
+    local funcName = parts[#parts] -- Last part is the function name
+    local objectPath = ""
+    local subPath = ""
+
+    if #parts > 1 then
+        -- Build object path (all parts except the last)
+        local pathParts = {}
+        for i = 1, #parts - 1 do
+            table.insert(pathParts, parts[i])
+        end
+        objectPath = table.concat(pathParts, ".")
+
+        -- Extract subpath (everything after primary object)
+        if primaryObject and objectPath:find("^" .. primaryObject .. "%.") then
+            subPath = objectPath:sub(#primaryObject + 2) -- +2 to skip the dot
+        elseif primaryObject and objectPath == primaryObject then
+            subPath = ""
+        else
+            subPath = objectPath
+        end
+    end
+
+    local depth = #parts - 1
+
+    -- Create sort key: depth (descending) + object path (ascending) + function name (ascending)
+    -- Format: 9999-depth_objectpath_functionname
+    local depthKey = string.format("%04d", 9999 - depth)
+    local sortKey = depthKey .. "_" .. objectPath .. "_" .. funcName
+
+    return {
+        depth = depth,
+        objectPath = objectPath,
+        subPath = subPath,
+        functionName = funcName,
+        sortKey = sortKey
+    }
+end
+
+-- Advanced hierarchical sorting function
+local function sortFunctionsHierarchically(functions)
+    -- Detect primary object names
+    local primaryObject, objectCounts = detectObjectNames(functions)
+
+    print(string.format("  Detected primary object: %s", primaryObject or "none"))
+    if primaryObject then
+        print(string.format("  Object usage counts: %s=%d", primaryObject, objectCounts[primaryObject]))
+        for obj, count in pairs(objectCounts) do
+            if obj ~= primaryObject then
+                print(string.format("    %s=%d", obj, count))
+            end
+        end
+    end
+
+    -- Parse hierarchical structure for each function
+    for _, func in ipairs(functions) do
+        func.hierarchy = parseHierarchicalName(func.name, primaryObject)
+    end
+
+    -- Sort by hierarchical criteria
+    table.sort(functions, function(a, b)
+        local aHier, bHier = a.hierarchy, b.hierarchy
+
+        -- Primary sort: by depth (descending - deeper hierarchies first)
+        if aHier.depth ~= bHier.depth then
+            return aHier.depth > bHier.depth
+        end
+
+        -- Secondary sort: by object path (ascending - alphabetical)
+        if aHier.objectPath ~= bHier.objectPath then
+            return aHier.objectPath < bHier.objectPath
+        end
+
+        -- Tertiary sort: by function name (ascending - alphabetical)
+        return aHier.functionName < bHier.functionName
+    end)
+
+    -- Debug output
+    print("  Function sorting order:")
+    for i, func in ipairs(functions) do
+        local h = func.hierarchy
+        print(string.format("    %d. %s (depth=%d, path='%s', func='%s')",
+            i, func.name, h.depth, h.objectPath, h.functionName))
+        if i > 10 then
+            print(string.format("    ... and %d more functions", #functions - 10))
+            break
+        end
+    end
+end
+
 -- Generate HTML documentation for a module
 local function generateModuleDoc(moduleName, content)
     local functions, count = parseFunctionDocs(content)
@@ -312,10 +518,8 @@ local function generateModuleDoc(moduleName, content)
         return nil
     end
 
-    -- Sort functions alphabetically by simple_name
-    table.sort(functions, function(a, b)
-        return a.simple_name < b.simple_name
-    end)
+    -- Sort functions using sophisticated hierarchical sorting
+    sortFunctionsHierarchically(functions)
 
     local docContent = {}
     table.insert(docContent, "{{Documentation}}")

@@ -11,14 +11,15 @@
 -- ]]
 local p = {}
 
-function p._row( row, elts, header )
+function p._row(row, elts, header)
     local _tag = header and 'th' or 'td'
     local ret = {}
     for _, v in ipairs(elts) do
         if type(v) == 'table' then
-            table.insert(ret,row:tag(_tag):wikitext(v.text):attr(v.attr or {}):addClass(v.class or ""):css(v.css or {}):done())
+            table.insert(ret,
+                row:tag(_tag):wikitext(v.text):attr(v.attr or {}):addClass(v.class or ""):css(v.css or {}):done())
         else
-            table.insert(ret,row:tag(_tag):wikitext(v):done())
+            table.insert(ret, row:tag(_tag):wikitext(v):done())
         end
     end
     row:done()
@@ -27,15 +28,15 @@ end
 
 function p._table(table, data)
     for _, rowdata in ipairs(data) do
-    	if rowdata ~= false then
-			local row = table:tag('tr');
-	        for _, v in ipairs(rowdata) do
-	            if not v then
-	            else
-	                row:tag(v.tag or 'td'):wikitext(v.text):attr(v.attr or {}):css(v.css or {}):done()
-	            end
-	        end
-	        row:done()
+        if rowdata ~= false then
+            local row = table:tag('tr');
+            for _, v in ipairs(rowdata) do
+                if not v then
+                else
+                    row:tag(v.tag or 'td'):wikitext(v.text):attr(v.attr or {}):css(v.css or {}):done()
+                end
+            end
+            row:done()
         end
     end
 end
