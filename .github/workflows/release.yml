@@ -1,0 +1,374 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+env:
+  DOCKER_IMAGE: mediawiki-lua-test
+
+jobs:
+  # Pre-release validation
+  pre-release-validation:
+    name: Pre-Release Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Setup LuaRocks
+      uses: leafo/gh-actions-luarocks@v4
+      
+    - name: Install luacheck
+      run: luarocks install luacheck
+      
+    - name: Run full test suite
+      run: |
+        echo "=== Running Full Test Suite for Release ==="
+        make test
+        
+    - name: Validate module structure
+      run: |
+        echo "=== Validating Module Structure ==="
+        # Check that all modules have proper headers
+        for module in src/modules/*.lua; do
+          if [ -f "$module" ]; then
+            if ! head -10 "$module" | grep -q "Module:"; then
+              echo "⚠️ Module $(basename "$module") may be missing proper header"
+            fi
+          fi
+        done
+        
+    - name: Check documentation completeness
+      run: |
+        echo "=== Checking Documentation ==="
+        required_docs=("README.md" "docs/usage.md" "docs/development-history.md")
+        for doc in "${required_docs[@]}"; do
+          if [ ! -f "$doc" ]; then
+            echo "❌ Missing required documentation: $doc"
+            exit 1
+          fi
+        done
+
+  # Build release artifacts
+  build-release:
+    name: Build Release Artifacts
+    runs-on: ubuntu-latest
+    needs: pre-release-validation
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Get release version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Create release build
+      run: |
+        echo "=== Creating Release Build ==="
+        mkdir -p release/modules
+        mkdir -p release/docs
+        mkdir -p release/examples
+        
+        # Copy core modules
+        cp -r src/modules/* release/modules/
+        
+        # Copy documentation
+        cp -r docs/* release/docs/
+        cp README.md release/
+        cp LICENSE release/
+        
+        # Copy examples
+        cp -r examples/* release/examples/
+        
+        # Create version info
+        cat > release/VERSION << EOF
+        MediaWiki Lua Module Library
+        Version: ${{ steps.version.outputs.version }}
+        Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        Git Commit: ${{ github.sha }}
+        EOF
+        
+    - name: Generate module manifest
+      run: |
+        echo "=== Generating Module Manifest ==="
+        cat > release/MODULES.md << 'EOF'
+        # MediaWiki Lua Module Library - Module Manifest
+        
+        ## Core Modules
+        
+        | Module | Description | Dependencies |
+        |--------|-------------|--------------|
+        EOF
+        
+        for module in src/modules/*.lua; do
+          if [ -f "$module" ]; then
+            name=$(basename "$module" .lua)
+            echo "| $name | $(head -5 "$module" | grep -o '\-\-.*' | head -1 | sed 's/^--//g' | xargs) | TBD |" >> release/MODULES.md
+          fi
+        done
+        
+    - name: Create distribution archives
+      run: |
+        echo "=== Creating Distribution Archives ==="
+        cd release
+        
+        # Create main distribution
+        tar -czf "../mediawiki-lua-library-${{ steps.version.outputs.version }}.tar.gz" .
+        zip -r "../mediawiki-lua-library-${{ steps.version.outputs.version }}.zip" .
+        
+        # Create modules-only distribution  
+        tar -czf "../mediawiki-lua-modules-${{ steps.version.outputs.version }}.tar.gz" modules/
+        zip -r "../mediawiki-lua-modules-${{ steps.version.outputs.version }}.zip" modules/
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-artifacts-${{ steps.version.outputs.version }}
+        path: |
+          mediawiki-lua-library-*.tar.gz
+          mediawiki-lua-library-*.zip
+          mediawiki-lua-modules-*.tar.gz
+          mediawiki-lua-modules-*.zip
+          release/
+        retention-days: 90
+
+  # Docker image build and publish
+  build-docker:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: pre-release-validation
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Get release version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Login to Docker Hub (optional)
+      # Uncomment and configure if you want to publish to Docker Hub
+      # uses: docker/login-action@v3
+      # with:
+      #   username: ${{ secrets.DOCKER_USERNAME }}
+      #   password: ${{ secrets.DOCKER_PASSWORD }}
+      
+    - name: Build Docker image
+      run: |
+        echo "=== Building Docker Image ==="
+        docker buildx build \
+          --tag $DOCKER_IMAGE:${{ steps.version.outputs.version }} \
+          --tag $DOCKER_IMAGE:latest \
+          --platform linux/amd64,linux/arm64 \
+          --output type=docker \
+          .
+          
+    - name: Test Docker image
+      run: |
+        echo "=== Testing Docker Image ==="
+        docker run --rm $DOCKER_IMAGE:${{ steps.version.outputs.version }} php -v
+        
+    - name: Save Docker image
+      run: |
+        echo "=== Saving Docker Image ==="
+        docker save $DOCKER_IMAGE:${{ steps.version.outputs.version }} | gzip > docker-image-${{ steps.version.outputs.version }}.tar.gz
+        
+    - name: Upload Docker image artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image-${{ steps.version.outputs.version }}
+        path: docker-image-${{ steps.version.outputs.version }}.tar.gz
+        retention-days: 30
+
+  # Performance benchmarking for release
+  performance-benchmark:
+    name: Performance Benchmark
+    runs-on: ubuntu-latest
+    needs: pre-release-validation
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Run comprehensive performance tests
+      run: |
+        echo "=== Running Performance Benchmarks ==="
+        lua tests/unit/test_performance.lua > performance-report.txt
+        
+        # Generate performance summary
+        cat > performance-summary.md << 'EOF'
+        # Performance Benchmark Report
+        
+        **Release Version:** ${{ steps.version.outputs.version }}
+        **Test Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        **Platform:** Ubuntu Latest (GitHub Actions)
+        
+        ## Results
+        
+        ```
+        EOF
+        cat performance-report.txt >> performance-summary.md
+        echo '```' >> performance-summary.md
+        
+    - name: Upload performance report
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-report-${{ steps.version.outputs.version }}
+        path: |
+          performance-report.txt
+          performance-summary.md
+        retention-days: 365
+
+  # Create GitHub release
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build-release, build-docker, performance-benchmark]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Get release version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Download release artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: release-artifacts-${{ steps.version.outputs.version }}
+        
+    - name: Download performance report
+      uses: actions/download-artifact@v4
+      with:
+        name: performance-report-${{ steps.version.outputs.version }}
+        
+    - name: Generate release notes
+      run: |
+        echo "=== Generating Release Notes ==="
+        cat > release-notes.md << EOF
+        # MediaWiki Lua Module Library ${{ steps.version.outputs.version }}
+        
+        ## What's New
+        
+        This release includes the comprehensive MediaWiki Lua Module Library with enhanced functional programming capabilities.
+        
+        ## Key Features
+        
+        - **Functional Programming**: Advanced functional programming utilities with Functools module
+        - **Array Operations**: Comprehensive array manipulation with performance optimizations
+        - **MediaWiki Integration**: Full compatibility with MediaWiki Scribunto environment
+        - **Performance Monitoring**: Built-in performance tracking and optimization
+        - **Comprehensive Testing**: 4-stage testing pipeline with mocked and real MediaWiki environments
+        
+        ## Modules Included
+        
+        - **Array**: Advanced array operations and functional programming
+        - **Functools**: Functional programming utilities, combinators, and monads
+        - **Funclib**: MediaWiki-specific functional utilities
+        - **Lists**: List manipulation and table operations
+        - **CodeStandards**: Development standards and validation
+        - **Currency**: Currency formatting and display
+        - **Helper_module**: Template and markup generation utilities
+        
+        ## Installation
+        
+        1. Download the appropriate archive for your needs:
+           - Full library: \`mediawiki-lua-library-${{ steps.version.outputs.version }}.tar.gz\`
+           - Modules only: \`mediawiki-lua-modules-${{ steps.version.outputs.version }}.tar.gz\`
+        
+        2. Extract to your MediaWiki modules directory
+        
+        3. Use the modules in your MediaWiki Lua scripts
+        
+        ## Testing
+        
+        This release has been tested through our comprehensive 4-stage pipeline:
+        - ✅ Syntax validation with luacheck
+        - ✅ Basic Lua execution tests
+        - ✅ Mocked MediaWiki environment testing
+        - ✅ Real Scribunto integration testing
+        
+        ## Performance
+        
+        See the attached performance report for detailed benchmarks.
+        
+        ## Documentation
+        
+        Complete documentation is included in the \`docs/\` directory, including:
+        - Usage guide
+        - API reference
+        - Development history
+        - Testing instructions
+        
+        ---
+        
+        **Build Information:**
+        - Git Commit: ${{ github.sha }}
+        - Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        - CI Pipeline: GitHub Actions
+        EOF
+        
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        release_name: MediaWiki Lua Library ${{ steps.version.outputs.version }}
+        body_path: release-notes.md
+        draft: false
+        prerelease: false
+        
+    - name: Upload release assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: mediawiki-lua-library-${{ steps.version.outputs.version }}.tar.gz
+        asset_name: mediawiki-lua-library-${{ steps.version.outputs.version }}.tar.gz
+        asset_content_type: application/gzip

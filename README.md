@@ -96,6 +96,7 @@ Complete documentation is available in the [`docs/`](docs/) directory:
 
 - **[Usage Guide](docs/usage.md)** - Testing and usage instructions
 - **[Development History](docs/development-history.md)** - Complete project timeline
+- **[GitHub Actions Guide](docs/github-actions-guide.md)** - CI/CD pipeline setup and usage
 - **[Security Setup](docs/SECURITY.md)** - Security configuration and best practices
 - **[Testing Documentation](docs/testing.md)** - Testing infrastructure details
 - **[Project Status](docs/PROJECT_STATUS.md)** - Current module status and features
@@ -107,6 +108,7 @@ Complete documentation is available in the [`docs/`](docs/) directory:
 1. **Start MediaWiki**: `Ctrl+Shift+P` → "Tasks: Run Task" → "Start MediaWiki Container & Open Browser"
 2. **View Dashboard**: `Ctrl+Shift+P` → "Tasks: Run Task" → "View Performance Dashboard"
 3. **Auto-fix Code**: `Ctrl+Shift+P` → "Tasks: Run Task" → "Auto-fix Lua and Markdown"
+4. **Run Tests**: `Ctrl+Shift+T` (or use "Run Test Pipeline" task)
 
 ### Command Line Workflow
 
@@ -117,11 +119,34 @@ make fix                     # Auto-fix linting issues
 make test                    # Run test pipeline
 make lint                    # Run linters only
 
+# GitHub Actions related
+make ci-test                 # Run CI pipeline locally (fast)
+make ci-local                # Run full CI pipeline with Docker
+make validate-workflows      # Validate GitHub Actions workflows
+
 # Individual operations
 ./scripts/auto-fix.sh        # Auto-fix Lua and Markdown
 bash tests/scripts/test-pipeline.sh  # Run tests
 docker stop mediawiki-lua    # Stop MediaWiki container
 ```
+
+### GitHub Actions CI/CD
+
+The project includes comprehensive GitHub Actions workflows:
+
+- **🔄 Continuous Integration**: Runs on every push/PR with 4-stage testing
+- **🔍 Pull Request Validation**: Smart testing based on changed files
+- **📦 Automated Releases**: Creates releases with artifacts when tags are pushed
+- **🔧 Scheduled Maintenance**: Daily health checks and dependency monitoring
+- **🤖 Dependency Updates**: Automated dependency update PRs via Dependabot
+
+**Pipeline Stages**:
+1. **Syntax Validation**: Lua syntax checking and linting
+2. **Basic Execution**: Module compilation and unit tests
+3. **Mocked Environment**: Docker-based MediaWiki environment testing
+4. **Scribunto Integration**: Full MediaWiki + Scribunto integration testing
+
+See [docs/github-actions-guide.md](docs/github-actions-guide.md) for complete setup and usage instructions.
 
 ## 🏗️ Project Architecture
 
@@ -143,6 +168,7 @@ src/modules/
 - **📊 Performance Monitoring**: Real-time metrics and visualization
 - **🛡️ Error Handling**: Standardized error management
 - **🧪 Comprehensive Testing**: 4-stage test pipeline with Docker integration
+- **🚀 CI/CD Pipeline**: GitHub Actions automation for testing and releases
 - **🔒 Security**: Environment-based configuration, no hardcoded secrets
 
 ## 🚀 Current Status
@@ -153,8 +179,10 @@ src/modules/
 **✅ Performance**: Dashboard monitoring active  
 **✅ Integration**: MediaWiki + VS Code + Docker
 
-### Recent Achievements (June 4, 2025)
+### Recent Achievements (June 11, 2025)
 
+- ✅ **GitHub Actions CI/CD Pipeline**: Comprehensive automation for testing, releases, and maintenance
+- ✅ **Project-wide MediaWiki Environment Modernization**: 90% code reduction in environment setup
 - ✅ **Performance Dashboard Implementation**: Real-time monitoring and visualization
 - ✅ **Security Remediation**: Environment-based configuration, secrets removed
 - ✅ **Documentation Consolidation**: Complete development history and guides

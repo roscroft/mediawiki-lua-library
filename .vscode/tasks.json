@@ -172,6 +172,66 @@
             "problemMatcher": []
         },
         {
+            "label": "Run CI Pipeline Locally",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "ci-test"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Full CI Pipeline with Docker",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "ci-local"
+            ],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Validate GitHub Actions Workflows",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "validate-workflows"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Generate Documentation for Specific Module (Refactored)",
             "type": "shell",
             "command": "lua",

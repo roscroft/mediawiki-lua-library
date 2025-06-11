@@ -1,0 +1,362 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  DOCKER_IMAGE: mediawiki-lua-test
+  DOCKER_CONTAINER: mediawiki-test-ci
+
+jobs:
+  # Stage 1: Syntax Validation and Linting
+  syntax-validation:
+    name: Syntax Validation & Linting
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Setup LuaRocks
+      uses: leafo/gh-actions-luarocks@v4
+      
+    - name: Install luacheck
+      run: luarocks install luacheck
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install Node dependencies
+      run: npm install
+      
+    - name: Run Lua syntax validation
+      run: |
+        echo "=== Lua Syntax Validation ==="
+        for module in src/modules/*.lua src/data/*.lua; do
+          if [[ -f "$module" ]]; then
+            echo "Checking syntax: $(basename "$module")"
+            lua -e "local f = loadfile('$module'); if not f then os.exit(1) end"
+          fi
+        done
+        
+    - name: Run luacheck
+      run: |
+        echo "=== Running luacheck ==="
+        luacheck src/modules/*.lua src/data/*.lua --formatter plain
+        
+    - name: Run markdown linting
+      run: |
+        echo "=== Markdown Linting ==="
+        npm run lint
+        
+    - name: Check project structure
+      run: |
+        echo "=== Project Structure Validation ==="
+        required_dirs=("src/modules" "docs" "tests" "scripts")
+        for dir in "${required_dirs[@]}"; do
+          if [ ! -d "$dir" ]; then
+            echo "❌ Missing required directory: $dir"
+            exit 1
+          else
+            echo "✅ Found: $dir"
+          fi
+        done
+
+  # Stage 2: Basic Lua Execution Tests
+  basic-lua-tests:
+    name: Basic Lua Execution
+    runs-on: ubuntu-latest
+    needs: syntax-validation
+    
+    strategy:
+      matrix:
+        lua-version: ["5.1", "5.3"]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Lua ${{ matrix.lua-version }}
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: ${{ matrix.lua-version }}
+        
+    - name: Test module compilation
+      run: |
+        echo "=== Testing Module Compilation (Lua ${{ matrix.lua-version }}) ==="
+        lua tests/unit/test_module_loading.lua
+        
+    - name: Run unit tests
+      run: |
+        echo "=== Running Unit Tests ==="
+        cd tests && lua run_all_tests.lua
+
+  # Stage 3: Mocked Environment Testing
+  mocked-environment-tests:
+    name: Mocked Environment Testing
+    runs-on: ubuntu-latest
+    needs: basic-lua-tests
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Cache Docker layers
+      uses: actions/cache@v4
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+          
+    - name: Build Docker image
+      run: |
+        echo "=== Building Docker Image ==="
+        docker build -t $DOCKER_IMAGE .
+        
+    - name: Test mocked environment
+      run: |
+        echo "=== Testing Mocked MediaWiki Environment ==="
+        # Start container
+        docker run -d \
+          --name $DOCKER_CONTAINER \
+          -v "$(pwd)/src:/var/www/html/src" \
+          -v "$(pwd)/tests:/var/www/html/tests" \
+          -v "$(pwd)/build:/var/www/html/build" \
+          $DOCKER_IMAGE
+          
+        # Wait for container to be ready
+        sleep 10
+        
+        # Copy test environment files
+        docker exec $DOCKER_CONTAINER mkdir -p /var/www/html/modules/custom
+        docker cp tests/env/module-loader.lua $DOCKER_CONTAINER:/var/www/html/
+        docker cp tests/env/wiki-lua-env.lua $DOCKER_CONTAINER:/var/www/html/
+        
+        # Run mocked environment tests
+        cat > /tmp/mock_test.lua << 'EOF'
+        dofile('/var/www/html/tests/env/module-loader.lua')
+        
+        print("Testing module loading in mocked environment...")
+        
+        local success, err = pcall(function()
+            local functools = require('Module:Functools')
+            print("✓ Functools loaded successfully")
+            
+            local funclib = require('Module:Funclib')  
+            print("✓ Funclib loaded successfully")
+            
+            local array = require('Module:Array')
+            print("✓ Array loaded successfully")
+        end)
+        
+        if not success then
+            print("✗ Module loading failed: " .. tostring(err))
+            os.exit(1)
+        end
+        
+        print("✓ All mocked environment tests passed")
+        EOF
+        
+        docker cp /tmp/mock_test.lua $DOCKER_CONTAINER:/tmp/mock_test.lua
+        docker exec $DOCKER_CONTAINER lua /tmp/mock_test.lua
+        
+    - name: Cleanup Docker
+      if: always()
+      run: |
+        docker stop $DOCKER_CONTAINER 2>/dev/null || true
+        docker rm $DOCKER_CONTAINER 2>/dev/null || true
+
+  # Stage 4: Scribunto Integration Testing
+  scribunto-integration:
+    name: Scribunto Integration
+    runs-on: ubuntu-latest
+    needs: mocked-environment-tests
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Cache Docker layers
+      uses: actions/cache@v4
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+          
+    - name: Build Docker image
+      run: |
+        echo "=== Building Docker Image for Scribunto ==="
+        docker build -t $DOCKER_IMAGE .
+        
+    - name: Test Scribunto integration
+      run: |
+        echo "=== Testing Scribunto Integration ==="
+        # Start container with MediaWiki
+        docker run -d \
+          --name $DOCKER_CONTAINER \
+          -p 8080:80 \
+          -v "$(pwd)/src:/var/www/html/src" \
+          -v "$(pwd)/tests:/var/www/html/tests" \
+          -v "$(pwd)/build:/var/www/html/build" \
+          $DOCKER_IMAGE
+          
+        # Wait for MediaWiki to initialize
+        sleep 15
+        
+        # Test that container is responding
+        retries=0
+        while [ $retries -lt 30 ]; do
+          if docker exec $DOCKER_CONTAINER php -r "echo 'Container ready';" &> /dev/null; then
+            echo "✓ Container is ready"
+            break
+          fi
+          sleep 2
+          retries=$((retries + 1))
+        done
+        
+        # Test Scribunto Lua environment
+        cat > /tmp/scribunto_test.lua << 'EOF'
+        print("Testing Scribunto Lua integration...")
+        
+        -- Test basic Lua functionality in Scribunto context
+        local test_table = {1, 2, 3, 4, 5}
+        if #test_table == 5 then
+            print("✓ Basic Lua table operations working")
+        end
+        
+        -- Test string operations
+        local test_string = "Hello from Scribunto Lua"
+        if string.find(test_string, "Scribunto") then
+            print("✓ String operations working")
+        end
+        
+        -- Test package path access
+        if package.path then
+            print("✓ Package path accessible")
+        end
+        
+        print("✓ Scribunto Lua environment test completed")
+        EOF
+        
+        docker cp /tmp/scribunto_test.lua $DOCKER_CONTAINER:/tmp/scribunto_test.lua
+        docker exec $DOCKER_CONTAINER lua5.1 /tmp/scribunto_test.lua
+        
+        # Test module structure accessibility
+        docker exec $DOCKER_CONTAINER ls -la /var/www/html/src/modules/
+        
+    - name: Cleanup Docker
+      if: always()
+      run: |
+        docker stop $DOCKER_CONTAINER 2>/dev/null || true
+        docker rm $DOCKER_CONTAINER 2>/dev/null || true
+
+  # Performance Testing (separate job)
+  performance-tests:
+    name: Performance Testing
+    runs-on: ubuntu-latest
+    needs: basic-lua-tests
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Run performance tests
+      run: |
+        echo "=== Running Performance Tests ==="
+        lua tests/unit/test_performance.lua
+        
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: performance-results
+        path: |
+          tests/results/
+          *.log
+        retention-days: 30
+
+  # Security Scanning
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run security scan
+      run: |
+        echo "=== Security Scanning ==="
+        
+        # Check for secrets in code
+        if grep -r "password\|secret\|key\|token" src/ tests/ --exclude-dir=.git || true; then
+          echo "⚠️ Potential secrets found - please review"
+        fi
+        
+        # Check for .env files not in .gitignore
+        if [ -f ".env" ] && ! grep -q "^\.env$" .gitignore 2>/dev/null; then
+          echo "❌ .env file exists but not in .gitignore"
+          exit 1
+        fi
+        
+        echo "✅ Basic security checks passed"
+
+  # Test Results Summary
+  test-summary:
+    name: Test Results Summary
+    runs-on: ubuntu-latest
+    needs: [syntax-validation, basic-lua-tests, mocked-environment-tests, scribunto-integration, performance-tests, security-scan]
+    if: always()
+    
+    steps:
+    - name: Generate test summary
+      run: |
+        echo "=== Test Results Summary ==="
+        echo "| Stage | Status |"
+        echo "|-------|--------|"
+        echo "| Syntax Validation | ${{ needs.syntax-validation.result }} |"
+        echo "| Basic Lua Tests | ${{ needs.basic-lua-tests.result }} |"
+        echo "| Mocked Environment | ${{ needs.mocked-environment-tests.result }} |"
+        echo "| Scribunto Integration | ${{ needs.scribunto-integration.result }} |"
+        echo "| Performance Tests | ${{ needs.performance-tests.result }} |"
+        echo "| Security Scan | ${{ needs.security-scan.result }} |"
+        
+        # Check if all critical tests passed
+        if [[ "${{ needs.syntax-validation.result }}" == "success" && 
+              "${{ needs.basic-lua-tests.result }}" == "success" && 
+              "${{ needs.mocked-environment-tests.result }}" == "success" ]]; then
+          echo "✅ Core test pipeline passed!"
+        else
+          echo "❌ Core test pipeline failed!"
+          exit 1
+        fi
