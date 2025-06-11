@@ -1,0 +1,540 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start MediaWiki Container",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "cd \"${workspaceFolder}\" && bash scripts/start-mediawiki.sh"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "View Performance Dashboard",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "cd \"${workspaceFolder}\" && bash scripts/view-dashboard.sh"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Open MediaWiki in Simple Browser",
+            "type": "shell",
+            "command": "echo",
+            "args": [
+                "Use Ctrl+Shift+P -> 'Simple Browser: Show' -> 'http://localhost:8080' to open MediaWiki"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Open Dashboard in Simple Browser",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "echo 'Opening Performance Dashboard in Simple Browser...' && echo 'Use Ctrl+Shift+P -> Simple Browser: Show -> file:///tmp/wiki-lua-dashboard.html'"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Auto-fix Lua and Markdown",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/auto-fix.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Run Test Pipeline",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "test"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Rebuild Docker Image",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/scripts/rebuild-docker-image.sh"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate Module Documentation",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/generate-module-docs.sh",
+            "args": [],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate Documentation for Specific Module",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/generate-module-docs.sh",
+            "args": [
+                "${input:moduleName}"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate Documentation (Simple - All Modules)",
+            "type": "shell",
+            "command": "lua",
+            "args": [
+                "scripts/generate-docs-simple.lua",
+                "--verbose"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate Documentation (Simple - Specific Module)",
+            "type": "shell",
+            "command": "lua",
+            "args": [
+                "scripts/generate-docs-simple.lua",
+                "--verbose",
+                "${input:moduleName}"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run CI Pipeline Locally",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "ci-test"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Full CI Pipeline with Docker",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "ci-local"
+            ],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Validate GitHub Actions Workflows",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "validate-workflows"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate Documentation (Unified)",
+            "type": "shell",
+            "command": "lua",
+            "args": [
+                "scripts/generate-docs-unified.lua"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate Documentation (Unified - Specific Module)",
+            "type": "shell",
+            "command": "lua",
+            "args": [
+                "scripts/generate-docs-unified.lua",
+                "${input:moduleName}"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate Documentation (Unified - Custom Style)",
+            "type": "shell",
+            "command": "lua",
+            "args": [
+                "scripts/generate-docs-unified.lua",
+                "--style=${input:docStyle}",
+                "--verbose"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Demo (Unified)",
+            "type": "shell",
+            "command": "lua",
+            "args": [
+                "scripts/demo-unified.lua"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Demo (Interactive)",
+            "type": "shell",
+            "command": "lua",
+            "args": [
+                "scripts/demo-unified.lua",
+                "--interactive"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Demo (Specific Type)",
+            "type": "shell",
+            "command": "lua",
+            "args": [
+                "scripts/demo-unified.lua",
+                "--type=${input:demoType}",
+                "--verbose"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Tests (Unified)",
+            "type": "shell",
+            "command": "lua",
+            "args": [
+                "scripts/test-unified.lua"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Tests (All Suites)",
+            "type": "shell",
+            "command": "lua",
+            "args": [
+                "scripts/test-unified.lua",
+                "--suite=all",
+                "--verbose"
+            ],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Tests (Specific Suite)",
+            "type": "shell",
+            "command": "lua",
+            "args": [
+                "scripts/test-unified.lua",
+                "--suite=${input:testSuite}",
+                "--verbose"
+            ],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Open GitHub Wiki in Browser",
+            "type": "shell",
+            "command": "echo",
+            "args": [
+                "Opening GitHub Wiki... Go to: https://github.com/roscroft/mediawiki-lua-library/wiki"
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "moduleName",
+            "type": "promptString",
+            "description": "Enter the module name (without .lua extension)"
+        },
+        {
+            "id": "docStyle",
+            "type": "pickString",
+            "description": "Select documentation style",
+            "options": [
+                {
+                    "label": "Refactored (Modular)",
+                    "value": "refactored"
+                },
+                {
+                    "label": "Elegant (Clean)",
+                    "value": "elegant"
+                },
+                {
+                    "label": "Functional (Core)",
+                    "value": "functional"
+                },
+                {
+                    "label": "Ultimate (Advanced)",
+                    "value": "ultimate"
+                }
+            ],
+            "default": "refactored"
+        },
+        {
+            "id": "demoType",
+            "type": "pickString",
+            "description": "Select demo type",
+            "options": [
+                {
+                    "label": "Dependency Simplification",
+                    "value": "simplified"
+                },
+                {
+                    "label": "Functional Elegance",
+                    "value": "elegance"
+                },
+                {
+                    "label": "Helper Module Enhancements",
+                    "value": "helper"
+                },
+                {
+                    "label": "Safe Helper Usage",
+                    "value": "safe"
+                },
+                {
+                    "label": "Ultimate Functional Mastery",
+                    "value": "mastery"
+                }
+            ],
+            "default": "simplified"
+        },
+        {
+            "id": "testSuite",
+            "type": "pickString",
+            "description": "Select test suite",
+            "options": [
+                {
+                    "label": "Core Functional Patterns",
+                    "value": "core"
+                },
+                {
+                    "label": "Functional Patterns Validation",
+                    "value": "patterns"
+                },
+                {
+                    "label": "Module Integration Tests",
+                    "value": "integration"
+                },
+                {
+                    "label": "Dependencies Simplification",
+                    "value": "dependencies"
+                },
+                {
+                    "label": "All Test Suites",
+                    "value": "all"
+                }
+            ],
+            "default": "core"
+        }
+    ]
+}

@@ -1,0 +1,280 @@
+name: Intelligent Issue Management
+
+on:
+  issues:
+    types: [opened, labeled]
+  issue_comment:
+    types: [created]
+  schedule:
+    # Run weekly on Mondays at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  auto-label-issues:
+    name: Auto-Label Issues
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    
+    steps:
+    - name: Auto-label based on content
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { issue } = context.payload;
+          const title = issue.title.toLowerCase();
+          const body = issue.body ? issue.body.toLowerCase() : '';
+          
+          const labels = [];
+          
+          // Auto-detect issue types
+          if (title.includes('bug') || body.includes('error') || body.includes('failed')) {
+            labels.push('bug');
+          }
+          
+          if (title.includes('feature') || title.includes('enhancement') || body.includes('add')) {
+            labels.push('enhancement');
+          }
+          
+          if (title.includes('doc') || body.includes('documentation') || body.includes('readme')) {
+            labels.push('documentation');
+          }
+          
+          if (title.includes('test') || body.includes('testing') || body.includes('spec')) {
+            labels.push('testing');
+          }
+          
+          if (title.includes('security') || body.includes('vulnerability') || body.includes('cve')) {
+            labels.push('security');
+          }
+          
+          if (title.includes('performance') || body.includes('slow') || body.includes('optimization')) {
+            labels.push('performance');
+          }
+          
+          // Auto-detect components
+          if (body.includes('lua') || body.includes('module') || body.includes('src/modules')) {
+            labels.push('lua-modules');
+          }
+          
+          if (body.includes('github actions') || body.includes('ci') || body.includes('workflow')) {
+            labels.push('ci-cd');
+          }
+          
+          if (body.includes('docker') || body.includes('mediawiki') || body.includes('scribunto')) {
+            labels.push('environment');
+          }
+          
+          if (body.includes('vscode') || body.includes('task') || body.includes('development')) {
+            labels.push('developer-experience');
+          }
+          
+          // Apply labels
+          if (labels.length > 0) {
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: labels
+            });
+            
+            console.log(`Added labels: ${labels.join(', ')}`);
+          }
+
+  suggest-automation:
+    name: Suggest Automation Opportunities
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    
+    steps:
+    - name: Analyze issue for automation potential
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { issue } = context.payload;
+          const title = issue.title.toLowerCase();
+          const body = issue.body ? issue.body.toLowerCase() : '';
+          
+          let automationSuggestions = [];
+          
+          // Check for manual process patterns
+          if (body.includes('manually') || body.includes('hand') || body.includes('remember to')) {
+            automationSuggestions.push('🤖 This issue mentions manual processes that could potentially be automated');
+          }
+          
+          if (body.includes('every time') || body.includes('repeatedly') || body.includes('often')) {
+            automationSuggestions.push('🔄 This appears to be a recurring task - consider automation');
+          }
+          
+          if (body.includes('deployment') || body.includes('release') || body.includes('build')) {
+            automationSuggestions.push('🚀 Consider adding this to the CI/CD pipeline');
+          }
+          
+          if (body.includes('validation') || body.includes('check') || body.includes('verify')) {
+            automationSuggestions.push('✅ This validation could be automated in GitHub Actions');
+          }
+          
+          if (body.includes('documentation') && body.includes('update')) {
+            automationSuggestions.push('📚 Documentation updates could be automated');
+          }
+          
+          // Post suggestions as a comment
+          if (automationSuggestions.length > 0) {
+            const comment = `## 🤖 Automation Suggestions\n\n${automationSuggestions.map(s => `- ${s}`).join('\n')}\n\n*This is an automated analysis. Consider if any of these processes could be automated using VS Code tasks, GitHub Actions, or scripts.*`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: comment
+            });
+          }
+
+  weekly-automation-report:
+    name: Weekly Automation Report
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate automation report
+      run: |
+        echo "📊 Weekly Automation Report" > automation-report.md
+        echo "==========================" >> automation-report.md
+        echo "" >> automation-report.md
+        echo "**Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> automation-report.md
+        echo "" >> automation-report.md
+        
+        echo "## 🔧 Current Automation Status" >> automation-report.md
+        echo "" >> automation-report.md
+        
+        # Count VS Code tasks
+        if [ -f ".vscode/tasks.json" ]; then
+          task_count=$(grep -c "\"label\"" .vscode/tasks.json 2>/dev/null || echo "0")
+          echo "- **VS Code Tasks:** $task_count" >> automation-report.md
+        fi
+        
+        # Count GitHub Actions workflows
+        workflow_count=$(find .github/workflows -name "*.yml" | wc -l)
+        echo "- **GitHub Actions Workflows:** $workflow_count" >> automation-report.md
+        
+        # Count executable scripts
+        script_count=$(find scripts -name "*.sh" -executable | wc -l)
+        echo "- **Executable Scripts:** $script_count" >> automation-report.md
+        
+        # Count Makefile targets
+        if [ -f "Makefile" ]; then
+          make_targets=$(grep -c "^[a-zA-Z].*:" Makefile 2>/dev/null || echo "0")
+          echo "- **Makefile Targets:** $make_targets" >> automation-report.md
+        fi
+        
+        echo "" >> automation-report.md
+        echo "## 💡 Automation Opportunities" >> automation-report.md
+        echo "" >> automation-report.md
+        
+        # Look for manual processes in recent commits
+        echo "### Recent Manual Process Indicators" >> automation-report.md
+        echo "" >> automation-report.md
+        
+        # Check recent commit messages for manual indicators
+        manual_indicators=$(git log --oneline --since="7 days ago" | grep -i "manual\|hand\|fix\|update" | head -5 || true)
+        if [ -n "$manual_indicators" ]; then
+          echo "Recent commits that might indicate manual processes:" >> automation-report.md
+          echo '```' >> automation-report.md
+          echo "$manual_indicators" >> automation-report.md
+          echo '```' >> automation-report.md
+        else
+          echo "No obvious manual process indicators in recent commits." >> automation-report.md
+        fi
+        
+        echo "" >> automation-report.md
+        echo "## 🎯 Recommendations" >> automation-report.md
+        echo "" >> automation-report.md
+        echo "1. **File Creation Safety**: Automated validation is now in place" >> automation-report.md
+        echo "2. **VS Code Integration**: Consider adding more tasks for frequently used scripts" >> automation-report.md
+        echo "3. **Documentation**: Automate wiki updates when modules change" >> automation-report.md
+        echo "4. **Testing**: 4-stage pipeline is automated, consider adding more performance tests" >> automation-report.md
+        echo "5. **Security**: Regular automated scanning is active" >> automation-report.md
+        
+    - name: Upload automation report
+      uses: actions/upload-artifact@v4
+      with:
+        name: automation-report-${{ github.run_number }}
+        path: automation-report.md
+        retention-days: 90
+
+  automation-health-check:
+    name: Automation Health Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check automation health
+      run: |
+        echo "🏥 Automation Health Check"
+        echo "========================="
+        
+        health_score=100
+        issues=()
+        
+        # Check VS Code tasks
+        if [ ! -f ".vscode/tasks.json" ]; then
+          health_score=$((health_score - 20))
+          issues+=("Missing VS Code tasks configuration")
+        fi
+        
+        # Check GitHub Actions
+        if [ $(find .github/workflows -name "*.yml" | wc -l) -lt 5 ]; then
+          health_score=$((health_score - 15))
+          issues+=("Limited GitHub Actions workflows")
+        fi
+        
+        # Check for executable scripts
+        if [ $(find scripts -name "*.sh" -executable | wc -l) -lt 5 ]; then
+          health_score=$((health_score - 10))
+          issues+=("Limited automation scripts")
+        fi
+        
+        # Check Makefile
+        if [ ! -f "Makefile" ]; then
+          health_score=$((health_score - 15))
+          issues+=("Missing Makefile for common tasks")
+        fi
+        
+        # Check for test automation
+        if [ ! -f "tests/scripts/test-pipeline.sh" ]; then
+          health_score=$((health_score - 20))
+          issues+=("Missing automated test pipeline")
+        fi
+        
+        # Check for file validation
+        if [ ! -f "scripts/validate-file-creation.sh" ]; then
+          health_score=$((health_score - 10))
+          issues+=("Missing file creation validation")
+        fi
+        
+        # Report health status
+        echo "📊 Automation Health Score: $health_score/100"
+        
+        if [ "$health_score" -ge 90 ]; then
+          echo "✅ Excellent automation health"
+        elif [ "$health_score" -ge 75 ]; then
+          echo "🔶 Good automation health"
+        elif [ "$health_score" -ge 50 ]; then
+          echo "⚠️ Fair automation health - room for improvement"
+        else
+          echo "❌ Poor automation health - significant improvements needed"
+        fi
+        
+        if [ ${#issues[@]} -gt 0 ]; then
+          echo ""
+          echo "🔧 Issues to address:"
+          for issue in "${issues[@]}"; do
+            echo "  - $issue"
+          done
+        fi

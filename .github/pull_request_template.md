@@ -35,6 +35,7 @@ Relates to #(issue_number)
 - [ ] **Scribunto Integration Testing** - Full MediaWiki integration
 
 ### Manual Testing
+
 - [ ] Local tests pass (`make test`)
 - [ ] Linting passes (`make lint`)
 - [ ] CI pipeline passes locally (`make ci-test`)

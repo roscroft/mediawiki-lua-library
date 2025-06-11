@@ -1,0 +1,60 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Lua Script",
+            "type": "lua",
+            "request": "launch",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "args": [],
+            "luaExe": "lua5.1",
+            "luaVersion": "5.1"
+        },
+        {
+            "name": "Debug Current Lua Module",
+            "type": "lua",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/demo-unified.lua",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "args": [
+                "${file}"
+            ],
+            "luaExe": "lua5.1",
+            "luaVersion": "5.1"
+        },
+        {
+            "name": "Run Test Suite",
+            "type": "lua",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/test-unified.lua",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "args": [
+                "--verbose"
+            ],
+            "luaExe": "lua5.1",
+            "luaVersion": "5.1"
+        },
+        {
+            "name": "Debug MediaWiki Container",
+            "type": "node",
+            "request": "attach",
+            "port": 9229,
+            "address": "localhost",
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/var/www/html"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Debug Module + Tests",
+            "configurations": [
+                "Debug Current Lua Module",
+                "Run Test Suite"
+            ]
+        }
+    ]
+}

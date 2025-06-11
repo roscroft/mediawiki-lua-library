@@ -1,0 +1,26 @@
+{
+    "recommendations": [
+        "sumneko.lua",
+        "github.copilot",
+        "github.copilot-chat",
+        "github.vscode-pull-request-github",
+        "github.vscode-github-actions",
+        "davidanson.vscode-markdownlint",
+        "shd101wyy.markdown-preview-enhanced",
+        "ms-vscode.vscode-json",
+        "redhat.vscode-yaml",
+        "ms-vscode.vscode-typescript-next",
+        "hbenl.vscode-test-explorer",
+        "ms-vscode.test-adapter-converter",
+        "ms-vscode-remote.remote-containers",
+        "ms-azuretools.vscode-docker",
+        "gruntfuggly.todo-tree",
+        "streetsidesoftware.code-spell-checker",
+        "ms-vscode.hexeditor"
+    ],
+    "unwantedRecommendations": [
+        "ms-vscode.vscode-typescript",
+        "yzhang.markdown-all-in-one",
+        "koihik.vscode-lua-format",
+    ]
+}

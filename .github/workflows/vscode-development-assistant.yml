@@ -1,0 +1,228 @@
+name: VS Code Development Assistant
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['.vscode/**', 'scripts/**']
+  pull_request:
+    paths: ['.vscode/**', 'scripts/**']
+  workflow_dispatch:
+    inputs:
+      generate_tasks:
+        description: 'Generate VS Code tasks for new scripts'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  vscode-tasks-validation:
+    name: VS Code Tasks Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate VS Code tasks configuration
+      run: |
+        echo "🔍 Validating VS Code tasks..."
+        
+        if [ -f ".vscode/tasks.json" ]; then
+          echo "✅ VS Code tasks.json exists"
+          
+          # Validate JSON syntax
+          if python3 -m json.tool .vscode/tasks.json > /dev/null 2>&1; then
+            echo "✅ tasks.json has valid JSON syntax"
+          else
+            echo "❌ tasks.json has invalid JSON syntax"
+            exit 1
+          fi
+          
+          # Check for required tasks
+          required_tasks=("Run Test Pipeline" "Auto-fix" "Start MediaWiki")
+          for task in "${required_tasks[@]}"; do
+            if grep -q "$task" .vscode/tasks.json; then
+              echo "✅ Found task: $task"
+            else
+              echo "⚠️ Missing recommended task: $task"
+            fi
+          done
+          
+        else
+          echo "❌ VS Code tasks.json not found"
+          exit 1
+        fi
+        
+    - name: Check script coverage in tasks
+      run: |
+        echo "📋 Checking script coverage in VS Code tasks..."
+        
+        # Find all executable scripts
+        scripts=$(find scripts -name "*.sh" -executable | sort)
+        
+        echo "📂 Available scripts:"
+        for script in $scripts; do
+          script_name=$(basename "$script" .sh)
+          if grep -q "$script" .vscode/tasks.json; then
+            echo "✅ $script (has VS Code task)"
+          else
+            echo "⚠️ $script (no VS Code task)"
+          fi
+        done
+
+  auto-generate-tasks:
+    name: Auto-Generate VS Code Tasks
+    runs-on: ubuntu-latest
+    if: github.event.inputs.generate_tasks == 'true' || github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate tasks for new scripts
+      run: |
+        echo "🔧 Checking for new scripts that need VS Code tasks..."
+        
+        # Get list of scripts not in tasks.json
+        new_scripts=""
+        for script in scripts/*.sh; do
+          if [ -f "$script" ] && [ -x "$script" ]; then
+            script_basename=$(basename "$script")
+            if ! grep -q "$script_basename" .vscode/tasks.json; then
+              new_scripts="$new_scripts $script"
+            fi
+          fi
+        done
+        
+        if [ -n "$new_scripts" ]; then
+          echo "📝 Found scripts without VS Code tasks:"
+          for script in $new_scripts; do
+            echo "  - $script"
+          done
+          
+          echo "💡 Consider adding these scripts to .vscode/tasks.json"
+          echo "Use the existing tasks as templates"
+        else
+          echo "✅ All scripts appear to have VS Code tasks"
+        fi
+        
+    - name: Validate script descriptions
+      run: |
+        echo "📖 Validating script descriptions..."
+        
+        for script in scripts/*.sh; do
+          if [ -f "$script" ]; then
+            # Check if script has help/description
+            if head -10 "$script" | grep -q "# Description\|# Usage\|echo.*Usage"; then
+              echo "✅ $(basename "$script") has description/usage info"
+            else
+              echo "⚠️ $(basename "$script") missing description/usage info"
+            fi
+          fi
+        done
+
+  development-workflow-optimization:
+    name: Development Workflow Optimization
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Analyze workflow efficiency
+      run: |
+        echo "⚡ Analyzing development workflow efficiency..."
+        
+        # Check for automated vs manual tasks
+        echo "🔄 Automation Analysis:"
+        
+        # Count automated tasks
+        automated_count=$(grep -c "\"type\": \"shell\"" .vscode/tasks.json 2>/dev/null || echo "0")
+        echo "  Automated VS Code tasks: $automated_count"
+        
+        # Count available scripts
+        script_count=$(find scripts -name "*.sh" -executable | wc -l)
+        echo "  Available scripts: $script_count"
+        
+        # Calculate automation ratio
+        if [ "$script_count" -gt 0 ]; then
+          automation_ratio=$((automated_count * 100 / script_count))
+          echo "  Automation ratio: ${automation_ratio}%"
+          
+          if [ "$automation_ratio" -gt 80 ]; then
+            echo "✅ High automation level"
+          elif [ "$automation_ratio" -gt 60 ]; then
+            echo "🔶 Good automation level"
+          else
+            echo "⚠️ Low automation level - consider adding more VS Code tasks"
+          fi
+        fi
+        
+    - name: Check for common development patterns
+      run: |
+        echo "🔍 Checking for common development patterns..."
+        
+        patterns=(
+          "make setup.*setup"
+          "make test.*test"
+          "make lint.*lint"
+          "make fix.*fix"
+        )
+        
+        for pattern in "${patterns[@]}"; do
+          command=$(echo "$pattern" | cut -d'*' -f1)
+          description=$(echo "$pattern" | cut -d'*' -f2)
+          
+          if [ -f "Makefile" ] && grep -q "$command" Makefile; then
+            echo "✅ Found $description automation in Makefile"
+          else
+            echo "⚠️ Missing $description automation"
+          fi
+        done
+
+  recommend-optimizations:
+    name: Recommend Workflow Optimizations
+    runs-on: ubuntu-latest
+    needs: [vscode-tasks-validation, development-workflow-optimization]
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Generate optimization recommendations
+      run: |
+        echo "💡 Workflow Optimization Recommendations"
+        echo "======================================="
+        
+        # Analyze current state and suggest improvements
+        echo ""
+        echo "🔧 Potential Automation Opportunities:"
+        
+        # Check for manual processes that could be automated
+        manual_processes=(
+          "File creation validation"
+          "Documentation updates"
+          "Performance monitoring"
+          "Security scanning"
+          "Code quality checks"
+        )
+        
+        for process in "${manual_processes[@]}"; do
+          # Simple heuristic - check if there are workflows for these
+          workflow_exists=$(find .github/workflows -name "*.yml" -exec grep -l "$process" {} \; 2>/dev/null | wc -l)
+          
+          if [ "$workflow_exists" -eq 0 ]; then
+            echo "  📋 Consider automating: $process"
+          else
+            echo "  ✅ Automated: $process"
+          fi
+        done
+        
+        echo ""
+        echo "🎯 Recommended Next Steps:"
+        echo "  1. Add more VS Code tasks for frequently used scripts"
+        echo "  2. Create GitHub Actions for repetitive manual tasks"
+        echo "  3. Implement pre-commit hooks for code quality"
+        echo "  4. Add automated dependency updates"
+        echo "  5. Create issue templates for common problems"

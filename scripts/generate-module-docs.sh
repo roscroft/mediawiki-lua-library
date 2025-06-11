@@ -1,20 +1,15 @@
 #!/bin/bash
 
 # Script to generate documentation for Lua modules
+# Wrapper for the unified documentation generator
 
 # Change to script directory
 cd "$(dirname "$0")"
 
-# Check for LuaFileSystem
-if ! luarocks list | grep -q "luafilesystem"; then
-    echo "Installing LuaFileSystem..."
-    luarocks install luafilesystem
-fi
-
-# Run the documentation generator
-echo "Running documentation generator..."
+# Run the unified documentation generator
+echo "Running unified documentation generator..."
 # Pass all arguments from shell script to lua script
-lua generate-docs.lua "$@"
+lua generate-docs-unified.lua "$@"
 
 # Output status
 if [ $? -eq 0 ]; then

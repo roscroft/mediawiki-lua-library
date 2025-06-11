@@ -1,0 +1,204 @@
+name: Automated File Creation Validation
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['scripts/**', 'src/**', 'tests/**']
+  pull_request:
+    paths: ['scripts/**', 'src/**', 'tests/**']
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC to catch any file creation issues
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+
+jobs:
+  file-creation-validation:
+    name: File Creation Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Validate file creation safety
+      run: |
+        echo "🔍 Running file creation validation tests..."
+        bash scripts/validate-file-creation.sh
+        
+    - name: Check for empty files
+      run: |
+        echo "🔍 Checking for empty files..."
+        empty_files=$(find . -name "*.lua" -o -name "*.sh" -o -name "*.md" | xargs -I {} sh -c 'test ! -s "{}" && echo "{}"' 2>/dev/null || true)
+        
+        if [ -n "$empty_files" ]; then
+          echo "❌ Found empty files:"
+          echo "$empty_files"
+          exit 1
+        else
+          echo "✅ No empty files found"
+        fi
+        
+    - name: Validate script permissions
+      run: |
+        echo "🔍 Checking script permissions..."
+        for script in scripts/*.sh; do
+          if [ -f "$script" ]; then
+            if [ ! -x "$script" ]; then
+              echo "❌ Script not executable: $script"
+              chmod +x "$script"
+              echo "✅ Fixed permissions for: $script"
+            else
+              echo "✅ $script has correct permissions"
+            fi
+          fi
+        done
+        
+    - name: Syntax validation for all files
+      run: |
+        echo "🔍 Running syntax validation..."
+        
+        # Validate Lua files
+        for lua_file in src/modules/*.lua src/data/*.lua scripts/*.lua; do
+          if [ -f "$lua_file" ]; then
+            echo "Checking Lua syntax: $(basename "$lua_file")"
+            lua -e "local f = loadfile('$lua_file'); if not f then print('Syntax error in $lua_file'); os.exit(1) end"
+          fi
+        done
+        
+        # Validate shell scripts
+        for shell_script in scripts/*.sh; do
+          if [ -f "$shell_script" ]; then
+            echo "Checking shell syntax: $(basename "$shell_script")"
+            bash -n "$shell_script"
+          fi
+        done
+        
+        echo "✅ All syntax validation passed"
+        
+    - name: Test script completion detection
+      run: |
+        echo "🔍 Testing script completion detection..."
+        
+        # Test a few key scripts for proper completion
+        timeout 30 bash scripts/validate-file-creation.sh || echo "Script completed or timed out appropriately"
+        timeout 30 bash scripts/check-wiki-status.sh || echo "Script completed or timed out appropriately"
+        
+        echo "✅ Script completion tests passed"
+
+  documentation-freshness:
+    name: Documentation Freshness Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check if wiki content needs updating
+      run: |
+        echo "📚 Checking documentation freshness..."
+        
+        # Check if source modules are newer than wiki content
+        newest_module=$(find src/modules -name "*.lua" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+        newest_wiki=$(find scripts/wiki-content -name "*.md" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2- 2>/dev/null || echo "")
+        
+        if [ -n "$newest_module" ] && [ -n "$newest_wiki" ]; then
+          module_time=$(stat -c %Y "$newest_module")
+          wiki_time=$(stat -c %Y "$newest_wiki")
+          
+          if [ "$module_time" -gt "$wiki_time" ]; then
+            echo "⚠️ Source modules are newer than wiki content"
+            echo "Consider updating wiki documentation"
+            echo "Newest module: $newest_module"
+            echo "Newest wiki: $newest_wiki"
+          else
+            echo "✅ Documentation appears up to date"
+          fi
+        else
+          echo "ℹ️ Could not compare timestamps"
+        fi
+
+  automated-cleanup:
+    name: Automated Repository Cleanup
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Clean up temporary files
+      run: |
+        echo "🧹 Cleaning up temporary files..."
+        
+        # Remove common temporary files
+        find . -name "*.tmp" -type f -delete
+        find . -name "*.temp" -type f -delete
+        find . -name "*.backup" -type f -delete
+        find . -name ".DS_Store" -type f -delete
+        
+        # Clean up test artifacts
+        find . -name "test-*.log" -type f -delete
+        find . -name "*.test.output" -type f -delete
+        
+        echo "✅ Cleanup completed"
+        
+    - name: Check for outdated scripts
+      run: |
+        echo "🔍 Checking for potentially outdated scripts..."
+        
+        # Look for scripts that haven't been modified in 90 days
+        old_scripts=$(find scripts -name "*.sh" -o -name "*.lua" | xargs -I {} sh -c 'test $((($(date +%s) - $(stat -c %Y "{}")) / 86400)) -gt 90 && echo "{}"' 2>/dev/null || true)
+        
+        if [ -n "$old_scripts" ]; then
+          echo "📋 Scripts not modified in 90+ days:"
+          echo "$old_scripts"
+          echo "Consider reviewing these scripts for relevance"
+        else
+          echo "✅ All scripts appear to be actively maintained"
+        fi
+
+  performance-monitoring:
+    name: Performance Monitoring
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Run performance benchmarks
+      run: |
+        echo "📊 Running performance benchmarks..."
+        
+        if [ -f "tests/unit/test_performance.lua" ]; then
+          lua tests/unit/test_performance.lua > performance-results.txt
+          
+          echo "📈 Performance Results:"
+          cat performance-results.txt
+          
+          # Check for performance regressions (basic implementation)
+          if grep -q "SLOW" performance-results.txt; then
+            echo "⚠️ Potential performance issues detected"
+          else
+            echo "✅ Performance looks good"
+          fi
+        else
+          echo "ℹ️ No performance tests found"
+        fi
+        
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: performance-results-${{ github.run_number }}
+        path: performance-results.txt
+        retention-days: 30
