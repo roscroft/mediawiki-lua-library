@@ -1,0 +1,196 @@
+{{Documentation}}
+|name = Array
+
+|fname1 = <nowiki>len(&nbsp;arr&nbsp;)</nowiki>
+|ftype1 = <samp>-> any</samp>
+|fuse1 = No description available.
+
+|fname2 = <nowiki>all(&nbsp;arr, check&nbsp;)</nowiki>
+|ftype2 = <samp>-> any</samp>
+|fuse2 = No description available.
+
+|fname3 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
+|ftype3 = <samp>-> any</samp>
+|fuse3 = No description available.
+
+|fname4 = <nowiki>any(&nbsp;arr, check&nbsp;)</nowiki>
+|ftype4 = <samp>-> any</samp>
+|fuse4 = No description available.
+
+|fname5 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
+|ftype5 = <samp>-> any</samp>
+|fuse5 = No description available.
+
+|fname6 = <nowiki>clean(&nbsp;arr&nbsp;)</nowiki>
+|ftype6 = <samp>-> any</samp>
+|fuse6 = No description available.
+
+|fname7 = <nowiki>clone(&nbsp;arr, deep&nbsp;)</nowiki>
+|ftype7 = <samp>-> any</samp>
+|fuse7 = No description available.
+
+|fname8 = <nowiki>contains(&nbsp;arr, val&nbsp;)</nowiki>
+|ftype8 = <samp>-> any</samp>
+|fuse8 = No description available.
+
+|fname9 = <nowiki>containsAny(&nbsp;arr, t&nbsp;)</nowiki>
+|ftype9 = <samp>-> any</samp>
+|fuse9 = No description available.
+
+|fname10 = <nowiki>containsAll(&nbsp;arr, t&nbsp;)</nowiki>
+|ftype10 = <samp>-> any</samp>
+|fuse10 = No description available.
+
+|fname11 = <nowiki>convolve(&nbsp;x, y&nbsp;)</nowiki>
+|ftype11 = <samp>-> any</samp>
+|fuse11 = No description available.
+
+|fname12 = <nowiki>condenseSparse(&nbsp;arr&nbsp;)</nowiki>
+|ftype12 = <samp>-> any</samp>
+|fuse12 = No description available.
+
+|fname13 = <nowiki>count(&nbsp;arr, check&nbsp;)</nowiki>
+|ftype13 = <samp>-> any</samp>
+|fuse13 = No description available.
+
+|fname14 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
+|ftype14 = <samp>-> any</samp>
+|fuse14 = No description available.
+
+|fname15 = <nowiki>diff(&nbsp;arr, order&nbsp;)</nowiki>
+|ftype15 = <samp>-> any</samp>
+|fuse15 = No description available.
+
+|fname16 = <nowiki>each(&nbsp;arr, fn&nbsp;)</nowiki>
+|ftype16 = <samp>-> any</samp>
+|fuse16 = No description available.
+
+|fname17 = <nowiki>filter(&nbsp;arr, fn&nbsp;)</nowiki>
+|ftype17 = <samp>-> any</samp>
+|fuse17 = No description available.
+
+|fname18 = <nowiki>find(&nbsp;arr, check, default&nbsp;)</nowiki>
+|ftype18 = <samp>-> any</samp>
+|fuse18 = No description available.
+
+|fname19 = <nowiki>find_index(&nbsp;arr, check, default&nbsp;)</nowiki>
+|ftype19 = <samp>-> any</samp>
+|fuse19 = No description available.
+
+|fname20 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
+|ftype20 = <samp>-> any</samp>
+|fuse20 = No description available.
+
+|fname21 = <nowiki>get(&nbsp;arr, indices&nbsp;)</nowiki>
+|ftype21 = <samp>-> any</samp>
+|fuse21 = No description available.
+
+|fname22 = <nowiki>int(&nbsp;arr, start, stop&nbsp;)</nowiki>
+|ftype22 = <samp>-> any</samp>
+|fuse22 = No description available.
+
+|fname23 = <nowiki>intersect(&nbsp;left, right&nbsp;)</nowiki>
+|ftype23 = <samp>-> any</samp>
+|fuse23 = No description available.
+
+|fname24 = <nowiki>intersects(&nbsp;left, right&nbsp;)</nowiki>
+|ftype24 = <samp>-> any</samp>
+|fuse24 = No description available.
+
+|fname25 = <nowiki>insert(&nbsp;arr, val, index, unpackVal&nbsp;)</nowiki>
+|ftype25 = <samp>-> any</samp>
+|fuse25 = No description available.
+
+|fname26 = <nowiki>last(&nbsp;arr, offset&nbsp;)</nowiki>
+|ftype26 = <samp>-> any</samp>
+|fuse26 = No description available.
+
+|fname27 = <nowiki>map(&nbsp;arr, fn&nbsp;)</nowiki>
+|ftype27 = <samp>-> any</samp>
+|fuse27 = No description available.
+
+|fname28 = <nowiki>max_by(&nbsp;arr, fn&nbsp;)</nowiki>
+|ftype28 = <samp>-> any</samp>
+|fuse28 = No description available.
+
+|fname29 = <nowiki>max(&nbsp;arr&nbsp;)</nowiki>
+|ftype29 = <samp>-> any</samp>
+|fuse29 = No description available.
+
+|fname30 = <nowiki>min(&nbsp;arr&nbsp;)</nowiki>
+|ftype30 = <samp>-> any</samp>
+|fuse30 = No description available.
+
+|fname31 = <nowiki>new(&nbsp;arr&nbsp;)</nowiki>
+|ftype31 = <samp>-> any</samp>
+|fuse31 = No description available.
+
+|fname32 = <nowiki>newIncrementor(&nbsp;start, step&nbsp;)</nowiki>
+|ftype32 = <samp>-> any</samp>
+|fuse32 = No description available.
+
+|fname33 = <nowiki>promote(&nbsp;arr, attr&nbsp;)</nowiki>
+|ftype33 = <samp>-> any</samp>
+|fuse33 = No description available.
+
+|fname34 = <nowiki>range(&nbsp;start, stop, step&nbsp;)</nowiki>
+|ftype34 = <samp>-> any</samp>
+|fuse34 = No description available.
+
+|fname35 = <nowiki>reduce(&nbsp;arr, fn, accumulator&nbsp;)</nowiki>
+|ftype35 = <samp>-> any</samp>
+|fuse35 = No description available.
+
+|fname36 = <nowiki>reject(&nbsp;arr, check&nbsp;)</nowiki>
+|ftype36 = <samp>-> any</samp>
+|fuse36 = No description available.
+
+|fname37 = <nowiki>rejectFn(&nbsp;elem&nbsp;)</nowiki>
+|ftype37 = <samp>-> any</samp>
+|fuse37 = No description available.
+
+|fname38 = <nowiki>rep(&nbsp;val, n&nbsp;)</nowiki>
+|ftype38 = <samp>-> any</samp>
+|fuse38 = No description available.
+
+|fname39 = <nowiki>scan(&nbsp;arr, fn, accumulator&nbsp;)</nowiki>
+|ftype39 = <samp>-> any</samp>
+|fuse39 = No description available.
+
+|fname40 = <nowiki>set(&nbsp;arr, indices, values&nbsp;)</nowiki>
+|ftype40 = <samp>-> any</samp>
+|fuse40 = No description available.
+
+|fname41 = <nowiki>slice(&nbsp;arr, start, stop&nbsp;)</nowiki>
+|ftype41 = <samp>-> any</samp>
+|fuse41 = No description available.
+
+|fname42 = <nowiki>split(&nbsp;arr, index&nbsp;)</nowiki>
+|ftype42 = <samp>-> any</samp>
+|fuse42 = No description available.
+
+|fname43 = <nowiki>sum(&nbsp;arr&nbsp;)</nowiki>
+|ftype43 = <samp>-> any</samp>
+|fuse43 = No description available.
+
+|fname44 = <nowiki>take(&nbsp;arr, count, start&nbsp;)</nowiki>
+|ftype44 = <samp>-> any</samp>
+|fuse44 = No description available.
+
+|fname45 = <nowiki>take_every(&nbsp;arr, n, start, count&nbsp;)</nowiki>
+|ftype45 = <samp>-> any</samp>
+|fuse45 = No description available.
+
+|fname46 = <nowiki>unique(&nbsp;arr, fn&nbsp;)</nowiki>
+|ftype46 = <samp>-> any</samp>
+|fuse46 = No description available.
+
+|fname47 = <nowiki>zip(&nbsp;...&nbsp;)</nowiki>
+|ftype47 = <samp>-> any</samp>
+|fuse47 = No description available.
+
+|example =
+<syntaxhighlight lang='lua'>
+    -- Example usage of Array will be added manually
+</syntaxhighlight>
+}}
