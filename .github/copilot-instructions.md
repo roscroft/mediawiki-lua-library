@@ -218,3 +218,210 @@ cp corrupted-file.ext.backup corrupted-file.ext
 - When feature development is complete, merge the feature branch with a pull request and delete the feature branch if and only if it has been successfully merged
 - Use descriptive commit messages
 - Keep commits small and focused
+
+## Project-Specific Guidelines & Patterns
+
+### **Wiki Documentation Strategy**
+- **Primary Documentation Location**: GitHub Wiki (not docs/ folder)
+- **Wiki Content Generation**: Use `scripts/generate-wiki-quick.sh` for creating wiki pages
+- **Wiki Deployment**: Use `scripts/deploy-wiki.sh` for publishing to GitHub
+- **README Integration**: All wiki links should use absolute GitHub URLs
+- **Wiki Page Structure**: Follow established pattern (Home, Getting-Started, Development-Guide, Testing, Security, GitHub-Actions, Project-Status)
+
+### **Script Consolidation Patterns**
+- **Unified Scripts**: Prefer consolidated tools over multiple variants
+  - `demo-unified.lua` - Interactive demonstrations
+  - `generate-docs-unified.lua` - Documentation generation
+  - `test-unified.lua` - Comprehensive testing
+- **Legacy Script Handling**: Remove one-time-use migration scripts after completion
+- **Script Naming**: Use descriptive names with unified- prefix for consolidated tools
+
+### **MediaWiki-Specific Requirements**
+- **Lua Version**: Always ensure Lua 5.1 compatibility (MediaWiki requirement)
+- **Scribunto Integration**: Test all modules in MediaWiki environment
+- **Performance Constraints**: Consider MediaWiki execution time (10s) and memory (50MB) limits
+- **Environment Detection**: Use `MediaWikiAutoInit` for automatic environment setup
+- **Module Naming**: Follow MediaWiki module naming conventions (Module:Name)
+
+### **4-Stage Testing Pipeline**
+Mandatory testing approach for all code changes:
+1. **Syntax Validation** - `luacheck` linting and syntax checking
+2. **Basic Execution** - Module compilation and unit tests
+3. **Mocked Environment** - Docker-based MediaWiki testing
+4. **Scribunto Integration** - Full MediaWiki + Scribunto integration
+- **Test Command**: `bash tests/scripts/test-pipeline.sh`
+- **VS Code Integration**: Use "Run Test Pipeline" task
+
+### **VS Code Integration Patterns**
+- **Task-Based Workflow**: Leverage VS Code tasks for common operations
+- **Container Management**: Use tasks for starting/stopping MediaWiki containers
+- **Performance Dashboard**: Integrate performance monitoring with VS Code
+- **Auto-fix Integration**: Use tasks for automated linting and formatting
+
+### **Security & Environment Configuration**
+- **Environment Variables**: All sensitive config in `.env` file (gitignored)
+- **Template Files**: Use `.env.template` for configuration examples
+- **Secret Generation**: Use `openssl rand -hex` for generating secure keys
+- **No Hardcoded Secrets**: Never commit passwords or API keys
+- **Docker Security**: Use official images, mount only necessary volumes
+
+### **Repository Structure Rules**
+- **Source Authority**: `src/modules/` contains authoritative source code
+- **Build Artifacts**: `build/modules/` contains symlinks only (DO NOT EDIT)
+- **Unified Scripts**: `scripts/` contains consolidated development tools
+- **Wiki Content**: `scripts/wiki-content/` for generated wiki pages
+- **Clean History**: Remove temporary files and completed migration artifacts
+
+### **Performance & Monitoring**
+- **Performance Dashboard**: Use `PerformanceDashboard.lua` for monitoring
+- **Functional Programming**: Emphasize pure functions and immutability
+- **Error Handling**: Use `CodeStandards.lua` patterns consistently
+- **Memory Efficiency**: Consider MediaWiki memory constraints in implementation
+
+### **Documentation Standards**
+- **JSDoc-Style**: Use JSDoc annotations for function documentation
+- **Code Comments**: Explain complex algorithms and MediaWiki-specific logic
+- **Wiki Updates**: Update relevant wiki pages when making significant changes
+- **Example Code**: Provide practical examples in `examples/` directory
+
+### **Git & Branch Management**
+- **Branch Names**: Use descriptive feature/bugfix branch names
+- **Main Branch**: Always use 'main' (never 'master')
+- **Commit Messages**: Use conventional commit format with clear descriptions
+- **Pull Requests**: Fill out PR template completely with testing evidence
+- **Linear History**: Maintain clean git history through proper merging
+
+### **CI/CD Integration**
+- **GitHub Actions**: All changes must pass 4-stage CI pipeline
+- **Automated Testing**: Run tests locally before submitting PRs
+- **Release Process**: Use semantic versioning with automated changelog generation
+- **Quality Gates**: All linting, security, and test checks must pass
+
+### **Community & Contribution**
+- **Contributing Guidelines**: Follow `CONTRIBUTING.md` for all contributions
+- **Code Owners**: Respect `.github/CODEOWNERS` for review assignments
+- **Issue Templates**: Use provided templates for bug reports and feature requests
+- **Professional Standards**: Maintain enterprise-grade code quality and documentation
+
+### **Terminal Command Execution Best Practices**
+
+#### **Command Completion Detection**
+To ensure proper command completion detection and avoid hanging terminals:
+
+1. **Explicit Output Flushing**
+   ```bash
+   # Always end scripts with clear completion signals
+   echo "✅ Script completed successfully!"
+   echo "Press Enter to continue..." >&2
+   ```
+
+2. **Forced Output Flushing**
+   ```bash
+   # Force flush stdout and stderr
+   exec 1>&1  # Force stdout flush
+   exec 2>&2  # Force stderr flush
+   echo ""    # Final newline
+   ```
+
+3. **Background Process Handling**
+   ```bash
+   # For background processes, use explicit signaling
+   nohup long_running_command &
+   PID=$!
+   echo "Process started with PID: $PID"
+   echo "PROCESS_STARTED" # Completion signal
+   ```
+
+4. **Exit Code Verification**
+   ```bash
+   # Always provide explicit exit status
+   if [ $? -eq 0 ]; then
+       echo "SUCCESS: Command completed"
+   else
+       echo "ERROR: Command failed with code $?"
+   fi
+   ```
+
+#### **Script Template for Reliable Completion**
+```bash
+#!/bin/bash
+# Script with reliable completion detection
+
+set -e  # Exit on error
+
+# Your script logic here
+main_function() {
+    # Script operations
+    echo "Performing operations..."
+    # ... actual work ...
+}
+
+# Cleanup function
+cleanup() {
+    echo "🧹 Cleanup completed"
+}
+
+# Main execution with completion signaling
+{
+    main_function
+    cleanup
+    echo ""
+    echo "✅ SCRIPT COMPLETED SUCCESSFULLY"
+    echo "$(date): Script finished"
+} 2>&1 | tee /dev/stderr
+
+# Force final output flush
+sync
+exit 0
+```
+
+#### **Enhanced Script Completion Patterns**
+```bash
+# Pattern 1: Explicit completion with timestamp
+echo "🎉 Operation completed at $(date)"
+echo "🔄 Ready for next command"
+
+# Pattern 2: Multi-line completion signal
+echo ""
+echo "================================"
+echo "✅ OPERATION COMPLETE"
+echo "================================"
+echo ""
+
+# Pattern 3: Status summary
+echo "📊 Final Status:"
+echo "   ✅ Success: Operation completed"
+echo "   📁 Files processed: X"
+echo "   ⏱️  Duration: Y seconds"
+echo ""
+```
+
+#### **VS Code Terminal Integration**
+For better VS Code terminal integration:
+
+```bash
+# Add to scripts for VS Code task integration
+echo "VSCODE_TASK_COMPLETE" >&2  # VS Code completion signal
+echo -e "\033]0;Task Complete\007"  # Set terminal title
+```
+
+#### **Testing Script Completion**
+Create validation for script completion:
+
+```bash
+# Test script completion detection
+test_script_completion() {
+    local script="$1"
+    local timeout=30
+    
+    echo "🧪 Testing script completion: $script"
+    
+    if timeout $timeout bash "$script"; then
+        echo "✅ Script completed within timeout"
+        return 0
+    else
+        echo "❌ Script timed out or failed"
+        return 1
+    fi
+}
+```
