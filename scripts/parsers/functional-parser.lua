@@ -376,6 +376,7 @@ FunctionalParser.demonstrate = function(sampleContent)
         func.compose(
             function(s) return s:gsub("%s+", " ") end,
             function(s) return s:gsub("^%s*(.-)%s*$", "%1") end
+
         )
     )
 
