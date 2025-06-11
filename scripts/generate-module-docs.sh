@@ -1,15 +1,19 @@
 #!/bin/bash
 
 # Script to generate documentation for Lua modules
-# Wrapper for the unified documentation generator
+# Now uses the standalone MediaWiki documentation generator
 
 # Change to script directory
 cd "$(dirname "$0")"
 
-# Run the unified documentation generator
-echo "Running unified documentation generator..."
-# Pass all arguments from shell script to lua script
-lua generate-docs-unified.lua "$@"
+# Check if standalone generator is available
+if [ -f "./generate-docs-standalone.sh" ]; then
+    echo "Using standalone MediaWiki documentation generator..."
+    bash generate-docs-standalone.sh "$@"
+else
+    echo "Falling back to legacy unified generator..."
+    lua generate-docs-unified.lua "$@"
+fi
 
 # Output status
 if [ $? -eq 0 ]; then

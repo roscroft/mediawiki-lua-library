@@ -448,6 +448,61 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             }
+        },
+        {
+            "label": "Generate Documentation (Standalone - All Modules)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "scripts/generate-docs-standalone.sh",
+                "--verbose"
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Generate Documentation (Standalone - Specific Module)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "scripts/generate-docs-standalone.sh",
+                "--verbose",
+                "${input:moduleName}"
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Generate Documentation (Standalone - Simple Generator)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "scripts/generate-docs-standalone.sh",
+                "--generator=simple",
+                "--verbose"
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Generate Documentation (Standalone - Custom Style)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "scripts/generate-docs-standalone.sh",
+                "--style=${input:docStyle}",
+                "--verbose"
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
         }
     ],
     "inputs": [
