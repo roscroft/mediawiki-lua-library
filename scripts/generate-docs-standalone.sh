@@ -148,8 +148,18 @@ main() {
     ARGS="$ARGS --generator=$GENERATOR"
     ARGS="$ARGS --style=$STYLE"
     ARGS="$ARGS --format=$FORMAT"
-    ARGS="$ARGS --source=$SOURCE_DIR"
-    ARGS="$ARGS --output=$OUTPUT"
+    
+    # Change to project root (parent of scripts directory)
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+    cd "$PROJECT_ROOT"
+    
+    # Now change to docs generator directory and adjust paths
+    cd "$DOCS_GENERATOR_DIR"
+    
+    # Use relative paths from generator directory to project root
+    ARGS="$ARGS --source=../../$SOURCE_DIR"
+    ARGS="$ARGS --output=../../$OUTPUT"
     
     if [ -n "$VERBOSE" ]; then
         ARGS="$ARGS --verbose"
@@ -161,14 +171,6 @@ main() {
     
     # Execute documentation generator
     echo -e "${GREEN}🚀 Generating documentation...${NC}"
-    
-    # Change to project root (parent of scripts directory)
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-    cd "$PROJECT_ROOT"
-    
-    # Now change to docs generator directory
-    cd "$DOCS_GENERATOR_DIR"
     
     if lua bin/generate-docs.lua $ARGS; then
         echo ""

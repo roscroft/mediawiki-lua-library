@@ -152,6 +152,41 @@ The project includes comprehensive GitHub Actions workflows:
 
 See the **[GitHub Wiki](https://github.com/roscroft/mediawiki-lua-library/wiki/GitHub-Actions)** for complete CI/CD setup and usage instructions.
 
+## 📚 Documentation Generation
+
+The project includes a standalone documentation generator specifically designed for MediaWiki Lua modules, available as a submodule at **[mediawiki-lua-docs-generator](https://github.com/roscroft/mediawiki-lua-docs-generator)**.
+
+### Features
+
+- **MediaWiki-Specific**: Optimized for MediaWiki/Scribunto module patterns
+- **Multiple Styles**: Elegant, functional, refactored, and ultimate documentation styles  
+- **Dual Generators**: Unified generator with multiple styles, and lightweight simple generator
+- **JSDoc Support**: Parses JSDoc-style comments with MediaWiki-specific extensions
+- **Multiple Formats**: HTML and Markdown output formats
+- **Submodule Integration**: Clean separation from main library code
+
+### Generate Documentation
+
+```bash
+# VS Code Tasks (Recommended)
+Ctrl+Shift+P → "Tasks: Run Task" → "Generate Documentation (Standalone - All Modules)"
+
+# Command Line
+bash scripts/generate-docs-standalone.sh                    # All modules
+bash scripts/generate-docs-standalone.sh Array              # Specific module  
+bash scripts/generate-docs-standalone.sh --style=elegant    # Custom style
+bash scripts/generate-docs-standalone.sh --generator=simple # Simple generator
+```
+
+### Available Generators
+
+- **Unified Generator**: Advanced parsing with multiple style support
+- **Simple Generator**: Lightweight, reliable fallback for basic documentation
+- **Styles**: `elegant`, `functional`, `refactored`, `ultimate`
+- **Output**: HTML files in `src/module-docs/`
+
+Documentation is automatically generated in CI/CD and available for all 26+ modules in the library.
+
 ## 🏗️ Project Architecture
 
 ### Clean Repository Structure
