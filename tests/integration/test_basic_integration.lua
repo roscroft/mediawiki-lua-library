@@ -14,10 +14,8 @@ with the CodeStandards integration.
 -- Setup paths and environment
 package.path = package.path .. ';src/modules/?.lua'
 
--- Load MediaWiki environment
-local env = dofile('tests/env/wiki-lua-env.lua')
-_G.mw = env.mw
-_G.libraryUtil = env.libraryUtil
+-- Auto-initialize MediaWiki environment (eliminates conditional imports)
+require('MediaWikiAutoInit')
 
 print("Environment setup complete:")
 print("mw:", type(mw))

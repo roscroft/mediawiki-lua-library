@@ -1,9 +1,23 @@
 -- <nowiki>
+
+-- Auto-initialize MediaWiki environment
+require('MediaWikiAutoInit')
+
 local p = {}
-local checkType = require('libraryUtil').checkType
-local mwHtml = getmetatable(mw.html.create()).__index   -- Trick to get acces to the mw.html class
-local stack = {}                                        -- Used to keep track of nested IF-END tags
-local noOp = {}                                         -- This object is returned by IF(false) tag
+local checkType = libraryUtil.checkType
+
+-- Get the mw.html class - handle both real MediaWiki and mock environments
+local mwHtml
+local testObj = mw.html.create('div')
+local meta = getmetatable(testObj)
+if meta and meta.__index then
+    mwHtml = meta.__index
+else
+    -- In mock environment, use the object itself as the prototype
+    mwHtml = testObj
+end
+local stack = {} -- Used to keep track of nested IF-END tags
+local noOp = {}  -- This object is returned by IF(false) tag
 
 function mwHtml:addClassIf(cond, ...)
     if cond then
@@ -194,7 +208,7 @@ end
 function mwHtml:END()
     if #stack == 0 then error('Missing IF tag', 2) end
 
-    local res = table.remove(stack)   -- Pop element from the end
+    local res = table.remove(stack) -- Pop element from the end
     if res.obj == noOp then
         return self
     else

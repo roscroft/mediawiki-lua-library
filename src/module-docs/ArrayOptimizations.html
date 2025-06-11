@@ -32,11 +32,11 @@
 ** Empty arrays: O(1) with early detection
 * Examples:
 <syntaxhighlight lang='lua'>
-local std_array = {1, 2, 3}  -- Standard array
-local proxy_array = setmetatable({[1] = 'a', [2] = 'b'}, proxy_mt)
+local std_array = {{({{)}}{{)}}1, 2, 3{{)}}  -- Standard array
+local proxy_array = setmetatable({{({{)}}{{)}}[1] = 'a', [2] = 'b'{{)}}, proxy_mt)
 print(len(std_array))    -- 3 (O(1) operation)
 print(len(proxy_array))  -- 2 (O(log n) operation)
-print(len({}))           -- 0 (O(1) early detection)
+print(len({{({{)}}{{)}}{{)}}))           -- 0 (O(1) early detection)
 </syntaxhighlight>
 * Memoization cache for frequently called array operations
 * Clear the memoization cache

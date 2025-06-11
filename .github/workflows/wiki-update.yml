@@ -1,0 +1,72 @@
+name: Update GitHub Wiki
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['src/modules/**', 'docs/**']
+  workflow_dispatch:
+    inputs:
+      force_update:
+        description: 'Force complete wiki update'
+        required: false
+        type: boolean
+
+jobs:
+  update-wiki:
+    name: Update GitHub Wiki
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+          
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luarocks
+          sudo luarocks install luafilesystem
+          
+      - name: Generate wiki content
+        run: |
+          chmod +x scripts/generate-wiki-docs.lua
+          lua scripts/generate-wiki-docs.lua --all --index --verbose
+          
+      - name: Checkout wiki repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Update wiki content
+        run: |
+          # Copy generated content to wiki
+          cp scripts/wiki-content/*.md wiki/ || true
+          
+          cd wiki
+          
+          # Configure git
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          
+          # Commit changes if any
+          if [[ -n $(git status --porcelain) ]]; then
+            git add .
+            git commit -m "Automated wiki update from repository changes"
+            git push
+            echo "✅ Wiki updated successfully"
+          else
+            echo "ℹ️ No wiki changes to commit"
+          fi
+          
+      - name: Create wiki summary
+        run: |
+          echo "## Wiki Update Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Generated**: $(find scripts/wiki-content -name "*.md" | wc -l) wiki pages" >> $GITHUB_STEP_SUMMARY
+          echo "- **Updated**: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Wiki URL**: [${{ github.repository }}/wiki](https://github.com/${{ github.repository }}/wiki)" >> $GITHUB_STEP_SUMMARY

@@ -21,7 +21,7 @@ Test Coverage:
 package.path = package.path .. ';../../src/modules/?.lua'
 
 -- Load environment setup
-dofile('tests/env/wiki-lua-env.lua')
+require('MediaWikiAutoInit')
 
 -- Module imports with proper paths
 local Array = require('Array')

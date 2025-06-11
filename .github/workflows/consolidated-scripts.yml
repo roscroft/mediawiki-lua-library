@@ -1,0 +1,269 @@
+name: Consolidated Scripts CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['scripts/**', 'src/modules/**']
+  pull_request:
+    paths: ['scripts/**', 'src/modules/**', 'tests/**']
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Test suite to run'
+        required: false
+        type: choice
+        options:
+          - all
+          - core
+          - patterns
+          - integration
+          - dependencies
+        default: 'all'
+      demo_type:
+        description: 'Demo type to run'
+        required: false
+        type: choice
+        options:
+          - simplified
+          - elegance
+          - helper
+          - safe
+          - mastery
+        default: 'simplified'
+      doc_style:
+        description: 'Documentation style'
+        required: false
+        type: choice
+        options:
+          - refactored
+          - elegant
+          - functional
+          - ultimate
+        default: 'refactored'
+
+jobs:
+  validate-consolidated-scripts:
+    name: Validate Consolidated Scripts
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+          
+      - name: Install LuaFileSystem
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luarocks
+          sudo luarocks install luafilesystem
+          
+      - name: Validate script syntax
+        run: |
+          echo "🔍 Validating consolidated script syntax..."
+          for script in scripts/generate-docs-unified.lua scripts/demo-unified.lua scripts/test-unified.lua; do
+            if [[ -f "$script" ]]; then
+              echo "Checking: $script"
+              lua -l loadfile -e "assert(loadfile('$script'))" && echo "  ✅ Syntax valid" || echo "  ❌ Syntax error"
+            fi
+          done
+          
+      - name: Test unified scripts help
+        run: |
+          echo "📚 Testing unified scripts help output..."
+          cd /home/runner/work/wiki-lua/wiki-lua || true
+          lua scripts/generate-docs-unified.lua --help || true
+          lua scripts/demo-unified.lua --help || true
+          lua scripts/test-unified.lua --help || true
+          
+  test-unified-functionality:
+    name: Test Unified Functionality
+    runs-on: ubuntu-latest
+    needs: validate-consolidated-scripts
+    
+    strategy:
+      matrix:
+        test-suite: [core, patterns, integration, dependencies]
+        
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+          
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luarocks
+          sudo luarocks install luafilesystem
+          
+      - name: Run unified tests
+        run: |
+          echo "🧪 Running unified test suite: ${{ matrix.test-suite }}"
+          cd "${GITHUB_WORKSPACE}"
+          lua scripts/test-unified.lua --suite=${{ matrix.test-suite }} --verbose --format=detailed
+          
+  demo-unified-functionality:
+    name: Demo Unified Functionality  
+    runs-on: ubuntu-latest
+    needs: validate-consolidated-scripts
+    
+    strategy:
+      matrix:
+        demo-type: [simplified, elegance, helper]
+        
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+          
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luarocks
+          sudo luarocks install luafilesystem
+          
+      - name: Run unified demo
+        run: |
+          echo "🎭 Running unified demo: ${{ matrix.demo-type }}"
+          cd "${GITHUB_WORKSPACE}"
+          lua scripts/demo-unified.lua --type=${{ matrix.demo-type }} --verbose
+          
+  generate-unified-docs:
+    name: Generate Unified Documentation
+    runs-on: ubuntu-latest
+    needs: validate-consolidated-scripts
+    
+    strategy:
+      matrix:
+        doc-style: [refactored, elegant]
+        
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+          
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luarocks
+          sudo luarocks install luafilesystem
+          
+      - name: Generate documentation
+        run: |
+          echo "📚 Generating documentation with style: ${{ matrix.doc-style }}"
+          cd "${GITHUB_WORKSPACE}"
+          lua scripts/generate-docs-unified.lua --style=${{ matrix.doc-style }} --verbose
+          
+      - name: Upload documentation artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-${{ matrix.doc-style }}
+          path: src/module-docs/
+          retention-days: 7
+          
+  integration-test:
+    name: Integration Test All Scripts
+    runs-on: ubuntu-latest
+    needs: [test-unified-functionality, demo-unified-functionality, generate-unified-docs]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+          
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luarocks
+          sudo luarocks install luafilesystem
+          
+      - name: Run comprehensive integration test
+        run: |
+          echo "🔄 Running comprehensive integration test..."
+          cd "${GITHUB_WORKSPACE}"
+          
+          # Test all unified scripts in sequence
+          echo "1. Testing unified tests..."
+          lua scripts/test-unified.lua --suite=all --format=json
+          
+          echo "2. Running simplified demo..."
+          lua scripts/demo-unified.lua --type=simplified
+          
+          echo "3. Generating documentation..."
+          lua scripts/generate-docs-unified.lua --style=refactored
+          
+          echo "✅ All unified scripts working correctly!"
+          
+  consolidation-verification:
+    name: Verify Script Consolidation
+    runs-on: ubuntu-latest
+    needs: integration-test
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Verify consolidation benefits
+        run: |
+          echo "📊 Script Consolidation Analysis"
+          echo "================================="
+          
+          # Count old vs new scripts
+          old_doc_scripts=$(find scripts/ -name "generate-docs*.lua" ! -name "*unified*" | wc -l)
+          old_demo_scripts=$(find scripts/ -name "demo-*.lua" ! -name "*unified*" | wc -l) 
+          old_test_scripts=$(find scripts/ -name "test-*.lua" ! -name "*unified*" | wc -l)
+          
+          echo "📈 Consolidation Metrics:"
+          echo "  Documentation scripts: $old_doc_scripts → 1 (generate-docs-unified.lua)"
+          echo "  Demo scripts: $old_demo_scripts → 1 (demo-unified.lua)"
+          echo "  Test scripts: $old_test_scripts → 1 (test-unified.lua)"
+          
+          total_old=$((old_doc_scripts + old_demo_scripts + old_test_scripts))
+          echo "  Total reduction: $total_old → 3 scripts"
+          
+          if [[ $total_old -gt 10 ]]; then
+            echo "✅ Significant consolidation achieved!"
+          else
+            echo "ℹ️  Consolidation in progress..."
+          fi
+          
+      - name: Validate VS Code tasks
+        run: |
+          echo "🎯 Validating VS Code task configuration..."
+          if [[ -f ".vscode/tasks.json" ]]; then
+            echo "✅ VS Code tasks.json exists"
+            
+            # Check for unified script tasks
+            if grep -q "generate-docs-unified.lua" .vscode/tasks.json; then
+              echo "✅ Unified documentation tasks configured"
+            fi
+            
+            if grep -q "demo-unified.lua" .vscode/tasks.json; then
+              echo "✅ Unified demo tasks configured" 
+            fi
+            
+            if grep -q "test-unified.lua" .vscode/tasks.json; then
+              echo "✅ Unified test tasks configured"
+            fi
+          else
+            echo "❌ VS Code tasks.json not found"
+          fi

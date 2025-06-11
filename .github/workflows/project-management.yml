@@ -1,0 +1,446 @@
+name: Project Management & Community
+
+on:
+  issues:
+    types: [opened, labeled, closed]
+  pull_request:
+    types: [opened, closed, ready_for_review, labeled]
+  schedule:
+    - cron: '0 12 * * 1'  # Weekly project health check
+  workflow_dispatch:
+
+jobs:
+  # Automatic issue labeling and triage
+  auto-triage:
+    name: Automatic Issue Triage
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Analyze issue content
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const issue = context.payload.issue;
+          const title = issue.title.toLowerCase();
+          const body = issue.body.toLowerCase();
+          
+          const labels = [];
+          
+          // Auto-detect issue type
+          if (title.includes('bug') || body.includes('error') || body.includes('fail')) {
+            labels.push('bug');
+          }
+          if (title.includes('feature') || title.includes('enhancement') || body.includes('would like')) {
+            labels.push('enhancement');
+          }
+          if (title.includes('doc') || body.includes('documentation')) {
+            labels.push('documentation');
+          }
+          if (title.includes('performance') || body.includes('slow') || body.includes('speed')) {
+            labels.push('performance');
+          }
+          if (title.includes('security') || body.includes('vulnerability')) {
+            labels.push('security');
+          }
+          
+          // Auto-detect priority
+          if (body.includes('critical') || body.includes('urgent') || title.includes('critical')) {
+            labels.push('priority:high');
+          } else if (body.includes('minor') || title.includes('minor')) {
+            labels.push('priority:low');
+          } else {
+            labels.push('priority:medium');
+          }
+          
+          // Auto-detect complexity
+          if (body.length > 1000 || body.includes('complex') || body.includes('multiple')) {
+            labels.push('complexity:high');
+          } else if (body.length < 200) {
+            labels.push('complexity:low');
+          } else {
+            labels.push('complexity:medium');
+          }
+          
+          // Auto-detect module
+          const modules = ['Array', 'Functools', 'Funclib', 'CodeStandards', 'Lists', 'TableTools'];
+          for (const module of modules) {
+            if (title.includes(module.toLowerCase()) || body.includes(module.toLowerCase())) {
+              labels.push(`module:${module.toLowerCase()}`);
+            }
+          }
+          
+          if (labels.length > 0) {
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: labels
+            });
+          }
+          
+          // Auto-assign based on module
+          const maintainers = {
+            'functools': ['maintainer'],
+            'array': ['maintainer'],
+            'codestandards': ['maintainer']
+          };
+          
+          for (const [module, assignees] of Object.entries(maintainers)) {
+            if (title.includes(module) || body.includes(module)) {
+              await github.rest.issues.addAssignees({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                assignees: assignees
+              });
+              break;
+            }
+          }
+
+  # Welcome new contributors
+  welcome-contributor:
+    name: Welcome New Contributors
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check if first-time contributor
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const author = context.payload.pull_request.user.login;
+          
+          // Check if this is their first PR
+          const { data: pullRequests } = await github.rest.pulls.list({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'all',
+            creator: author
+          });
+          
+          if (pullRequests.length === 1) {
+            // This is their first PR
+            const welcomeMessage = `
+          ## 🎉 Welcome to the MediaWiki Lua Module Library!
+          
+          Thank you for your first contribution! We're excited to have you as part of our community.
+          
+          ### 📋 What happens next?
+          
+          1. **Automated Checks**: Our CI/CD pipeline will run comprehensive tests
+          2. **Code Review**: A maintainer will review your changes
+          3. **Collaboration**: Feel free to ask questions or request help
+          
+          ### 🚀 Quick Links
+          
+          - [📚 Documentation Guide](docs/github-actions-guide.md)
+          - [🧪 Testing Guide](docs/testing.md)
+          - [💬 Discussion Forum](https://github.com/${context.repo.owner}/${context.repo.repo}/discussions)
+          
+          ### 🏷️ Contributor Recognition
+          
+          Your contribution will be acknowledged in our release notes and contributor list.
+          
+          Thanks again for contributing! 🙏
+          `;
+          
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: welcomeMessage
+            });
+            
+            // Add first-time-contributor label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: ['first-time-contributor']
+            });
+          }
+
+  # Project health monitoring
+  project-health:
+    name: Weekly Project Health Check
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Analyze project health
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: issues } = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open'
+          });
+          
+          const { data: pulls } = await github.rest.pulls.list({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open'
+          });
+          
+          // Analyze issue age
+          const now = new Date();
+          const staleThreshold = 30 * 24 * 60 * 60 * 1000; // 30 days
+          const oldThreshold = 90 * 24 * 60 * 60 * 1000; // 90 days
+          
+          let staleIssues = 0;
+          let oldIssues = 0;
+          let highPriorityIssues = 0;
+          
+          for (const issue of issues) {
+            const age = now - new Date(issue.created_at);
+            if (age > oldThreshold) oldIssues++;
+            else if (age > staleThreshold) staleIssues++;
+            
+            if (issue.labels.some(label => label.name.includes('priority:high'))) {
+              highPriorityIssues++;
+            }
+          }
+          
+          let stalePRs = 0;
+          for (const pr of pulls) {
+            const age = now - new Date(pr.created_at);
+            if (age > staleThreshold) stalePRs++;
+          }
+          
+          // Generate health report
+          const healthReport = `
+          # 📊 Weekly Project Health Report
+          
+          **Date:** ${new Date().toISOString().split('T')[0]}
+          **Repository:** ${context.repo.owner}/${context.repo.repo}
+          
+          ## 📈 Current Status
+          
+          | Metric | Count | Status |
+          |--------|-------|--------|
+          | Open Issues | ${issues.length} | ${issues.length < 20 ? '✅' : '⚠️'} |
+          | Open PRs | ${pulls.length} | ${pulls.length < 10 ? '✅' : '⚠️'} |
+          | High Priority Issues | ${highPriorityIssues} | ${highPriorityIssues < 5 ? '✅' : '🚨'} |
+          | Stale Issues (30+ days) | ${staleIssues} | ${staleIssues < 10 ? '✅' : '⚠️'} |
+          | Old Issues (90+ days) | ${oldIssues} | ${oldIssues < 5 ? '✅' : '🚨'} |
+          | Stale PRs (30+ days) | ${stalePRs} | ${stalePRs < 3 ? '✅' : '⚠️'} |
+          
+          ## 🎯 Recommendations
+          
+          ${staleIssues > 5 ? '- 📋 Review and triage stale issues\n' : ''}
+          ${stalePRs > 2 ? '- 🔄 Follow up on stale pull requests\n' : ''}
+          ${highPriorityIssues > 3 ? '- 🚨 Address high priority issues\n' : ''}
+          ${issues.length > 25 ? '- 📊 Consider issue cleanup or additional maintainers\n' : ''}
+          
+          ## 📅 Next Steps
+          
+          - Review automated triage accuracy
+          - Update project documentation if needed
+          - Consider community engagement activities
+          `;
+          
+          // Create issue for health report
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: \`📊 Weekly Health Report - \${new Date().toISOString().split('T')[0]}\`,
+            body: healthReport,
+            labels: ['maintenance', 'weekly-report']
+          });
+
+  # Stale issue management
+  manage-stale:
+    name: Manage Stale Issues and PRs
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Mark stale issues
+      uses: actions/stale@v9
+      with:
+        stale-issue-message: |
+          👋 This issue has been automatically marked as stale because it has not had recent activity.
+          
+          **What happens next?**
+          - If this is still relevant, please comment to keep it open
+          - If no activity occurs within 7 days, this issue will be automatically closed
+          - You can always reopen closed issues if needed
+          
+          **Help us maintain the project:**
+          - Add more details if this is still an issue
+          - Reference related issues or PRs
+          - Consider if this might be resolved in recent updates
+          
+          Thank you for your contribution! 🙏
+          
+        stale-pr-message: |
+          👋 This pull request has been automatically marked as stale because it has not had recent activity.
+          
+          **What happens next?**
+          - If this PR is still relevant, please rebase and comment
+          - If no activity occurs within 7 days, this PR will be automatically closed
+          - You can always reopen closed PRs if needed
+          
+          **To keep this PR active:**
+          - Rebase against the latest main branch
+          - Respond to any review comments
+          - Add tests if required
+          
+          Thank you for your contribution! 🙏
+          
+        close-issue-message: |
+          🔒 This issue has been automatically closed due to inactivity.
+          
+          **Don't worry!** You can always:
+          - Reopen this issue if it's still relevant
+          - Create a new issue with updated information
+          - Reference this issue in related discussions
+          
+          Thank you for helping improve the project! 🚀
+          
+        close-pr-message: |
+          🔒 This pull request has been automatically closed due to inactivity.
+          
+          **Don't worry!** You can always:
+          - Reopen this PR after rebasing
+          - Create a new PR with the same changes
+          - Reach out to maintainers for help
+          
+          Thank you for your contribution! 🚀
+          
+        days-before-stale: 30
+        days-before-close: 7
+        stale-issue-label: 'status:stale'
+        stale-pr-label: 'status:stale'
+        exempt-issue-labels: 'priority:high,status:blocked,good first issue'
+        exempt-pr-labels: 'priority:high,status:blocked,work in progress'
+
+  # Generate contributor recognition
+  contributor-recognition:
+    name: Generate Contributor Recognition
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Generate contributor stats
+      uses: actions/github-script@v7
+      with:
+        script: |
+          // Get contributors from the last month
+          const oneMonthAgo = new Date();
+          oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+          
+          const { data: commits } = await github.rest.repos.listCommits({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            since: oneMonthAgo.toISOString(),
+            per_page: 100
+          });
+          
+          const { data: issues } = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'closed',
+            since: oneMonthAgo.toISOString()
+          });
+          
+          const { data: pulls } = await github.rest.pulls.list({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'closed',
+            sort: 'updated',
+            direction: 'desc'
+          });
+          
+          // Aggregate contributor activity
+          const contributors = new Map();
+          
+          // Count commits
+          for (const commit of commits) {
+            const author = commit.author?.login || commit.commit.author.name;
+            if (!contributors.has(author)) {
+              contributors.set(author, { commits: 0, issues: 0, prs: 0 });
+            }
+            contributors.get(author).commits++;
+          }
+          
+          // Count issues
+          for (const issue of issues) {
+            if (!issue.pull_request) { // Only count issues, not PRs
+              const author = issue.user.login;
+              if (!contributors.has(author)) {
+                contributors.set(author, { commits: 0, issues: 0, prs: 0 });
+              }
+              contributors.get(author).issues++;
+            }
+          }
+          
+          // Count PRs
+          for (const pr of pulls) {
+            if (new Date(pr.updated_at) > oneMonthAgo) {
+              const author = pr.user.login;
+              if (!contributors.has(author)) {
+                contributors.set(author, { commits: 0, issues: 0, prs: 0 });
+              }
+              contributors.get(author).prs++;
+            }
+          }
+          
+          // Generate recognition report
+          let recognitionReport = \`
+          # 🏆 Monthly Contributor Recognition
+          
+          **Period:** \${oneMonthAgo.toDateString()} - \${new Date().toDateString()}
+          
+          Thank you to all our amazing contributors! 🙏
+          
+          ## 📊 Top Contributors This Month
+          
+          | Contributor | Commits | Issues | PRs | Total Activity |
+          |-------------|---------|--------|-----|----------------|
+          \`;
+          
+          // Sort contributors by total activity
+          const sortedContributors = Array.from(contributors.entries())
+            .map(([name, stats]) => ({
+              name,
+              ...stats,
+              total: stats.commits + stats.issues + stats.prs
+            }))
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 10); // Top 10
+          
+          for (const contributor of sortedContributors) {
+            recognitionReport += \`| @\${contributor.name} | \${contributor.commits} | \${contributor.issues} | \${contributor.prs} | \${contributor.total} |\n\`;
+          }
+          
+          recognitionReport += \`
+          
+          ## 🎖️ Special Recognition
+          
+          \${sortedContributors.length > 0 ? \`🥇 **Top Contributor:** @\${sortedContributors[0].name} - Thank you for your outstanding contributions!\` : ''}
+          \${sortedContributors.filter(c => c.name.includes('first-time')).length > 0 ? \`\n🌟 **New Contributors:** Welcome to our amazing first-time contributors!\` : ''}
+          
+          ## 💝 Community Impact
+          
+          - **Total Activity:** \${Array.from(contributors.values()).reduce((sum, stats) => sum + stats.commits + stats.issues + stats.prs, 0)} contributions
+          - **Active Contributors:** \${contributors.size} community members
+          - **Collaboration:** \${pulls.length} pull requests reviewed
+          
+          Keep up the fantastic work! 🚀
+          \`;
+          
+          // Create recognition issue
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: \`🏆 Monthly Recognition - \${new Date().toISOString().split('T')[0]}\`,
+            body: recognitionReport,
+            labels: ['community', 'recognition', 'monthly']
+          });

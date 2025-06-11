@@ -1,8 +1,448 @@
 {{Documentation}}
 {{Helper module
 |name = Functools
-|summary = Advanced functional programming module
 
-|functions =
+|fname1 = <nowiki>func.Maybe.alt(&nbsp;m1, m2&nbsp;)</nowiki>
+|ftype1 = <samp>m1: Maybe<T></samp><br><samp>m2: Maybe<T></samp><br><samp>-> </samp>
+|fuse1 = Alternative operation - return first Just value or Nothing if all are Nothing
 
+|fname2 = <nowiki>func.Maybe.ap(&nbsp;mf&nbsp;)</nowiki>
+|ftype2 = <samp>mf: Maybe<fun(x:</samp><br><samp>-> fun(mx:</samp>
+|fuse2 = Apply a function inside Maybe to a value inside Maybe (applicative)
+
+|fname3 = <nowiki>func.Maybe.bind(&nbsp;f&nbsp;)</nowiki>
+|ftype3 = <samp>f: fun(x:</samp><br><samp>m: Maybe<T></samp><br><samp>f: fun(x:</samp><br><samp>-> fun(m:</samp>
+|fuse3 = Map a function over a Maybe value
+
+* Monadic bind operation for Maybe (flatMap)
+
+|fname4 = <nowiki>func.Maybe.fromMaybe(&nbsp;default&nbsp;)</nowiki>
+|ftype4 = <samp>default: T</samp><br><samp>-> fun(m:</samp>
+|fuse4 = Get value from Maybe with default
+
+|fname5 = <nowiki>func.Maybe.isJust(&nbsp;maybe&nbsp;)</nowiki>
+|ftype5 = <samp>maybe: Maybe<T></samp><br><samp>-> boolean hasValue</samp>
+|fuse5 = Create an empty Maybe (Nothing)
+
+* Check if Maybe contains a value
+
+|fname6 = <nowiki>func.Maybe.isNothing(&nbsp;maybe&nbsp;)</nowiki>
+|ftype6 = <samp>maybe: Maybe<T></samp><br><samp>-> boolean isEmpty</samp>
+|fuse6 = Check if Maybe is Nothing
+
+|fname7 = <nowiki>func.Maybe.just(&nbsp;value&nbsp;)</nowiki>
+|ftype7 = <samp>value: T</samp><br><samp>-> </samp>
+|fuse7 = Create a Maybe containing a value (Just)
+
+|fname8 = <nowiki>func.Maybe.lift2(&nbsp;f&nbsp;)</nowiki>
+|ftype8 = <samp>f: fun(x:</samp><br><samp>-> fun(mx:</samp>
+|fuse8 = Lift a binary function to work with Maybe values
+
+|fname9 = <nowiki>func.Maybe.sequence(&nbsp;maybes&nbsp;)</nowiki>
+|ftype9 = <samp>maybes: Maybe<T>[]</samp><br><samp>-> </samp>
+|fuse9 = Sequence a list of Maybe values
+
+|fname10 = <nowiki>func.Maybe.traverse(&nbsp;f, xs&nbsp;)</nowiki>
+|ftype10 = <samp>f: fun(x:</samp><br><samp>xs: T[]</samp><br><samp>-> </samp>
+|fuse10 = Traverse an array applying a function that returns Maybe
+
+|fname11 = <nowiki>func.Result.err(&nbsp;error&nbsp;)</nowiki>
+|ftype11 = <samp>error: E</samp><br><samp>-> </samp>
+|fuse11 = Create a failed result
+
+|fname12 = <nowiki>func.Result.ok(&nbsp;value&nbsp;)</nowiki>
+|ftype12 = <samp>value: T</samp><br><samp>-> </samp>
+|fuse12 = Create a successful result
+
+|fname13 = <nowiki>func.ops.add(&nbsp;a, b&nbsp;)</nowiki>
+|ftype13 = <samp>default: U</samp><br><samp>f: fun(x:</samp><br><samp>m: Maybe<T></samp><br><samp>a: number</samp><br><samp>b: number</samp><br><samp>-> number</samp>
+|fuse13 = Apply function to Maybe value or return default if Nothing
+
+|fname14 = <nowiki>func.ops.ap(&nbsp;a, b&nbsp;)</nowiki>
+|ftype14 = <samp>a: string</samp><br><samp>b: string</samp><br><samp>-> string</samp>
+|fuse14 = String concatenation
+
+|fname15 = <nowiki>func.ops.div(&nbsp;a, b&nbsp;)</nowiki>
+|ftype15 = <samp>a: number</samp><br><samp>b: number</samp><br><samp>-> number</samp>
+|fuse15 = Division operation
+
+|fname16 = <nowiki>func.ops.eq(&nbsp;a, b&nbsp;)</nowiki>
+|ftype16 = <samp>a: any</samp><br><samp>b: any</samp><br><samp>-> boolean</samp>
+|fuse16 = Equality comparison
+
+|fname17 = <nowiki>func.ops.gt(&nbsp;a, b&nbsp;)</nowiki>
+|ftype17 = <samp>a: any</samp><br><samp>b: any</samp><br><samp>-> boolean</samp>
+|fuse17 = Greater than comparison
+
+|fname18 = <nowiki>func.ops.lt(&nbsp;a, b&nbsp;)</nowiki>
+|ftype18 = <samp>a: any</samp><br><samp>b: any</samp><br><samp>-> boolean</samp>
+|fuse18 = Less than comparison
+
+|fname19 = <nowiki>func.ops.mod(&nbsp;a, b&nbsp;)</nowiki>
+|ftype19 = <samp>a: number</samp><br><samp>b: number</samp><br><samp>-> number</samp>
+|fuse19 = Modulo operation
+
+|fname20 = <nowiki>func.ops.mul(&nbsp;a, b&nbsp;)</nowiki>
+|ftype20 = <samp>a: number</samp><br><samp>b: number</samp><br><samp>-> number</samp>
+|fuse20 = Multiplication operation
+
+|fname21 = <nowiki>func.ops.pow(&nbsp;a, b&nbsp;)</nowiki>
+|ftype21 = <samp>a: number</samp><br><samp>b: number</samp><br><samp>-> number</samp>
+|fuse21 = Power operation
+
+|fname22 = <nowiki>func.ops.sub(&nbsp;a, b&nbsp;)</nowiki>
+|ftype22 = <samp>a: number</samp><br><samp>b: number</samp><br><samp>-> number</samp>
+|fuse22 = Subtraction operation
+
+|fname23 = <nowiki>func.validation.default_value(&nbsp;value, default&nbsp;)</nowiki>
+|ftype23 = <samp>value: T{{({{)}}{{)}}{{({{)}}{{)}}!{{)}}{{)}}nil</samp><br><samp>default: T</samp><br><samp>-> T</samp>
+|fuse23 = Return default value if input is nil/empty
+
+|fname24 = <nowiki>func.validation.validate_options(&nbsp;options, rules&nbsp;)</nowiki>
+|ftype24 = <samp>options: table</samp><br><samp>rules: table</samp><br><samp>-> string{{({{)}}{{)}}{{({{)}}{{)}}!{{)}}{{)}}nil</samp>
+|fuse24 = Validate options against rule set
+
+|fname25 = <nowiki>func.validation.validate_value(&nbsp;value, rules&nbsp;)</nowiki>
+|ftype25 = <samp>f: fun(x:</samp><br><samp>result: Result<T,</samp><br><samp>value: any</samp><br><samp>rules: table</samp><br><samp>-> boolean{{({{)}}{{)}}{{({{)}}{{)}}!{{)}}{{)}}string</samp>
+|fuse25 = Map over a successful result
+
+* Validate a value against rules
+
+|fname26 = <nowiki>func.ap(&nbsp;f&nbsp;)</nowiki>
+|ftype26 = <samp>f: fun(x:</samp><br><samp>-> fun(g: fun(x: A): B): fun(x: A): C</samp>
+|fuse26 = Substitute combinator. S combinator. (a → b → c) → (a → b) → a → c
+
+|fname27 = <nowiki>func.append(&nbsp;arr, element&nbsp;)</nowiki>
+|ftype27 = <samp>arr: T[]</samp><br><samp>element: T</samp><br><samp>-> T[]</samp>
+|fuse27 = Append element to array without mutation
+
+|fname28 = <nowiki>func.apply(&nbsp;f&nbsp;)</nowiki>
+|ftype28 = <samp>f: fun(x:</samp><br><samp>-> fun(x: A): B</samp>
+|fuse28 = Apply function. A combinator. (a -> b) -> a -> b
+
+|fname29 = <nowiki>pair.bimap(&nbsp;left_f, right_f&nbsp;)</nowiki>
+|ftype29 = <samp>left_f: fun(x:</samp><br><samp>pair: table<1,</samp><br><samp>right_f: fun(x:</samp><br><samp>pair: table<1,</samp><br><samp>left_f: fun(x:</samp><br><samp>right_f: fun(x:</samp><br><samp>-> fun(p: table): table</samp>
+|fuse29 = Apply function to left element of pair
+
+* Apply function to right element of pair
+* Apply functions to both elements of pair
+
+|fname30 = <nowiki>func.blackbird(&nbsp;f&nbsp;)</nowiki>
+|ftype30 = <samp>f: fun(c:</samp><br><samp>-> fun(g: fun(a: A): fun(b: B): C): fun(a: A): fun(b: B): D</samp>
+|fuse30 = Blackbird combinator - (c → d) → (a → b → c) → a → b → d
+
+|fname31 = <nowiki>func.chain(&nbsp;f&nbsp;)</nowiki>
+|ftype31 = <samp>f: fun(x:</samp><br><samp>-> fun(g: fun(y: B): A): fun(y: B): C</samp>
+|fuse31 = Chain combinator. S_ combinator. (a → b → c) → (b → a) → b → c
+
+|fname32 = <nowiki>func.chain_safe(&nbsp;operations&nbsp;)</nowiki>
+|ftype32 = <samp>operations: function[]</samp><br><samp>-> function</samp>
+|fuse32 = Chain safe operations
+
+|fname33 = <nowiki>pair.choose(&nbsp;pred, p&nbsp;)</nowiki>
+|ftype33 = <samp>pred: boolean</samp><br><samp>p: table<1,</samp><br><samp>-> T</samp>
+|fuse33 = Choose element from pair based on predicate
+
+|fname34 = <nowiki>func.comp(&nbsp;f&nbsp;)</nowiki>
+|ftype34 = <samp>f: fun(x:</samp><br><samp>-> fun(g: fun(x: A): B): fun(x: A): C</samp>
+|fuse34 = Function composition. B combinator. (b → c) → (a → b) → a → c
+
+|fname35 = <nowiki>func.complement(&nbsp;predicate&nbsp;)</nowiki>
+|ftype35 = <samp>predicate: fun(x:</samp><br><samp>-> fun(x: T): boolean</samp>
+|fuse35 = Complement a predicate function
+
+|fname36 = <nowiki>func.compose(&nbsp;...&nbsp;)</nowiki>
+|ftype36 = <samp>-> function</samp>
+|fuse36 = Generic compose with varargs
+
+|fname37 = <nowiki>func.compose_t(&nbsp;...&nbsp;)</nowiki>
+|ftype37 = <samp>-> function</samp>
+|fuse37 = Compose transducers for efficient pipeline processing
+
+|fname38 = <nowiki>func.cond(&nbsp;predicate, then_fn, else_fn&nbsp;)</nowiki>
+|ftype38 = <samp>predicate: fun(x:</samp><br><samp>then_fn: fun(x:</samp><br><samp>else_fn?: fun(x:</samp><br><samp>-> fun(x: T): T</samp>
+|fuse38 = Conditional function application
+
+|fname39 = <nowiki>func.cond_multi(&nbsp;pairs, default&nbsp;)</nowiki>
+|ftype39 = <samp>pairs: table<function,</samp><br><samp>default: U</samp><br><samp>-> fun(x: T): U</samp>
+|fuse39 = Apply a sequence of predicates, returning first match or default
+
+|fname40 = <nowiki>func.const(&nbsp;x&nbsp;)</nowiki>
+|ftype40 = <samp>x: T</samp><br><samp>-> fun(y: U): T</samp>
+|fuse40 = Constant function. K combinator. a -> b -> a
+
+|fname41 = <nowiki>func.contains_in(&nbsp;list&nbsp;)</nowiki>
+|ftype41 = <samp>list: T[]</samp><br><samp>-> fun(x: T): boolean</samp>
+|fuse41 = Create a predicate that checks if value is in list
+
+|fname42 = <nowiki>func.count_calls(&nbsp;f&nbsp;)</nowiki>
+|ftype42 = <samp>f: function</samp><br><samp>-> function, function</samp>
+|fuse42 = Count function calls
+
+|fname43 = <nowiki>func.curry(&nbsp;fn, target_arity&nbsp;)</nowiki>
+|ftype43 = <samp>fn: function</samp><br><samp>target_arity: integer?</samp><br><samp>-> function</samp>
+|fuse43 = Generic curry function with performance optimizations and no variable redefinition
+
+|fname44 = <nowiki>func.deep_clone(&nbsp;obj&nbsp;)</nowiki>
+|ftype44 = <samp>obj: T</samp><br><samp>-> T</samp>
+|fuse44 = Deep clone a table
+
+|fname45 = <nowiki>func.deep_flatten(&nbsp;nested_array&nbsp;)</nowiki>
+|ftype45 = <samp>nested_array: any[]</samp><br><samp>-> T[]</samp>
+|fuse45 = Deep flatten nested arrays recursively
+
+|fname46 = <nowiki>func.drop(&nbsp;n&nbsp;)</nowiki>
+|ftype46 = <samp>n: integer</samp><br><samp>-> fun(xs: T[]): T[]</samp>
+|fuse46 = Drop n elements from sequence using purely functional approach
+
+|fname47 = <nowiki>func.each(&nbsp;f&nbsp;)</nowiki>
+|ftype47 = <samp>f: fun(x:</samp><br><samp>-> fun(xs: T[]): T[]</samp>
+|fuse47 = Apply function to each element for side effects (functional forEach)
+
+|fname48 = <nowiki>func.filter(&nbsp;predicate, xs&nbsp;)</nowiki>
+|ftype48 = <samp>predicate: fun(x:</samp><br><samp>xs: T[]</samp><br><samp>-> T[]</samp>
+|fuse48 = Filter array elements based on predicate
+
+|fname49 = <nowiki>func.filter_t(&nbsp;predicate&nbsp;)</nowiki>
+|ftype49 = <samp>predicate: fun(x:</samp><br><samp>-> function</samp>
+|fuse49 = Filter transducer
+
+|fname50 = <nowiki>func.find(&nbsp;predicate&nbsp;)</nowiki>
+|ftype50 = <samp>predicate: fun(x:</samp><br><samp>-> fun(xs: T[]): T{{({{)}}{{)}}{{({{)}}{{)}}!{{)}}{{)}}nil</samp>
+|fuse50 = Find first element matching predicate (functional search)
+
+|fname51 = <nowiki>pair.first(&nbsp;p&nbsp;)</nowiki>
+|ftype51 = <samp>p: table<1,</samp><br><samp>-> A</samp>
+|fuse51 = Get first element of pair
+
+|fname52 = <nowiki>func.fix(&nbsp;f&nbsp;)</nowiki>
+|ftype52 = <samp>f: fun(rec:</samp><br><samp>-> fun(x: T): R</samp>
+|fuse52 = Fixed-point combinator (Y combinator approximation)
+
+|fname53 = <nowiki>func.flatten(&nbsp;nested_array&nbsp;)</nowiki>
+|ftype53 = <samp>nested_array: T[][]{{({{)}}{{)}}{{({{)}}{{)}}!{{)}}{{)}}T[]</samp><br><samp>-> T[]</samp>
+|fuse53 = Flatten nested arrays into a single array (one level deep)
+
+|fname54 = <nowiki>func.flatten_t(&nbsp;&nbsp;)</nowiki>
+|ftype54 = <samp>-> function</samp>
+|fuse54 = Flatten transducer for nested arrays
+
+|fname55 = <nowiki>func.flip(&nbsp;f&nbsp;)</nowiki>
+|ftype55 = <samp>f: fun(x:</samp><br><samp>-> fun(y: B): fun(x: A): C</samp>
+|fuse55 = Flip arguments. C combinator. (a → b → c) → b → a → c
+
+|fname56 = <nowiki>func.foldl(&nbsp;f, init, ...&nbsp;)</nowiki>
+|ftype56 = <samp>f: fun(acc:</samp><br><samp>init: A</samp><br><samp>-> A</samp>
+|fuse56 = Fold left with varargs
+
+|fname57 = <nowiki>func.fst(&nbsp;a, b&nbsp;)</nowiki>
+|ftype57 = <samp>a: A</samp><br><samp>b: B</samp><br><samp>-> A</samp>
+|fuse57 = Returns the first element of a pair
+
+|fname58 = <nowiki>func.group_by(&nbsp;key_fn, xs&nbsp;)</nowiki>
+|ftype58 = <samp>key_fn: fun(x:</samp><br><samp>xs: T[]</samp><br><samp>-> table<K, T[]></samp>
+|fuse58 = Group array elements by a key function
+
+|fname59 = <nowiki>func.id(&nbsp;x&nbsp;)</nowiki>
+|ftype59 = <samp>x: T</samp><br><samp>-> T x</samp>
+|fuse59 = Identity function. I combinator. a -> a
+
+|fname60 = <nowiki>func.is_empty(&nbsp;value&nbsp;)</nowiki>
+|ftype60 = <samp>value: any</samp><br><samp>-> boolean</samp>
+|fuse60 = Check if value is empty (nil, empty string, or empty table)
+
+|fname61 = <nowiki>func.is_type(&nbsp;type_name&nbsp;)</nowiki>
+|ftype61 = <samp>type_name: string</samp><br><samp>-> fun(value: any): boolean</samp>
+|fuse61 = Check if input has specific type
+
+|fname62 = <nowiki>func.iterate(&nbsp;initial, step_fn&nbsp;)</nowiki>
+|ftype62 = <samp>initial: T</samp><br><samp>step_fn: fun(x:</samp><br><samp>-> table</samp>
+|fuse62 = Create infinite sequence from initial value and step function
+
+|fname63 = <nowiki>func.join(&nbsp;f&nbsp;)</nowiki>
+|ftype63 = <samp>f: fun(x:</samp><br><samp>-> fun(x: A): B</samp>
+|fuse63 = Duplication function. W combinator. (a → a → b) → a → b
+
+|fname64 = <nowiki>func.juxt(&nbsp;...&nbsp;)</nowiki>
+|ftype64 = <samp>-> function</samp>
+|fuse64 = Create a function that applies multiple functions to same input
+
+|fname65 = <nowiki>func.lazy(&nbsp;generator&nbsp;)</nowiki>
+|ftype65 = <samp>generator: fun():</samp><br><samp>-> table</samp>
+|fuse65 = Create a lazy sequence generator
+
+|fname66 = <nowiki>func.lens(&nbsp;getter, setter&nbsp;)</nowiki>
+|ftype66 = <samp>getter: fun(s:</samp><br><samp>setter: fun(a:</samp><br><samp>-> table<string, function></samp>
+|fuse66 = Create a lens for functional data access and modification
+
+|fname67 = <nowiki>func.lift2(&nbsp;f&nbsp;)</nowiki>
+|ftype67 = <samp>f: fun(x:</samp><br><samp>-> fun(g: fun(x: A): B): fun(h: fun(x: A): C): fun(x: A): D</samp>
+|fuse67 = Converge function. S2 combinator. (b → c → d) → (a → b) → (a → c) → a → d
+
+|fname68 = <nowiki>pair.make_pair(&nbsp;a, b&nbsp;)</nowiki>
+|ftype68 = <samp>a: A</samp><br><samp>b: B</samp><br><samp>-> table<1, A, 2, B></samp>
+|fuse68 = Create pair with same element twice
+
+* Create pair from two elements
+
+|fname69 = <nowiki>func.map(&nbsp;f, xs&nbsp;)</nowiki>
+|ftype69 = <samp>f: fun(x:</samp><br><samp>xs: T[]</samp><br><samp>-> U[]</samp>
+|fuse69 = Map function over array elements
+
+|fname70 = <nowiki>func.map_t(&nbsp;f&nbsp;)</nowiki>
+|ftype70 = <samp>f: fun(x:</samp><br><samp>-> function</samp>
+|fuse70 = Map transducer
+
+|fname71 = <nowiki>func.maybe_call(&nbsp;f, ...&nbsp;)</nowiki>
+|ftype71 = <samp>f: function</samp><br><samp>...: any</samp><br><samp>-> </samp>
+|fuse71 = Maybe-style safe call
+
+|fname72 = <nowiki>func.memoize(&nbsp;f&nbsp;)</nowiki>
+|ftype72 = <samp>f: fun(x:</samp><br><samp>-> fun(x: A): B</samp>
+|fuse72 = Memoize a function for single argument
+
+|fname73 = <nowiki>func.memoize_multi(&nbsp;f&nbsp;)</nowiki>
+|ftype73 = <samp>f: fun(...:</samp><br><samp>-> fun(...: A): B</samp>
+|fuse73 = Memoize a function with multiple arguments
+
+|fname74 = <nowiki>func.merge(&nbsp;t1, t2&nbsp;)</nowiki>
+|ftype74 = <samp>t1: T</samp><br><samp>t2?: table</samp><br><samp>-> T</samp>
+|fuse74 = Merge two tables (shallow copy)
+
+|fname75 = <nowiki>func.null_compose(&nbsp;...&nbsp;)</nowiki>
+|ftype75 = <samp>-> function</samp>
+|fuse75 = Compose with early termination on nil/false
+
+|fname76 = <nowiki>func.on(&nbsp;f&nbsp;)</nowiki>
+|ftype76 = <samp>f: fun(x:</samp><br><samp>-> fun(g: fun(x: A): B): fun(x: A): fun(y: A): C</samp>
+|fuse76 = Psi combinator. P combinator. (b → b → c) → (a → b) → a → a → c
+
+|fname77 = <nowiki>func.over(&nbsp;lens, f&nbsp;)</nowiki>
+|ftype77 = <samp>lens: table<string,</samp><br><samp>f: fun(a:</samp><br><samp>-> fun(s: S): S</samp>
+|fuse77 = Curried lens modify operation
+
+|fname78 = <nowiki>func.pack(&nbsp;...&nbsp;)</nowiki>
+|ftype78 = <samp>-> table</samp>
+|fuse78 = Pack arguments into a table
+
+|fname79 = <nowiki>func.partial(&nbsp;f, ...&nbsp;)</nowiki>
+|ftype79 = <samp>f: function</samp><br><samp>-> function</samp>
+|fuse79 = Create a partial application with fixed first arguments
+
+|fname80 = <nowiki>func.partition(&nbsp;predicate&nbsp;)</nowiki>
+|ftype80 = <samp>predicate: fun(x:</samp><br><samp>-> fun(xs: T[]): T[], T[]</samp>
+|fuse80 = Create a function that partitions array based on predicate
+
+|fname81 = <nowiki>pair.pchoose(&nbsp;p&nbsp;)</nowiki>
+|ftype81 = <samp>p: table<1,</samp><br><samp>-> fun(pred: boolean): T</samp>
+|fuse81 = Curried choose function
+
+|fname82 = <nowiki>func.phoenix(&nbsp;f&nbsp;)</nowiki>
+|ftype82 = <samp>f: fun(a:</samp><br><samp>-> fun(g: fun(a: A): B): fun(h: fun(a: A): C): fun(a: A): D</samp>
+|fuse82 = Phoenix combinator - (a → b → c → d) → (a → b) → (a → c) → a → d
+
+|fname83 = <nowiki>func.pipe(&nbsp;...&nbsp;)</nowiki>
+|ftype83 = <samp>...: fun(x:</samp><br><samp>-> fun(x: T): U</samp>
+|fuse83 = Function composition in left-to-right (pipe) order
+
+|fname84 = <nowiki>func.prop_lens(&nbsp;key&nbsp;)</nowiki>
+|ftype84 = <samp>key: K</samp><br><samp>-> table<string, function></samp>
+|fuse84 = Focus on a specific key in a table (lens for table access)
+
+|fname85 = <nowiki>func.range(&nbsp;start, stop&nbsp;)</nowiki>
+|ftype85 = <samp>start: integer</samp><br><samp>stop: integer</samp><br><samp>-> integer[]</samp>
+|fuse85 = Generate a range of numbers from start to stop
+
+|fname86 = <nowiki>func.reduce(&nbsp;f, init, xs&nbsp;)</nowiki>
+|ftype86 = <samp>f: fun(acc:</samp><br><samp>init: U</samp><br><samp>xs: T[]</samp><br><samp>-> U</samp>
+|fuse86 = Reduce array to single value (fold left)
+
+|fname87 = <nowiki>func.reverse(&nbsp;xs&nbsp;)</nowiki>
+|ftype87 = <samp>xs: T[]</samp><br><samp>-> T[]</samp>
+|fuse87 = Reverse an array using functional approach
+
+|fname88 = <nowiki>func.safe_call(&nbsp;f, ...&nbsp;)</nowiki>
+|ftype88 = <samp>f: function</samp><br><samp>...: any</samp><br><samp>-> boolean, T</samp>
+|fuse88 = Safe function call with error handling
+
+|fname89 = <nowiki>func.safe_compose(&nbsp;...&nbsp;)</nowiki>
+|ftype89 = <samp>-> function</samp>
+|fuse89 = Safe function composition that catches errors at each step
+
+|fname90 = <nowiki>pair.second(&nbsp;p&nbsp;)</nowiki>
+|ftype90 = <samp>p: table<1,</samp><br><samp>-> B</samp>
+|fuse90 = Get second element of pair
+
+|fname91 = <nowiki>func.set(&nbsp;lens, value&nbsp;)</nowiki>
+|ftype91 = <samp>lens: table<string,</samp><br><samp>value: A</samp><br><samp>-> fun(s: S): S</samp>
+|fuse91 = Curried lens set operation
+
+|fname92 = <nowiki>func.snd(&nbsp;a, b&nbsp;)</nowiki>
+|ftype92 = <samp>a: A</samp><br><samp>b: B</samp><br><samp>-> B</samp>
+|fuse92 = Returns the second element of a pair
+
+|fname93 = <nowiki>func.swap(&nbsp;a&nbsp;)</nowiki>
+|ftype93 = <samp>a: A</samp><br><samp>-> fun(b: B): {{({{)}}{{)}}[1]: B, [2]: A{{)}}</samp>
+|fuse93 = Swaps the order of two arguments
+
+|fname94 = <nowiki>func.take(&nbsp;n&nbsp;)</nowiki>
+|ftype94 = <samp>n: integer</samp><br><samp>-> fun(xs: T[]): T[]</samp>
+|fuse94 = Take n elements from sequence using purely functional approach
+
+|fname95 = <nowiki>func.take_t(&nbsp;n&nbsp;)</nowiki>
+|ftype95 = <samp>n: number</samp><br><samp>-> function</samp>
+|fuse95 = Take transducer for limiting result count
+
+|fname96 = <nowiki>func.thread_first(&nbsp;x, ...&nbsp;)</nowiki>
+|ftype96 = <samp>x: any</samp><br><samp>-> any</samp>
+|fuse96 = Thread-first macro (->)
+
+|fname97 = <nowiki>func.thrush(&nbsp;x&nbsp;)</nowiki>
+|ftype97 = <samp>x: A</samp><br><samp>-> fun(f: fun(x: A): B): B</samp>
+|fuse97 = Thrush combinator. T combinator. a -> (a -> b) -> b
+
+|fname98 = <nowiki>func.time_fn(&nbsp;f&nbsp;)</nowiki>
+|ftype98 = <samp>f: function</samp><br><samp>-> function</samp>
+|fuse98 = Time a function execution
+
+|fname99 = <nowiki>func.to_table(&nbsp;a, b&nbsp;)</nowiki>
+|ftype99 = <samp>a: A</samp><br><samp>b: B</samp><br><samp>-> table<1, A, 2, B></samp>
+|fuse99 = Create table from two values
+
+|fname100 = <nowiki>func.trampoline(&nbsp;f&nbsp;)</nowiki>
+|ftype100 = <samp>f: fun(...:</samp><br><samp>-> fun(...: A): R</samp>
+|fuse100 = Add trampolining for stack safety in recursive calls with functional improvements
+
+|fname101 = <nowiki>func.transducer(&nbsp;xform&nbsp;)</nowiki>
+|ftype101 = <samp>xform: fun(reducer:</samp><br><samp>-> </samp>
+|fuse101 = Create a transducer for efficient composition of map/filter operations
+
+|fname102 = <nowiki>func.until_fn(&nbsp;predicate, transform&nbsp;)</nowiki>
+|ftype102 = <samp>predicate: fun(x:</samp><br><samp>transform: fun(x:</samp><br><samp>-> fun(x: T): T</samp>
+|fuse102 = Functional until combinator - repeatedly apply function until predicate is true
+
+|fname103 = <nowiki>func.unwrap_or(&nbsp;result, default&nbsp;)</nowiki>
+|ftype103 = <samp>result: {{({{)}}{{)}}[1]:</samp><br><samp>default: T</samp><br><samp>-> T</samp>
+|fuse103 = Safely unwrap the result of a function call
+
+|fname104 = <nowiki>func.unzip(&nbsp;pairs&nbsp;)</nowiki>
+|ftype104 = <samp>pairs: table<integer,</samp><br><samp>-> T[], U[]</samp>
+|fuse104 = Unzip an array of pairs into two arrays
+
+|fname105 = <nowiki>func.view(&nbsp;lens&nbsp;)</nowiki>
+|ftype105 = <samp>lens: table<string,</samp><br><samp>-> fun(s: S): A</samp>
+|fuse105 = Curried lens get operation
+
+|fname106 = <nowiki>func.while_fn(&nbsp;predicate, transform&nbsp;)</nowiki>
+|ftype106 = <samp>predicate: fun(x:</samp><br><samp>transform: fun(x:</samp><br><samp>-> fun(x: T): T</samp>
+|fuse106 = Functional while combinator - repeatedly apply function while predicate is true
+
+|fname107 = <nowiki>func.zip(&nbsp;xs, ys&nbsp;)</nowiki>
+|ftype107 = <samp>xs: ArrayLike<T></samp><br><samp>ys: ArrayLike<U></samp><br><samp>-> </samp>
+|fuse107 = Zip two arrays together into pairs
+
+|example =
+<syntaxhighlight lang='lua'>
+    -- Example usage of Functools will be added manually
+</syntaxhighlight>
 }}

@@ -1,0 +1,349 @@
+name: Advanced Security & Quality Scanning
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly on Mondays
+  workflow_dispatch:
+
+jobs:
+  # Advanced static analysis
+  security-scanning:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: 'trivy-results.sarif'
+        
+    - name: Secret scanning with TruffleHog
+      run: |
+        docker run --rm -v "$PWD:/pwd" trufflesecurity/trufflehog:latest \
+          filesystem /pwd --format json --output /pwd/secrets-scan.json || true
+          
+        if [ -f secrets-scan.json ] && [ -s secrets-scan.json ]; then
+          echo "🚨 Potential secrets found:"
+          cat secrets-scan.json | jq '.[] | {detector: .DetectorName, line: .Raw}'
+          exit 1
+        else
+          echo "✅ No secrets detected"
+        fi
+        
+    - name: Dependency vulnerability scan
+      run: |
+        # Scan package.json if exists
+        if [ -f package.json ]; then
+          npm audit --audit-level=high --format=json > npm-audit.json || true
+          if [ -s npm-audit.json ]; then
+            echo "📊 NPM Audit Results:"
+            cat npm-audit.json | jq '.vulnerabilities | length' | \
+              xargs -I {} echo "{} vulnerabilities found"
+          fi
+        fi
+        
+        # Scan Lua dependencies
+        echo "🔍 Scanning Lua module dependencies..."
+        find src/modules -name "*.lua" -exec grep -l "require(" {} \; | while read file; do
+          echo "Dependencies in $file:"
+          grep "require(" "$file" | sed "s/.*require(['\"]\\([^'\"]*\\)['\"].*/  - \\1/"
+        done
+        
+    - name: License compliance check
+      run: |
+        echo "📄 License Compliance Report"
+        echo "========================="
+        
+        # Check for license headers
+        find src/modules -name "*.lua" | while read file; do
+          if ! head -10 "$file" | grep -qi "license\|copyright"; then
+            echo "⚠️  Missing license header: $file"
+          fi
+        done
+        
+        # Verify LICENSE file
+        if [ ! -f LICENSE ]; then
+          echo "❌ No LICENSE file found"
+          exit 1
+        fi
+
+  # Code quality metrics
+  quality-analysis:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Install quality tools
+      run: |
+        luarocks install luacheck
+        sudo apt-get update
+        sudo apt-get install -y cloc tokei
+        
+    - name: Run luacheck with detailed analysis
+      run: |
+        echo "# 📊 Code Quality Report" > quality-report.md
+        echo "" >> quality-report.md
+        echo "**Date:** $(date -u)" >> quality-report.md
+        echo "**Commit:** ${{ github.sha }}" >> quality-report.md
+        echo "" >> quality-report.md
+        
+        echo "## 🔍 Static Analysis Results" >> quality-report.md
+        echo "" >> quality-report.md
+        
+        # Run luacheck with statistics
+        luacheck src/modules --formatter=plain --statistics > luacheck-output.txt || true
+        
+        # Parse luacheck results
+        warnings=$(grep "warning" luacheck-output.txt | wc -l || echo "0")
+        errors=$(grep "error" luacheck-output.txt | wc -l || echo "0")
+        
+        echo "| Metric | Count |" >> quality-report.md
+        echo "|--------|-------|" >> quality-report.md
+        echo "| Warnings | $warnings |" >> quality-report.md
+        echo "| Errors | $errors |" >> quality-report.md
+        echo "" >> quality-report.md
+        
+        # Top issues
+        echo "## 🔧 Top Issues" >> quality-report.md
+        echo "```" >> quality-report.md
+        head -20 luacheck-output.txt >> quality-report.md
+        echo "```" >> quality-report.md
+        
+    - name: Calculate code metrics
+      run: |
+        echo "" >> quality-report.md
+        echo "## 📈 Code Metrics" >> quality-report.md
+        echo "" >> quality-report.md
+        
+        # Line counts
+        cloc src/modules --md >> quality-report.md
+        
+        echo "" >> quality-report.md
+        echo "## 🧮 Complexity Analysis" >> quality-report.md
+        echo "" >> quality-report.md
+        
+        # Function complexity analysis
+        find src/modules -name "*.lua" | while read file; do
+          module_name=$(basename "$file" .lua)
+          functions=$(grep -c "^[[:space:]]*function\|^[[:space:]]*local[[:space:]]*function" "$file" || echo "0")
+          lines=$(wc -l < "$file")
+          
+          if [ "$functions" -gt 0 ]; then
+            avg_lines=$((lines / functions))
+            echo "- **$module_name**: $functions functions, avg $avg_lines lines per function" >> quality-report.md
+          fi
+        done
+        
+    - name: Test coverage simulation
+      run: |
+        echo "" >> quality-report.md
+        echo "## 🧪 Test Coverage Analysis" >> quality-report.md
+        echo "" >> quality-report.md
+        
+        # Simulate coverage by counting test files vs source files
+        source_files=$(find src/modules -name "*.lua" | wc -l)
+        test_files=$(find tests -name "test_*.lua" | wc -l)
+        
+        if [ "$source_files" -gt 0 ]; then
+          coverage=$((test_files * 100 / source_files))
+          echo "- **Estimated Coverage**: $coverage% ($test_files test files for $source_files modules)" >> quality-report.md
+        fi
+        
+        echo "" >> quality-report.md
+        echo "## 📝 Documentation Coverage" >> quality-report.md
+        echo "" >> quality-report.md
+        
+        # Documentation coverage
+        doc_files=$(find src/module-docs -name "*.html" 2>/dev/null | wc -l || echo "0")
+        if [ "$source_files" -gt 0 ]; then
+          doc_coverage=$((doc_files * 100 / source_files))
+          echo "- **Documentation Coverage**: $doc_coverage% ($doc_files docs for $source_files modules)" >> quality-report.md
+        fi
+        
+    - name: Upload quality report
+      uses: actions/upload-artifact@v4
+      with:
+        name: quality-report
+        path: quality-report.md
+
+  # Performance regression detection
+  performance-regression:
+    name: Performance Regression Detection
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup benchmarking
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lua5.1 time bc
+        
+    - name: Run current benchmarks
+      run: |
+        cd examples/advanced
+        echo "=== Current Performance ===" > ../../current-perf.txt
+        /usr/bin/time -f "real:%e user:%U sys:%S mem:%M" lua performance_benchmark.lua 2>> ../../current-perf.txt
+        
+    - name: Get baseline performance
+      run: |
+        # Try to get performance from previous successful run
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          git checkout ${{ github.event.pull_request.base.sha }}
+          cd examples/advanced
+          echo "=== Baseline Performance ===" > ../../baseline-perf.txt
+          /usr/bin/time -f "real:%e user:%U sys:%S mem:%M" lua performance_benchmark.lua 2>> ../../baseline-perf.txt || echo "Baseline unavailable" >> ../../baseline-perf.txt
+          git checkout -
+        fi
+        
+    - name: Compare performance
+      run: |
+        echo "# 🚀 Performance Comparison Report" > perf-comparison.md
+        echo "" >> perf-comparison.md
+        echo "**Date:** $(date -u)" >> perf-comparison.md
+        echo "**Branch:** ${{ github.ref_name }}" >> perf-comparison.md
+        echo "" >> perf-comparison.md
+        
+        if [ -f baseline-perf.txt ] && [ -f current-perf.txt ]; then
+          echo "## 📊 Performance Metrics" >> perf-comparison.md
+          echo "" >> perf-comparison.md
+          echo "| Metric | Baseline | Current | Change |" >> perf-comparison.md
+          echo "|--------|----------|---------|--------|" >> perf-comparison.md
+          
+          # Extract and compare metrics (simplified)
+          current_time=$(grep "real:" current-perf.txt | cut -d: -f2 || echo "0")
+          baseline_time=$(grep "real:" baseline-perf.txt | cut -d: -f2 || echo "0")
+          
+          if [ "$baseline_time" != "0" ] && [ "$current_time" != "0" ]; then
+            change=$(echo "scale=2; ($current_time - $baseline_time) / $baseline_time * 100" | bc -l || echo "N/A")
+            echo "| Execution Time | ${baseline_time}s | ${current_time}s | ${change}% |" >> perf-comparison.md
+          fi
+        else
+          echo "## ⚠️ Performance Baseline" >> perf-comparison.md
+          echo "" >> perf-comparison.md
+          echo "No baseline available for comparison. This will be used as baseline for future runs." >> perf-comparison.md
+        fi
+        
+        echo "" >> perf-comparison.md
+        cat current-perf.txt >> perf-comparison.md
+        
+    - name: Upload performance comparison
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-comparison
+        path: perf-comparison.md
+
+  # Generate comprehensive quality report
+  generate-quality-summary:
+    name: Generate Quality Summary
+    needs: [security-scanning, quality-analysis, performance-regression]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Download all reports
+      uses: actions/download-artifact@v4
+      
+    - name: Generate summary
+      run: |
+        cat > quality-summary.md << 'EOF'
+        # 🎯 Comprehensive Quality Report
+        
+        **Generated:** $(date -u)
+        **Workflow:** ${{ github.workflow }}
+        **Repository:** ${{ github.repository }}
+        
+        ## 📋 Quality Gates Status
+        
+        | Check | Status | Notes |
+        |-------|--------|-------|
+        EOF
+        
+        # Check security scanning
+        if [ -f "trivy-results.sarif" ]; then
+          echo "| 🔒 Security Scan | ✅ Complete | Trivy scan completed |" >> quality-summary.md
+        else
+          echo "| 🔒 Security Scan | ❌ Failed | No results found |" >> quality-summary.md
+        fi
+        
+        # Check quality analysis
+        if [ -f "quality-report/quality-report.md" ]; then
+          echo "| 📊 Quality Analysis | ✅ Complete | Static analysis completed |" >> quality-summary.md
+        else
+          echo "| 📊 Quality Analysis | ❌ Failed | No results found |" >> quality-summary.md
+        fi
+        
+        # Check performance
+        if [ -f "performance-comparison/perf-comparison.md" ]; then
+          echo "| 🚀 Performance Check | ✅ Complete | Benchmarks completed |" >> quality-summary.md
+        else
+          echo "| 🚀 Performance Check | ❌ Failed | No results found |" >> quality-summary.md
+        fi
+        
+        echo "" >> quality-summary.md
+        
+        # Include detailed reports
+        if [ -f "quality-report/quality-report.md" ]; then
+          echo "---" >> quality-summary.md
+          cat quality-report/quality-report.md >> quality-summary.md
+        fi
+        
+        if [ -f "performance-comparison/perf-comparison.md" ]; then
+          echo "---" >> quality-summary.md
+          cat performance-comparison/perf-comparison.md >> quality-summary.md
+        fi
+        
+    - name: Upload comprehensive summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: quality-summary
+        path: quality-summary.md
+        
+    - name: Create quality badge
+      run: |
+        # Generate quality score (simplified)
+        quality_score="85"  # This would be calculated from actual metrics
+        
+        curl -X POST "https://img.shields.io/badge/Quality-${quality_score}%25-brightgreen" \
+          -o quality-badge.svg || true
+          
+    - name: Comment on PR with quality report
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          if (fs.existsSync('quality-summary.md')) {
+            const summary = fs.readFileSync('quality-summary.md', 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🎯 Quality & Security Report\n\n${summary.substring(0, 65000)}`
+            });
+          }

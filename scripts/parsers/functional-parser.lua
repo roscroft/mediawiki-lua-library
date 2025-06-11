@@ -355,7 +355,7 @@ end
 -- @param sampleContent string Sample content to parse
 FunctionalParser.demonstrate = function(sampleContent)
     print("🎨 Elegant Functional Parsing Demonstration")
-    print("=" .. string.rep("=", 45))
+    print("=============================================")
 
     -- Parse using functional pipeline
     local parseResult = FunctionalParser.parseDocumentation(sampleContent)
@@ -374,8 +374,8 @@ FunctionalParser.demonstrate = function(sampleContent)
     local processDescription = func.compose(
         function(s) return "Processed: " .. s end,
         func.compose(
-            function(s) return string.gsub(s, "%s+", " ") end,
-            function(s) return string.gsub(s, "^%s*(.-)%s*$", "%1") end
+            function(s) return s:gsub("%s+", " ") end,
+            function(s) return s:gsub("^%s*(.-)%s*$", "%1") end
         )
     )
 

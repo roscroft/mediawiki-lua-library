@@ -19,9 +19,9 @@ Relates to #(issue number)
 
 ## Changes Made
 <!-- Describe the specific changes made -->
-- 
-- 
-- 
+-
+-
+-
 
 ## Testing
 <!-- Describe how you tested these changes -->
@@ -31,6 +31,7 @@ Relates to #(issue number)
 - [ ] Performance testing (if applicable)
 
 ### Test Environment
+
 - **Lua Version**: 5.1
 - **MediaWiki Version**: (if applicable)
 - **Testing Method**: [ ] Local / [ ] Docker / [ ] MediaWiki instance
