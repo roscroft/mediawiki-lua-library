@@ -3,8 +3,6 @@
 📚 **[Complete Documentation on Wiki →](https://github.com/roscroft/mediawiki-lua-library/wiki)**
 
 
-A comprehensive functional programming library ecosystem for MediaWiki environments, providing advanced utilities for array manipulation, functional programming patterns, and UI component building with standardized error handling and performance monitoring.
-
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -225,7 +223,35 @@ src/modules/
 - 🔌 **Extension Ecosystem**: Additional MediaWiki-specific modules
 - 🌐 **Community Integration**: MediaWiki.org deployment preparation
 
-For detailed development history and technical documentation, see the **[GitHub Wiki](https://github.com/roscroft/mediawiki-lua-library/wiki)**.
+## 🤝 Contributing
+
+We welcome contributions! This project uses **branch protection rules** to maintain code quality.
+
+### Quick Contribution Guide
+
+1. **Fork & Clone**: Fork the repository and clone your fork
+2. **Create Branch**: `git checkout -b feature/your-feature`
+3. **Make Changes**: Follow our [Contributing Guidelines](CONTRIBUTING.md)
+4. **Test Changes**: Run `make test` and `make lint`
+5. **Submit PR**: Create pull request via GitHub interface
+6. **Code Review**: Maintainers will review (may require changes)
+7. **Automated Merge**: After approval and CI passes, PR will be merged
+
+### Branch Protection Features
+
+- 🛡️ **Direct pushes blocked** - All changes must go through pull requests
+- 👥 **Code review required** - At least 1 approving review needed
+- 🧪 **CI checks required** - All tests must pass before merge
+- 🔒 **Code owners** - Automatic review requests for file changes
+- 📋 **Linear history** - Clean git history maintained
+
+### Development Resources
+
+- **[Contributing Guidelines](CONTRIBUTING.md)** - Complete contribution guide
+- **[Branch Protection Setup](.github/BRANCH_PROTECTION.md)** - Repository protection rules
+- **[GitHub Wiki](https://github.com/roscroft/mediawiki-lua-library/wiki)** - Comprehensive documentation
+
+**For maintainers**: Run `./scripts/setup-branch-protection.sh` to configure protection rules.
 
 ---
 

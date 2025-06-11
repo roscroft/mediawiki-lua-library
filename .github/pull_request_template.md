@@ -1,21 +1,23 @@
-## Description
-<!-- Provide a brief description of the changes in this PR -->
+## 📋 Pull Request Description
 
-## Type of Change
+### Summary
+<!-- Provide a brief summary of what this PR accomplishes -->
+
+### Type of Change
 <!-- Mark the relevant option with an [x] -->
-- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
-- [ ] ✨ New feature (non-breaking change which adds functionality)
+- [ ] 🐛 Bug fix (non-breaking change that fixes an issue)
+- [ ] ✨ New feature (non-breaking change that adds functionality)
 - [ ] 💥 Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] 📚 Documentation update
+- [ ] 📚 Documentation update (improves or adds to documentation)
 - [ ] 🔧 Code refactoring (no functional changes)
-- [ ] ⚡ Performance improvement
-- [ ] 🧪 Test improvements
-- [ ] 🔨 Build/CI improvements
+- [ ] 🧪 Test improvements (adds or improves tests)
+- [ ] 🚀 Performance improvement (improves performance without changing functionality)
+- [ ] 🔒 Security fix (addresses security vulnerabilities)
 
-## Related Issues
-<!-- Link any related issues -->
-Fixes #(issue number)
-Relates to #(issue number)
+### Related Issues
+<!-- Link any related GitHub issues -->
+Fixes #(issue_number)
+Relates to #(issue_number)
 
 ## Changes Made
 <!-- Describe the specific changes made -->
@@ -23,20 +25,36 @@ Relates to #(issue number)
 -
 -
 
-## Testing
-<!-- Describe how you tested these changes -->
-- [ ] Unit tests pass (`lua tests/run_all_tests.lua`)
-- [ ] Integration tests pass
-- [ ] Manual testing performed
+## 🧪 Testing & Validation
+
+### Required CI Checks
+<!-- These must pass before merge -->
+- [ ] **Syntax Validation & Linting** - Lua syntax and style checks
+- [ ] **Basic Execution Testing** - Module compilation and unit tests  
+- [ ] **Mocked Environment Testing** - Docker-based testing
+- [ ] **Scribunto Integration Testing** - Full MediaWiki integration
+
+### Manual Testing
+- [ ] Local tests pass (`make test`)
+- [ ] Linting passes (`make lint`) 
+- [ ] CI pipeline passes locally (`make ci-test`)
 - [ ] Performance testing (if applicable)
 
-### Test Environment
+### Test Evidence
+<!-- Include command output or screenshots -->
+```bash
+# Paste test command output here
+```
 
-- **Lua Version**: 5.1
-- **MediaWiki Version**: (if applicable)
-- **Testing Method**: [ ] Local / [ ] Docker / [ ] MediaWiki instance
+## 🔒 Security & Quality
 
-## Code Quality
+### Security Checklist
+- [ ] No hardcoded secrets or credentials
+- [ ] Input validation implemented for new functions
+- [ ] Error handling follows CodeStandards.lua patterns
+- [ ] No sensitive data in commit history
+
+### Code Quality
 <!-- Verify code quality standards -->
 - [ ] Code follows the project's style guidelines
 - [ ] Self-review of the code performed
