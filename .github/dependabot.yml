@@ -1,0 +1,51 @@
+version: 2
+
+updates:
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "maintainer"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    
+  # NPM dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "06:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "maintainer"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    # Group minor and patch updates
+    groups:
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    
+  # Docker base image updates (if using external images)
+  - package-ecosystem: "docker"
+    directory: "/docker"
+    schedule:
+      interval: "monthly"
+      day: "first-monday"
+      time: "06:00"
+    open-pull-requests-limit: 2
+    reviewers:
+      - "maintainer"
+    commit-message:
+      prefix: "chore"
+      include: "scope"

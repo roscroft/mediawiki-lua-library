@@ -1,0 +1,317 @@
+name: Scheduled Maintenance
+
+on:
+  schedule:
+    # Run every day at 6:00 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Force rebuild of Docker images'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  DOCKER_IMAGE: mediawiki-lua-test
+
+jobs:
+  # Daily health check
+  health-check:
+    name: Daily Health Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Setup LuaRocks
+      uses: leafo/gh-actions-luarocks@v4
+      
+    - name: Install luacheck
+      run: luarocks install luacheck
+      
+    - name: Run health checks
+      run: |
+        echo "=== Daily Health Check $(date) ==="
+        
+        # Test syntax validation
+        echo "🔍 Checking syntax..."
+        luacheck src/modules/*.lua --formatter plain
+        
+        # Test basic module loading
+        echo "🔍 Testing module loading..."
+        lua tests/unit/test_module_loading.lua
+        
+        # Check project structure integrity
+        echo "🔍 Checking project structure..."
+        required_files=(
+          "src/modules/Array.lua"
+          "src/modules/Functools.lua"
+          "src/modules/Funclib.lua"
+          "src/modules/MediaWikiAutoInit.lua"
+          "tests/run_all_tests.lua"
+          "docker/Dockerfile"
+        )
+        
+        for file in "${required_files[@]}"; do
+          if [ ! -f "$file" ]; then
+            echo "❌ Missing critical file: $file"
+            exit 1
+          fi
+        done
+        
+        echo "✅ Health check completed successfully"
+        
+    - name: Test Docker build
+      run: |
+        echo "🐳 Testing Docker build..."
+        docker build -t $DOCKER_IMAGE-health-check .
+        docker run --rm $DOCKER_IMAGE-health-check php -v
+        docker rmi $DOCKER_IMAGE-health-check
+        
+    - name: Generate health report
+      run: |
+        cat > health-report.md << EOF
+        # Daily Health Check Report
+        
+        **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        **Status:** ✅ HEALTHY
+        
+        ## Checks Performed
+        
+        - ✅ Lua syntax validation
+        - ✅ Module loading tests
+        - ✅ Project structure integrity
+        - ✅ Docker build test
+        
+        ## Next Check
+        
+        Tomorrow at 6:00 AM UTC
+        EOF
+        
+    - name: Upload health report
+      uses: actions/upload-artifact@v4
+      with:
+        name: health-report-$(date +%Y%m%d)
+        path: health-report.md
+        retention-days: 7
+
+  # Dependency updates check
+  dependency-check:
+    name: Dependency Updates Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Check for npm updates
+      run: |
+        echo "=== Checking NPM Dependencies ==="
+        npm outdated || true
+        
+        # Check if package.json needs updates
+        if npm outdated | grep -q "Package"; then
+          echo "📦 NPM dependencies have updates available"
+          echo "Consider running: npm update"
+        else
+          echo "✅ NPM dependencies are up to date"
+        fi
+        
+    - name: Check GitHub Actions versions
+      run: |
+        echo "=== Checking GitHub Actions Versions ==="
+        
+        # Check if we're using latest versions of common actions
+        echo "📋 Current action versions in use:"
+        grep -r "uses:" .github/workflows/ | grep -E "@v[0-9]" | sort | uniq
+        
+        echo ""
+        echo "💡 Consider checking for updates to GitHub Actions"
+        echo "   - actions/checkout@v4"
+        echo "   - actions/setup-node@v4" 
+        echo "   - actions/upload-artifact@v4"
+        echo "   - docker/setup-buildx-action@v3"
+
+  # Performance regression detection
+  performance-regression:
+    name: Performance Regression Detection
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Run performance tests
+      run: |
+        echo "=== Performance Regression Check ==="
+        lua tests/unit/test_performance.lua > current-performance.txt
+        
+    - name: Compare with baseline (if available)
+      run: |
+        echo "📊 Current performance results:"
+        cat current-performance.txt
+        
+        # Note: In a real scenario, you'd download previous results and compare
+        echo ""
+        echo "💡 To implement regression detection:"
+        echo "   1. Store baseline performance results"
+        echo "   2. Compare current results with baseline"
+        echo "   3. Alert if performance degrades significantly"
+        
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-results-$(date +%Y%m%d)
+        path: current-performance.txt
+        retention-days: 30
+
+  # Security audit
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run security checks
+      run: |
+        echo "=== Security Audit ==="
+        
+        # Check for potential secrets
+        echo "🔍 Scanning for potential secrets..."
+        if grep -r -i "password\|secret\|key\|token\|api_key" src/ tests/ scripts/ --include="*.lua" --include="*.sh" | grep -v "test\|example\|demo"; then
+          echo "⚠️ Potential secrets found - please review"
+        else
+          echo "✅ No obvious secrets found in code"
+        fi
+        
+        # Check file permissions
+        echo "🔍 Checking file permissions..."
+        find . -type f -perm /o+w | head -10 | while read file; do
+          echo "⚠️ World-writable file: $file"
+        done
+        
+        # Check for .env files
+        echo "🔍 Checking for environment files..."
+        if find . -name ".env*" -type f | grep -v ".gitignore"; then
+          echo "⚠️ Environment files found - ensure they're in .gitignore"
+        else
+          echo "✅ No environment files found"
+        fi
+        
+        # Check Docker security
+        echo "🔍 Checking Dockerfile security..."
+        if grep -q "^USER root" docker/Dockerfile; then
+          echo "⚠️ Dockerfile runs as root - consider using non-root user"
+        fi
+        
+        echo "✅ Security audit completed"
+
+  # Code quality metrics
+  code-quality:
+    name: Code Quality Metrics
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Calculate metrics
+      run: |
+        echo "=== Code Quality Metrics ==="
+        
+        # Count lines of code
+        echo "📊 Lines of Code:"
+        echo "  Lua modules: $(find src/modules -name "*.lua" -exec wc -l {} + | tail -1 | awk '{print $1}')"
+        echo "  Test files: $(find tests -name "*.lua" -exec wc -l {} + | tail -1 | awk '{print $1}')"
+        echo "  Scripts: $(find scripts -name "*.lua" -o -name "*.sh" | xargs wc -l | tail -1 | awk '{print $1}')"
+        
+        # Count modules
+        echo ""
+        echo "📦 Module Count:"
+        echo "  Core modules: $(ls src/modules/*.lua | wc -l)"
+        echo "  Test files: $(ls tests/unit/*.lua tests/integration/*.lua 2>/dev/null | wc -l)"
+        
+        # Test coverage estimation
+        echo ""
+        echo "🧪 Test Coverage (estimated):"
+        modules=$(ls src/modules/*.lua | wc -l)
+        tests=$(ls tests/unit/test_*.lua 2>/dev/null | wc -l)
+        coverage=$((tests * 100 / modules))
+        echo "  Unit test coverage: ~${coverage}% (${tests}/${modules} modules)"
+        
+        # Documentation coverage
+        echo ""
+        echo "📚 Documentation:"
+        docs=$(ls docs/*.md 2>/dev/null | wc -l)
+        echo "  Documentation files: $docs"
+        if [ -f "README.md" ]; then
+          echo "  README.md: ✅"
+        else
+          echo "  README.md: ❌"
+        fi
+
+  # Cleanup old artifacts
+  cleanup:
+    name: Cleanup Old Artifacts
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    
+    steps:
+    - name: Cleanup workflow artifacts
+      run: |
+        echo "=== Cleanup Report ==="
+        echo "🧹 Old artifacts would be cleaned up here"
+        echo ""
+        echo "💡 GitHub automatically cleans up artifacts after retention period"
+        echo "   - Health reports: 7 days"
+        echo "   - Performance results: 30 days"
+        echo "   - Release artifacts: 90 days"
+        echo ""
+        echo "Consider implementing custom cleanup if needed"
+
+  # Generate maintenance summary
+  maintenance-summary:
+    name: Maintenance Summary
+    runs-on: ubuntu-latest
+    needs: [health-check, dependency-check, performance-regression, security-audit, code-quality]
+    if: always()
+    
+    steps:
+    - name: Generate summary
+      run: |
+        echo "=== Daily Maintenance Summary ==="
+        echo "**Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+        echo ""
+        echo "| Check | Status |"
+        echo "|-------|--------|"
+        echo "| Health Check | ${{ needs.health-check.result }} |"
+        echo "| Dependency Check | ${{ needs.dependency-check.result }} |"
+        echo "| Performance Check | ${{ needs.performance-regression.result }} |"
+        echo "| Security Audit | ${{ needs.security-audit.result }} |"
+        echo "| Code Quality | ${{ needs.code-quality.result }} |"
+        echo ""
+        if [[ "${{ needs.health-check.result }}" == "success" ]]; then
+          echo "✅ Project is healthy and ready for development"
+        else
+          echo "⚠️ Some maintenance checks failed - please review"
+        fi

@@ -1,0 +1,414 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [ main, develop ]
+
+env:
+  DOCKER_IMAGE: mediawiki-lua-test-pr
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # PR Information and Validation
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    
+    outputs:
+      has-lua-changes: ${{ steps.changes.outputs.lua }}
+      has-doc-changes: ${{ steps.changes.outputs.docs }}
+      has-test-changes: ${{ steps.changes.outputs.tests }}
+    
+    steps:
+    - name: Checkout PR
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Detect changes
+      uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          lua:
+            - 'src/modules/**/*.lua'
+            - 'src/data/**/*.lua'
+          docs:
+            - 'docs/**'
+            - '*.md'
+          tests:
+            - 'tests/**'
+          scripts:
+            - 'scripts/**'
+          config:
+            - '.github/**'
+            - 'Makefile'
+            - 'package.json'
+            - 'docker/**'
+            
+    - name: Validate PR title
+      run: |
+        echo "=== Validating PR Title ==="
+        title="${{ github.event.pull_request.title }}"
+        
+        # Check if title follows conventional commit format
+        if [[ "$title" =~ ^(feat|fix|docs|style|refactor|test|chore|perf)(\(.+\))?: .+ ]]; then
+          echo "✅ PR title follows conventional commit format"
+        else
+          echo "💡 Consider using conventional commit format:"
+          echo "   feat: add new functionality"
+          echo "   fix: bug fixes"
+          echo "   docs: documentation changes"
+          echo "   test: test improvements"
+          echo "   refactor: code refactoring"
+          echo "   perf: performance improvements"
+        fi
+        
+    - name: Check PR description
+      run: |
+        echo "=== Checking PR Description ==="
+        description="${{ github.event.pull_request.body }}"
+        
+        if [ -z "$description" ]; then
+          echo "⚠️ PR has no description - consider adding details about the changes"
+        else
+          echo "✅ PR has description"
+        fi
+        
+    - name: Validate change scope
+      run: |
+        echo "=== Change Scope Analysis ==="
+        echo "Lua modules changed: ${{ steps.changes.outputs.lua }}"
+        echo "Documentation changed: ${{ steps.changes.outputs.docs }}"
+        echo "Tests changed: ${{ steps.changes.outputs.tests }}"
+        echo "Scripts changed: ${{ steps.changes.outputs.scripts }}"
+        echo "Config changed: ${{ steps.changes.outputs.config }}"
+
+  # Fast feedback - syntax and basic validation
+  quick-validation:
+    name: Quick Validation
+    runs-on: ubuntu-latest
+    needs: pr-validation
+    if: needs.pr-validation.outputs.has-lua-changes == 'true'
+    
+    steps:
+    - name: Checkout PR
+      uses: actions/checkout@v4
+      
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Setup LuaRocks
+      uses: leafo/gh-actions-luarocks@v4
+      
+    - name: Install luacheck
+      run: luarocks install luacheck
+      
+    - name: Quick syntax check
+      run: |
+        echo "=== Quick Syntax Validation ==="
+        changed_files=$(git diff --name-only origin/main...HEAD | grep '\.lua$' | head -20)
+        
+        for file in $changed_files; do
+          if [ -f "$file" ]; then
+            echo "Checking: $file"
+            lua -e "local f = loadfile('$file'); if not f then os.exit(1) end"
+            luacheck "$file" --formatter plain
+          fi
+        done
+        
+    - name: Test basic module loading
+      run: |
+        echo "=== Testing Basic Module Loading ==="
+        if [ -f "tests/unit/test_module_loading.lua" ]; then
+          lua tests/unit/test_module_loading.lua
+        fi
+
+  # Comprehensive testing for significant changes
+  comprehensive-testing:
+    name: Comprehensive Testing
+    runs-on: ubuntu-latest
+    needs: [pr-validation, quick-validation]
+    if: always() && (needs.pr-validation.outputs.has-lua-changes == 'true' || needs.pr-validation.outputs.has-test-changes == 'true')
+    
+    strategy:
+      matrix:
+        test-stage: ['unit', 'integration', 'mocked', 'docker']
+        
+    steps:
+    - name: Checkout PR
+      uses: actions/checkout@v4
+      
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Run unit tests
+      if: matrix.test-stage == 'unit'
+      run: |
+        echo "=== Running Unit Tests ==="
+        cd tests && lua run_all_tests.lua
+        
+    - name: Run integration tests
+      if: matrix.test-stage == 'integration'
+      run: |
+        echo "=== Running Integration Tests ==="
+        for test in tests/integration/*.lua; do
+          if [ -f "$test" ]; then
+            echo "Running: $(basename "$test")"
+            lua "$test"
+          fi
+        done
+        
+    - name: Setup Docker for mocked tests
+      if: matrix.test-stage == 'mocked'
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Run mocked environment tests
+      if: matrix.test-stage == 'mocked'
+      run: |
+        echo "=== Running Mocked Environment Tests ==="
+        docker build -t $DOCKER_IMAGE .
+        
+        # Start container
+        docker run -d \
+          --name pr-test-container \
+          -v "$(pwd)/src:/var/www/html/src" \
+          -v "$(pwd)/tests:/var/www/html/tests" \
+          $DOCKER_IMAGE
+          
+        sleep 10
+        
+        # Copy test environment
+        docker cp tests/env/module-loader.lua pr-test-container:/var/www/html/
+        docker cp tests/env/wiki-lua-env.lua pr-test-container:/var/www/html/
+        
+        # Run basic tests
+        cat > /tmp/pr_test.lua << 'EOF'
+        dofile('/var/www/html/tests/env/module-loader.lua')
+        print("Testing PR changes in mocked environment...")
+        local success = pcall(function()
+            require('Module:Functools')
+            require('Module:Array')
+        end)
+        if not success then
+            os.exit(1)
+        end
+        print("✓ Mocked environment tests passed")
+        EOF
+        
+        docker cp /tmp/pr_test.lua pr-test-container:/tmp/pr_test.lua
+        docker exec pr-test-container lua /tmp/pr_test.lua
+        
+        # Cleanup
+        docker stop pr-test-container
+        docker rm pr-test-container
+        
+    - name: Run performance regression tests
+      if: matrix.test-stage == 'docker'
+      run: |
+        echo "=== Performance Regression Tests ==="
+        if [ -f "tests/unit/test_performance.lua" ]; then
+          lua tests/unit/test_performance.lua > pr-performance.txt
+          echo "Performance results:"
+          cat pr-performance.txt
+        fi
+
+  # Documentation validation
+  documentation-check:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    needs: pr-validation
+    if: needs.pr-validation.outputs.has-doc-changes == 'true' || needs.pr-validation.outputs.has-lua-changes == 'true'
+    
+    steps:
+    - name: Checkout PR
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Lint documentation
+      run: |
+        echo "=== Documentation Linting ==="
+        npm run lint
+        
+    - name: Check for broken links (basic)
+      run: |
+        echo "=== Checking for Broken Links ==="
+        # Basic check for common broken link patterns
+        if grep -r "http://\|https://" docs/ *.md | grep -E "404|broken|invalid"; then
+          echo "⚠️ Potentially broken links found"
+        else
+          echo "✅ No obvious broken links detected"
+        fi
+        
+    - name: Validate module documentation
+      run: |
+        echo "=== Module Documentation Validation ==="
+        
+        # Check if new modules have documentation
+        changed_modules=$(git diff --name-only origin/main...HEAD | grep 'src/modules/.*\.lua$' | head -10)
+        
+        for module in $changed_modules; do
+          if [ -f "$module" ]; then
+            module_name=$(basename "$module" .lua)
+            
+            # Check if module has proper header documentation
+            if head -20 "$module" | grep -q "@module\|@description\|Module:"; then
+              echo "✅ $module_name has documentation headers"
+            else
+              echo "💡 Consider adding documentation headers to $module_name"
+            fi
+          fi
+        done
+
+  # Security check for PR
+  security-check:
+    name: Security Check
+    runs-on: ubuntu-latest
+    needs: pr-validation
+    
+    steps:
+    - name: Checkout PR
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Check for secrets in changes
+      run: |
+        echo "=== Security Check for PR ==="
+        
+        # Check changed files for potential secrets
+        changed_files=$(git diff --name-only origin/main...HEAD)
+        
+        for file in $changed_files; do
+          if [ -f "$file" ]; then
+            echo "Checking: $file"
+            
+            # Look for potential secrets in the diff
+            if git diff origin/main...HEAD -- "$file" | grep -i "password\|secret\|key\|token\|api_key" | grep "^+"; then
+              echo "⚠️ Potential secret added in $file - please review"
+            fi
+          fi
+        done
+        
+    - name: Check file permissions
+      run: |
+        echo "=== Checking File Permissions ==="
+        changed_files=$(git diff --name-only origin/main...HEAD)
+        
+        for file in $changed_files; do
+          if [ -f "$file" ] && [ -x "$file" ]; then
+            case "$file" in
+              *.lua|*.md|*.json|*.yml|*.yaml)
+                echo "⚠️ Executable bit set on $file - consider removing"
+                ;;
+              *.sh)
+                echo "✅ $file is executable (expected for script)"
+                ;;
+            esac
+          fi
+        done
+
+  # Code quality analysis
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    needs: pr-validation
+    if: needs.pr-validation.outputs.has-lua-changes == 'true'
+    
+    steps:
+    - name: Checkout PR
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.1"
+        
+    - name: Setup LuaRocks
+      uses: leafo/gh-actions-luarocks@v4
+      
+    - name: Install luacheck
+      run: luarocks install luacheck
+      
+    - name: Analyze code quality
+      run: |
+        echo "=== Code Quality Analysis ==="
+        
+        # Get changed Lua files
+        changed_lua_files=$(git diff --name-only origin/main...HEAD | grep '\.lua$')
+        
+        for file in $changed_lua_files; do
+          if [ -f "$file" ]; then
+            echo "=== Analyzing: $file ==="
+            
+            # Run luacheck with detailed output
+            luacheck "$file" --formatter plain --no-color
+            
+            # Check file size
+            file_size=$(wc -l < "$file")
+            if [ "$file_size" -gt 500 ]; then
+              echo "💡 Large file ($file_size lines) - consider breaking into smaller modules"
+            fi
+            
+            # Check for long lines
+            long_lines=$(grep -n '.\{121,\}' "$file" | wc -l)
+            if [ "$long_lines" -gt 0 ]; then
+              echo "💡 $long_lines lines longer than 120 characters"
+            fi
+          fi
+        done
+
+  # PR Summary
+  pr-summary:
+    name: PR Validation Summary
+    runs-on: ubuntu-latest
+    needs: [pr-validation, quick-validation, comprehensive-testing, documentation-check, security-check, code-quality]
+    if: always()
+    
+    steps:
+    - name: Generate PR summary
+      run: |
+        echo "=== PR Validation Summary ==="
+        echo "**PR #${{ github.event.pull_request.number }}:** ${{ github.event.pull_request.title }}"
+        echo ""
+        echo "| Check | Status |"
+        echo "|-------|--------|"
+        echo "| PR Validation | ${{ needs.pr-validation.result }} |"
+        echo "| Quick Validation | ${{ needs.quick-validation.result || 'skipped' }} |"
+        echo "| Comprehensive Testing | ${{ needs.comprehensive-testing.result || 'skipped' }} |"
+        echo "| Documentation Check | ${{ needs.documentation-check.result || 'skipped' }} |"
+        echo "| Security Check | ${{ needs.security-check.result }} |"
+        echo "| Code Quality | ${{ needs.code-quality.result || 'skipped' }} |"
+        echo ""
+        
+        # Determine overall status
+        if [[ "${{ needs.pr-validation.result }}" == "success" && 
+              ("${{ needs.quick-validation.result }}" == "success" || "${{ needs.quick-validation.result }}" == "skipped") &&
+              ("${{ needs.comprehensive-testing.result }}" == "success" || "${{ needs.comprehensive-testing.result }}" == "skipped") &&
+              ("${{ needs.documentation-check.result }}" == "success" || "${{ needs.documentation-check.result }}" == "skipped") &&
+              "${{ needs.security-check.result }}" == "success" &&
+              ("${{ needs.code-quality.result }}" == "success" || "${{ needs.code-quality.result }}" == "skipped") ]]; then
+          echo "✅ **PR validation passed!** Ready for review."
+        else
+          echo "❌ **PR validation failed.** Please address the issues above."
+          exit 1
+        fi
