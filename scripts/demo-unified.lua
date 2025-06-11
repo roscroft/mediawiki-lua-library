@@ -29,6 +29,8 @@ Examples:
 -- Add module path
 package.path = package.path .. ';src/modules/?.lua'
 
+require('Array')
+
 -- Command line argument parsing
 local function parseArguments(args)
     local config = {
