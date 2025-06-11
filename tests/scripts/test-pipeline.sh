@@ -11,7 +11,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}=== Wiki Lua Testing Pipeline (Reorganized Structure) ===${NC}"
+echo -e "${YELLOW}=== Wiki Lua Testing Pipeline ===${NC}"
 
 # Initialize counters
 total_tests=0

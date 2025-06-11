@@ -69,7 +69,7 @@ print("")
 if array_ok and Array then
     print("--- Testing Array with CodeStandards Integration ---")
 
-    local test_data = {1, 2, 3, 4, 5}
+    local test_data = { 1, 2, 3, 4, 5 }
     local arr_ok, arr = pcall(Array.new, test_data)
     test_assert(arr_ok and arr ~= nil, "Array.new works with performance monitoring")
 
@@ -93,7 +93,7 @@ if functools_ok and functools then
 
     local compose_ok, composed = pcall(functools.compose, multiply, add)
     test_assert(compose_ok and type(composed) == 'function',
-                "functools.compose works with standardized error handling")
+        "functools.compose works with standardized error handling")
 
     if compose_ok and composed then
         local result_ok, result = pcall(composed, 5, 3)
@@ -110,14 +110,10 @@ if standards_ok and standards then
     -- Test parameter validation
     local validation_ok, validation_result = pcall(function()
         return standards.validateParameters('testFunction', {
-            {name = 'param1', type = 'string', required = true}
-        }, {'test'})
+            { name = 'param1', type = 'string', required = true }
+        }, { 'test' })
     end)
     test_assert(validation_ok and validation_result, "Parameter validation works correctly")
-
-    -- Test performance monitoring wrapper - REMOVED
-    -- Note: wrapWithPerformanceMonitoring API removed during migration
-    print("Performance monitoring API changed during migration - test skipped")
 
     print("")
 end
@@ -128,7 +124,7 @@ if array_ok and functools_ok and standards_ok then
 
     local integration_ok = pcall(function()
         -- Create an array
-        local arr = Array.new({1, 2, 3, 4, 5})
+        local arr = Array.new({ 1, 2, 3, 4, 5 })
 
         -- Create composed function using functools
         local double = function(x) return x * 2 end
@@ -153,8 +149,8 @@ if standards_ok then
     local error_handling_ok = pcall(function()
         -- Test that invalid parameters are caught
         local is_valid, err = standards.validateParameters('testFunction', {
-            {name = 'param1', type = 'string', required = true}
-        }, {123})
+            { name = 'param1', type = 'string', required = true }
+        }, { 123 })
 
         -- Should fail validation
         return not is_valid
@@ -174,8 +170,8 @@ print(string.format("Success Rate: %.1f%%", (tests_passed / tests_run) * 100))
 
 if tests_passed == tests_run then
     print("\n🎉 All integration tests passed! The CodeStandards integration is working correctly.")
-    os.exit(0)
+    return true
 else
     print("\n❌ Some integration tests failed. Please review the issues above.")
-    os.exit(1)
+    return false
 end

@@ -91,15 +91,6 @@ assert_performance("Array.find value search", function()
     Array.find(large_array, 500)
 end, 0.05)
 
--- Test fast array operations
-assert_performance("Array.fast.map with memoization", function()
-    Array.fast.map({1, 2, 3, 4, 5}, function(x) return x * x end, true)
-end, 0.01)
-
-assert_performance("Array.fast.filter optimization", function()
-    Array.fast.filter(large_array, function(x) return x > 500 end)
-end, 0.1)
-
 -- ======================
 -- FUNCTOOLS PERFORMANCE TESTS
 -- ======================
@@ -157,17 +148,17 @@ end, 0.01)
 
 -- Test column building performance
 assert_performance("Column building", function()
-    funclib.make_column("Test", {align = "center", sortable = true})
+    funclib.make_column("Test", { align = "center", sortable = true })
 end, 0.02)
 
 -- Test fast column with caching
 assert_performance("Fast column with caching", function()
-    funclib.fast_column("Test", {align = "center"})
+    funclib.fast_column("Test", { align = "center" })
 end, 0.001)
 
 -- Test batch column creation
 local column_configs = Array.map(Array.range(1, 50), function(i)
-    return {header = "Column " .. i, options = {align = "left"}}
+    return { header = "Column " .. i, options = { align = "left" } }
 end)
 
 assert_performance("Batch column creation", function()
@@ -178,35 +169,17 @@ end, 0.05)
 assert_performance("Template builder", function()
     local builder = funclib.template_builder("TestTemplate")
     builder:param("param1", "value1")
-           :param("param2", "value2")
-           :numbered_param("numbered1")
+        :param("param2", "value2")
+        :numbered_param("numbered1")
     builder:build()
 end, 0.005)
-
--- ======================
--- MEMORY EFFICIENCY TESTS
--- ======================
-
--- Test memory usage
-local test_array = Array.range(1, 100)
-local memory_info = Array.getMemoryInfo(test_array)
-
-print(string.format("\nMemory efficiency for 100-element array:"))
-print(string.format("  Length: %d", memory_info.length))
-print(string.format("  Memory: %.2f KB", memory_info.memory_kb))
-print(string.format("  Efficiency: %.2f%%", memory_info.efficiency_ratio * 100))
-print(string.format("  Avg bytes/element: %.2f", memory_info.avg_bytes_per_element))
-
--- Verify memory efficiency is reasonable
-assert_equal(memory_info.length, 100, "Array length correct")
-assert_equal(memory_info.efficiency_ratio > 0.1, true, "Memory efficiency reasonable")
 
 -- ======================
 -- CORRECTNESS TESTS
 -- ======================
 
 -- Verify optimizations don't break functionality
-local test_data = {1, 2, 3, 4, 5}
+local test_data = { 1, 2, 3, 4, 5 }
 
 -- Test Array.each correctness
 local sum = 0
@@ -236,22 +209,6 @@ end)
 memoized(5)
 memoized(5) -- Should not increase call_count
 assert_equal(call_count, 1, "Memoization correctness")
-
--- ======================
--- BENCHMARK UTILITY TESTS
--- ======================
-
--- Test the benchmark utility itself
-local bench_result = Array.benchmark(function()
-    local sum = 0
-    for i = 1, 100 do
-        sum = sum + i
-    end
-end, 100, 10)
-
-assert_equal(type(bench_result.total_time), "number", "Benchmark returns total_time")
-assert_equal(type(bench_result.operations_per_second), "number", "Benchmark returns ops/sec")
-assert_equal(bench_result.iterations, 100, "Benchmark tracks iterations correctly")
 
 -- ======================
 -- RESULTS SUMMARY

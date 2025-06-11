@@ -2,22 +2,22 @@ require("strict")
 require('Module:Mw.html extension')
 
 local p = {}
-local arr = require('Array')
-local plink = require('Plink')._plink
-local coins = require('Currency')._coins
-local get_calcvalue = require('Calcvalue')._get
-local round = require('Number')._round
-local default = require('Paramtest').default_to
-local ttools = require('TableTools')
-local add_table = require('Tables')._table
-local f = require('Functools')
-local partial, compose = f.c2, f.compose
-local map, pmap, pfilter, pget, pconcat = f.map, f.pmap, f.pfilter, f.prop, f.pconcat
+local arr = require('Module:Array')
+local plink = require('Module:Plink')._plink
+local coins = require('Module:Currency')._coins
+local get_calcvalue = require('Module:Calcvalue')._get
+local round = require('Module:Number')._round
+local default = require('Module:Paramtest').default_to
+local ttools = require('Module:TableTools')
+local add_table = require('Module:Tables')._table
+local f = require('Module:Functools')
+local compose = f.compose
+local map, pmap, pconcat = f.map, f.pmap, f.pconcat
 local append, pmult = f.ops.ap, f.mul
-local fold_div, fold_or, fold_append = f.fold_div, f.fold_or, f.fold_append
-local first, second, bimap, send_right, dbl, ifThenElse, pifThenElse = f.pair.first, f.pair.second, f.pair.bimap,
-    f.pair.send_right, f.pair.dbl, f.pair.choose, f.pair.pchoose
+local fold_div = f.fold_div
+local first, second, ifThenElse, pifThenElse = f.pair.first, f.pair.second, f.pair.choose, f.pair.pchoose
 local id, thrush = f.combinators.id, f.combinators.thrush
+local c2 = f.c2
 
 local usage_data = require('Module:UsageCost/data')
 local DIVINE_CHARGE_SLOTS = usage_data.DIVINE_CHARGE_SLOTS
@@ -32,6 +32,9 @@ local geprice = function(item) return GEPRICES[item] end
 local to_text = function(str) return { text = str } end
 local to_coins = compose(to_text, coins)
 local coins_with_sort = function(n) return string.format("data-sort-value=\"%d\" | %s", n, coins(n)) end
+
+local function get(attr, obj) return obj[attr] end
+local pget = c2(get)
 
 local consts = {
     nums = {
@@ -53,10 +56,40 @@ local consts = {
     }
 }
 
+local function get_property(obj, property, default)
+    if obj and obj[property] ~= nil then
+        return obj[property]
+    end
+    return default
+end
+
+local function has_reference(item)
+    return item.ref and item.ref ~= ""
+end
+
+local function get_cost_category(type_name)
+    local cost_categories = {
+        fixedduration = "fixed",
+        combatcharge = "combat",
+        divinecharge = "div",
+        nonstandarddegrade = "nonstandard"
+    }
+
+    local lower_type = type_name:lower()
+    return cost_categories[lower_type] or error("Unknown cost type: " .. lower_type)
+end
+
 local drain = pmult(consts.nums.drain_rate)
 
-local default_num = function(arg, n) return tonumber(default(arg, n or 0)) end
-local default_from = function(def_fn, attr, def_val) return function(base) return def_fn(pget(attr)(base), def_val) end end
+local default_num = function(arg, n)
+    return tonumber(default(arg, n or 0))
+end
+local default_from = function(def_fn, attr, def_val)
+    return function(base)
+        local attribute = get(attr, base)
+        return def_fn(attribute, def_val)
+    end
+end
 local defaults = {
     smithing = default_from(default_num, "smithing", 0),
     duration = default_from(default_num, "duration", 60),
@@ -121,9 +154,17 @@ local function mpcall(fn, arg)
 end
 
 local function num_match(str) return function(arg) return tonumber(arg:match(str)) end end
-local function max_num(search_str) return compose(arr.max, pmap(num_match(search_str .. "(%d+)"))) end
+
 local function max_idx(search_str, constant, args)
-    return arr.range(math.min(consts.nums[constant], max_num(search_str)(ttools.keysToList(args))))
+    local cnum = consts.nums[constant]
+    local argList = ttools.keysToList(args)
+    local to_match = search_str .. "(%d+)"
+    local matched = num_match(to_match)
+    local mapres = arr.condenseSparse(map(matched, argList))
+    if #mapres == 0 then
+        return arr.range(1) -- If mapres is empty, there's only the one method
+    end
+    return arr.range(math.min(cnum, arr.max(mapres)))
 end
 
 local function exists(fn)
@@ -263,53 +304,70 @@ local function if_smithing(is_smithing)
     end
 end
 
-local build_methods_pipe = function(args)
-    return compose(
-        partial(build_method)(args),
-        partial(append)("method")
-    )
+local function format_method_items(method)
+    -- Format each item in the method
+    local formatted_items = {}
+    for _, iqpr in ipairs(method.iqprs) do
+        table.insert(formatted_items, format_as_wikitext(iqpr))
+    end
+
+    -- Join items with <br> tags
+    local items_html = table.concat(formatted_items, '<br>')
+
+    -- Add smithing reference if needed
+    local smithing_text = if_smithing(get_property(method, "is_smithing", false))
+
+    -- Return bottom-aligned items with smithing info
+    return bottom_aligned(items_html .. smithing_text)
 end
-local method_to_items_pipe = compose(
-    bottom_aligned,
-    fold_append,
-    bimap(
-        compose(pconcat('<br>'), pmap(format_as_wikitext), pget("iqprs")),
-        compose(if_smithing, pget("is_smithing"))),
-    dbl)
-local method_to_costs_pipe = compose(
-    get_total_cost,
-    pget("iqprs"))
-local method_to_has_refs_pipe = compose(
-    fold_or,
-    bimap(
-        compose(arr.any, pmap(pget("ref")), pget("iqprs")),
-        pget("is_smithing")
-    ),
-    dbl)
+
+local function calculate_method_cost(method)
+    return get_total_cost(method.iqprs)
+end
+
+local function method_has_references(method)
+    -- Check if any item has references
+    local has_item_refs = arr.any(method.iqprs, has_reference)
+
+    -- Return true if there are item refs or smithing info
+    return has_item_refs or get_property(method, "is_smithing", false)
+end
 
 function p._common(frame, base_refs)
     local args = frame:getParent().args
-    local methods = map(build_methods_pipe(args), max_idx("method", "max_methods", args))
-    if #methods == 0 then error("No methods defined") end
-    local items = map(method_to_items_pipe, methods)
-    local costs = map(method_to_costs_pipe, methods)
-    local needs_ref_group = base_refs or arr.any(map(method_to_has_refs_pipe, methods), id)
-    return args, methods, items, costs, needs_ref_group
-end
 
-local function add_table_ret(arg_tbl, html_tbl)
-    local return_tbl = ttools.deepCopy(html_tbl)
-    add_table(return_tbl, arg_tbl)
-    return return_tbl
-end
-
-local function recursive_build(table_pipeline, sort)
-    local beginning, last = arr.split(table_pipeline, #table_pipeline - 1)
-    if #last == 0 then
-        return add_table_ret(beginning, init_table(sort or false))
-    else
-        return add_table_ret(last, recursive_build(beginning, sort))
+    -- Build methods from arguments
+    local methods = {}
+    local method_indices = max_idx("method", "max_methods", args)
+    for _, idx in ipairs(method_indices) do
+        local method_name = "method" .. idx
+        local method = build_method(args, method_name)
+        table.insert(methods, method)
     end
+
+    if #methods == 0 then
+        error("No methods defined")
+    end
+
+    -- Format items for each method
+    local items = {}
+    for _, method in ipairs(methods) do
+        table.insert(items, format_method_items(method))
+    end
+
+    -- Calculate costs for each method
+    local costs = {}
+    for _, method in ipairs(methods) do
+        table.insert(costs, calculate_method_cost(method))
+    end
+
+    -- Determine if references are needed
+    local needs_ref_group = get_property(base_refs, nil, false)
+    if not needs_ref_group then
+        needs_ref_group = arr.any(methods, method_has_references)
+    end
+
+    return args, methods, items, costs, needs_ref_group
 end
 
 function p._write_smw_augmented(is_augmented)
@@ -326,12 +384,24 @@ function p._write(args, enc_table)
     return nil
 end
 
-function p._table(fn_args_list, needs_ref_group)
-    local tbl = recursive_build(fn_args_list)
-    if needs_ref_group then
-        tbl = append(tbl, add_reflist())
+function p._table(row_groups, needs_ref_group)
+    -- Create a new table
+    local assembled_table = init_table(false)
+
+    -- Add all row groups to the table
+    for _, rows in ipairs(row_groups) do
+        add_table(assembled_table, rows)
     end
-    return tbl
+
+    -- Convert table to string
+    local table_html = tostring(assembled_table)
+
+    -- Add references if needed
+    if needs_ref_group then
+        return table_html .. add_reflist()
+    end
+
+    return table_html
 end
 
 function p.fixedDuration(frame)
@@ -349,7 +419,7 @@ function p.fixedDuration(frame)
     }
     p._write_smw_augmented(tostring(false))
     p._write(args, enc_table)
-    return p._table(table_pipeline, needs_ref_group)
+    return p._table({ table_pipeline }, needs_ref_group)
 end
 
 function p.combatCharge(frame)
@@ -357,18 +427,35 @@ function p.combatCharge(frame)
     local charges = defaults.charges(args)
     local enc_table = { type = "CombatCharge", charges = charges, methods = methods }
 
+    -- Check for potential division by zero
+    if charges <= 0 then
+        charges = 1 -- Prevent division by zero
+    end
+
+    -- Build args list manually instead of using unpack()
     local fn_args_list = {
         get_header_and_rows("[[Equipment degradation|Combat charges]]", { colspan(fnum(charges), #methods) }),
         get_descriptions_table(methods),
         get_header_and_rows("Item(s) consumed", items),
         get_header_and_rows("Total GE price", map(to_coins, item_costs)),
-        get_header_and_rows(colspan("Per hour", #methods + 1)),
-        unpack(get_combat_rates(item_costs, charges))
+        get_header_and_rows(colspan("Per hour", #methods + 1))
     }
-    local is_d2d_augmented = arr.any(items, function(item) return item.text:match("Divine charge") or false end)
+
+    -- Add combat rates separately with validation
+    local combat_rates = get_combat_rates(item_costs, charges)
+    for _, rate_data in ipairs(combat_rates) do
+        table.insert(fn_args_list, rate_data)
+    end
+
+    local function contains_divine_charge(items)
+        return arr.any(items, function(item) return (item.text and item.text:match("Divine charge")) or false end)
+    end
+
+    local is_d2d_augmented = contains_divine_charge(items)
     p._write_smw_augmented(tostring(is_d2d_augmented))
     p._write(args, enc_table)
-    return p._table(fn_args_list, needs_ref_group)
+    local out_table = p._table({ fn_args_list }, needs_ref_group)
+    return out_table
 end
 
 function p.nonStandardDegrade(frame)
@@ -387,7 +474,7 @@ function p.nonStandardDegrade(frame)
     }
     p._write_smw_augmented(tostring(false))
     p._write(args, enc_table)
-    return p._table(fn_args_list, needs_ref_group)
+    return p._table({ fn_args_list }, needs_ref_group)
 end
 
 local function divineChargeCalc(tier, chargeDrainMult)
@@ -416,7 +503,7 @@ function p.divineCharge(frame)
     }
     p._write_smw_augmented(tostring(true))
     p._write(args, enc_table)
-    return p._table(fn_args_list, needs_ref_group)
+    return p._table({ fn_args_list }, needs_ref_group)
 end
 
 local function usage_cost_ask(item)
@@ -470,7 +557,9 @@ local function json_method_flatten(json, idx)
     return json_args
 end
 
-local function get_methods(json_method, idx) return build_method(json_method_flatten(json_method, idx), "method" .. idx) end
+local function get_methods(json_method, idx)
+    return build_method(json_method_flatten(json_method, idx), "method" .. idx)
+end
 
 local function cost_per_hour(args, ucJSON, kind)
     if kind == "div" then
@@ -479,12 +568,15 @@ local function cost_per_hour(args, ucJSON, kind)
         local researchFactor = chargeDrainResearch(invlvl)
         local slotMult = DIVINE_CHARGE_SLOTS[ucJSON["slot"]:lower()]["chargeDrainMult"]
         local chargesPerHour = divineChargeCalc(tier, slotMult) * researchFactor * invcape * chargeDrainItemLvl(itemlvl)
-        return map(compose(pmult(geprice("Divine charge")), pmult(1 / consts.nums.charges_per_charge)),
-            { chargesPerHour })
+        local function calculateDivineChargeCost(chargesPerHour)
+            local pricePerCharge = geprice("Divine charge") / consts.nums.charges_per_charge
+            return chargesPerHour * pricePerCharge
+        end
+        return map(calculateDivineChargeCost, { chargesPerHour })
     end
     local methods = map(get_methods, ucJSON.methods)
     local durations = map(pget("duration"), methods)
-    local item_costs = map(method_to_costs_pipe, methods)
+    local item_costs = map(calculate_method_cost, methods)
     if kind == "fixed" then -- to_text, coins, round,
         return map(compose(pmult(1 / 60), fold_div), arr.zip(item_costs, durations))
     elseif kind == "combat" then
@@ -496,26 +588,9 @@ local function cost_per_hour(args, ucJSON, kind)
     end
 end
 
-local function cost_type(args)
-    return function(json)
-        local cost_table = {
-            fixedduration = "fixed",
-            combatcharge = "combat",
-            divinecharge = "div",
-            nonstandarddegrade =
-            "nonstandard"
-        }
-        local type_ = json["type"]:lower()
-        if not cost_table[type_] then error(type_) end
-        return cost_per_hour(args, json, cost_table[type_])
-    end
-end
-
 -- Unweighted simple average
 local avg = function(lst) return arr.sum(lst) / arr.len(lst) end
 local op_table = { avg = avg, highest = arr.max, max = arr.max, min = arr.min }
--- Set op_table to be the function to call based on what op is. Note op defaults to min
-local function cost_metric(args) return compose(round, op_table[defaults.op(args)]) end
 
 -- There are a couple pages, like Aspect of Evasion, that have multiple Usage Cost JSONs
 local function double_decode(json_string)
@@ -526,44 +601,89 @@ local function smw_decode(smw)
     return double_decode(smw[1]["Usage Cost JSON"])
 end
 
+local function calculate_item_cost(args, json_data, cost_type_name)
+    return cost_per_hour(args, json_data, get_cost_category(cost_type_name))
+end
+
+local function apply_cost_metric(args, cost)
+    local operation = defaults.op(args)
+    return op_table[operation](cost)
+end
+
+local function format_cost(args, cost)
+    local formatter = format_(args)
+    return formatter(cost)
+end
+
 -- Expects a table (in practice I think it's mostly exactly one) of items.
 -- Finds and formats the sum of their usage costs
 function p.getUsageCost(frame)
     local args = frame:getParent().args
-    local usage_cost_pipeline = compose(
-        format_(args),
-        arr.sum,
-        pmap(
-            compose(cost_metric(args), cost_type(args), smw_decode, usage_cost_ask)),
-        ttools.compressSparseArray
-    )
-    return usage_cost_pipeline(args)
+    local item_args = ttools.compressSparseArray(args)
+
+    -- Calculate cost for each item
+    local total_cost = 0
+    for _, item_name in ipairs(item_args) do
+        -- Get item data
+        local smw_data = usage_cost_ask(item_name)
+        local json_data = smw_decode(smw_data) or {}
+
+        -- Calculate cost
+        local cost_type_name = json_data.type:lower()
+        local cost = calculate_item_cost(args, json_data, cost_type_name)
+
+        -- Apply the selected metric (min, max, avg)
+        local metric_value = apply_cost_metric(args, cost)
+
+        total_cost = total_cost + metric_value
+    end
+
+    -- Format the result according to args
+    return format_cost(args, total_cost)
 end
 
-local page_cell = to_text
-local function cost_cell(cost) return { text = coins(cost), attr = { ["data-sort-value"] = cost } } end
-local function right_is_string(pair) return type(pair[2]) == "string" end
-local function right_has_type(pair) return pget("type")(pair[2]) end
-local function isnt_nonstandard(pair) return pair[2].type ~= "NonStandardDegrade" end
+local function create_cost_cell(cost)
+    return { text = coins(cost), attr = { ["data-sort-value"] = cost } }
+end
+
 -- Expects a table of items.
 -- Returns formatted pagename, data pairs for use in add_table.
 function p.getMultiUsageCosts()
     local args = { is_smithing = false, smithing_level = 1 }
-    local usage_cost_table_pipeline = compose(
-        pmap(bimap(
-            page_cell,
-            cost_cell)),
-        pmap(send_right(compose(cost_metric(args), cost_type(args)))),
-        pfilter(isnt_nonstandard),
-        pfilter(right_has_type),
-        pmap(send_right(double_decode)),
-        pfilter(right_is_string),
-        pmap(bimap(
-            compose(plink, pget("pageName")),
-            pget("Usage Cost JSON"))),
-        pmap(dbl)
-    )
-    return usage_cost_table_pipeline(usage_table_ask())
+    local result_rows = {}
+
+    -- Get all usage data
+    local all_usage_data = usage_table_ask()
+
+    for _, entry in ipairs(all_usage_data) do
+        local page_name = entry.pageName
+        local json_text = entry["Usage Cost JSON"]
+
+        -- Process only entries with valid JSON strings
+        if type(json_text) == "string" then
+            -- Try to decode JSON
+            local decoded = double_decode(json_text)
+
+            -- Process only entries with valid type
+            local type_name = get_property(decoded, "type")
+            if type_name then
+                if get_cost_category(type_name) ~= "nonstandard" then
+                    -- Calculate and format the cost
+                    local cost = calculate_item_cost(args, decoded, type_name:lower())
+                    local metric_value = apply_cost_metric(args, cost)
+
+                    -- Create table cells
+                    local name_cell = to_text(plink(page_name))
+                    local cost_cell = create_cost_cell(metric_value)
+
+                    -- Add to result
+                    table.insert(result_rows, { name_cell, cost_cell })
+                end
+            end
+        end
+    end
+
+    return result_rows
 end
 
 function p.getUsageCostTable()
@@ -572,7 +692,7 @@ function p.getUsageCostTable()
     local t = init_table(true)
     add_table(t, { { { tag = "th", text = "Item" }, { tag = "th", text = "Hourly usage cost" } } })
     add_table(t, multi_usage_costs)
-    return append(t, add_reflist())
+    return tostring(t) .. add_reflist()
 end
 
 return p

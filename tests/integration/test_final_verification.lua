@@ -95,8 +95,8 @@ print("--- CodeStandards Core Functions Verification ---")
 if standards_ok then
     local validation_ok = pcall(function()
         local valid, msg = standards.validateParameters('testFunction', {
-            {name = 'param1', type = 'string', required = true}
-        }, {'test'})
+            { name = 'param1', type = 'string', required = true }
+        }, { 'test' })
         return valid == true
     end)
     verify(validation_ok, "Parameter validation system functional")
@@ -122,20 +122,20 @@ print("")
 print("--- Array Module Integration Verification ---")
 if array_ok then
     local new_ok = pcall(function()
-        local arr = Array.new({1, 2, 3})
+        local arr = Array.new({ 1, 2, 3 })
         return arr ~= nil
     end)
     verify(new_ok, "Array.new basic functionality")
 
     local filter_ok = pcall(function()
-        local arr = Array.new({1, 2, 3, 4, 5})
+        local arr = Array.new({ 1, 2, 3, 4, 5 })
         local filtered = Array.filter(arr, function(x) return x % 2 == 0 end)
         return filtered ~= nil
     end)
     verify(filter_ok, "Array.filter basic functionality")
 
     local map_ok = pcall(function()
-        local arr = Array.new({1, 2, 3})
+        local arr = Array.new({ 1, 2, 3 })
         local mapped = Array.map(arr, function(x) return x * 2 end)
         return mapped ~= nil
     end)
@@ -163,7 +163,7 @@ print("--- Cross-Module Integration Verification ---")
 if array_ok and functools_ok and funclib_ok then
     local integration_ok = pcall(function()
         -- Test complex workflow using multiple modules
-        local arr = Array.new({1, 2, 3, 4, 5})
+        local arr = Array.new({ 1, 2, 3, 4, 5 })
         local double = function(x) return x * 2 end
         local add_one = function(x) return x + 1 end
         local composed = functools.compose(add_one, double)
@@ -181,9 +181,9 @@ if standards_ok then
     local error_handling_ok = pcall(function()
         local success, err = pcall(function()
             local valid, msg = standards.validateParameters('testFunction', {
-                {name = 'param1', type = 'string', required = true}
-            }, {123})
-            return valid -- Should be false for wrong type
+                { name = 'param1', type = 'string', required = true }
+            }, { 123 })
+            return valid               -- Should be false for wrong type
         end)
         return success and not success -- Should fail validation
     end)
@@ -198,7 +198,7 @@ if array_ok and standards_ok then
     local performance_ok = pcall(function()
         -- Test that performance monitoring is actually collecting data
         local start_time = os.clock()
-        local arr = Array.new({1, 2, 3, 4, 5})
+        local arr = Array.new({ 1, 2, 3, 4, 5 })
         Array.filter(arr, function(x) return x % 2 == 0 end)
         local end_time = os.clock()
         return (end_time - start_time) >= 0 -- Performance monitoring adds some overhead
@@ -223,9 +223,9 @@ if tests_passed == tests_run then
     print("✅ Error handling is standardized")
     print("✅ Parameter validation is working")
     print("\nThe MediaWiki Lua project CodeStandards integration phase is COMPLETE!")
-    os.exit(0)
+    return true
 else
     print("\n⚠️  Integration verification found some issues.")
     print("Review the failed verifications above and address any remaining problems.")
-    os.exit(1)
+    return false
 end

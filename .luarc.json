@@ -1,28 +1,33 @@
 {
-    "$schema": "https://raw.githubusercontent.com/LuaLS/lua-language-server/master/locale/en-us/setting.lua",
+    "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+    "runtime": {
+        "version": "Lua 5.1",
+        "path": [
+            "src/modules/?.lua",
+            "src/modules/?/init.lua"
+        ]
+    },
     "workspace": {
         "library": [
-            "./src/modules"
+            "src/modules",
+            "${3rd}/luassert/library"
         ],
-        "ignoreDir": [
-            "build/",
-            ".git/",
-            "node_modules/"
-        ],
-        "ignoreSubmodules": true,
-        "checkThirdParty": false
+        "checkThirdParty": false,
+        "maxPreload": 2000,
+        "preloadFileSize": 1000
     },
     "diagnostics": {
         "enable": true,
         "globals": [
-            "mw"
+            "mw",
+            "require",
+            "unpack"
+        ],
+        "disable": [
+            "undefined-doc-name"
         ]
     },
-    "hint": {
-        "enable": true,
-        "setType": true
-    },
-    "runtime": {
-        "version": "Lua 5.1"
+    "type": {
+        "castNumberToInteger": false
     }
 }

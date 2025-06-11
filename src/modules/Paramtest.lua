@@ -25,9 +25,9 @@
 
 local checkType, checkTypeForNamedArg
 do
-	local _libraryUtil = require("libraryUtil");
-	checkType = _libraryUtil.checkType;
-	checkTypeForNamedArg = _libraryUtil.checkTypeForNamedArg;
+    local _libraryUtil = require("libraryUtil");
+    checkType = _libraryUtil.checkType;
+    checkTypeForNamedArg = _libraryUtil.checkTypeForNamedArg;
 end
 
 --
@@ -41,7 +41,7 @@ local p = {}
 --
 
 function p.is_empty(arg)
-	return not string.find(arg or '', '%S')
+    return not string.find(arg or '', '%S')
 end
 
 --
@@ -49,10 +49,10 @@ end
 --
 
 function p.table_is_empty(arg)
-	for _, _ in pairs(arg) do
-		return false
-	end
-	return true
+    for _, _ in pairs(arg) do
+        return false
+    end
+    return true
 end
 
 --
@@ -60,24 +60,24 @@ end
 --
 
 function p.default_to(arg, default)
-	if string.find(arg or '', '%S') then
-		return arg
-	else
-		return default
-	end
+    if string.find(arg or '', '%S') then
+        return arg
+    else
+        return default
+    end
 end
 
 --
 -- Returns a list of paramaters if it has any content, or the default
 --
 function p.defaults(args)
-	checkType("defaults", 1, args, "table");
-	local ret = {}
-	for i, v in ipairs(args) do
-		checkTypeForNamedArg("defaults", i, v, "table");
-		ret[i] = p.default_to(v[1], v[2]);
-	end
-	return unpack(ret, 1, #args);
+    checkType("defaults", 1, args, "table");
+    local ret = {}
+    for i, v in ipairs(args) do
+        checkTypeForNamedArg("defaults", i, v, "table");
+        ret[i] = p.default_to(v[1], v[2]);
+    end
+    return unpack(ret, 1, #args);
 end
 
 --
@@ -86,7 +86,7 @@ end
 --
 
 function p.has_content(arg)
-	return string.find(arg or '', '%S')
+    return string.find(arg or '', '%S')
 end
 
 --
@@ -95,10 +95,10 @@ end
 --
 
 function p.table_has_content(arg)
-	for _, _ in pairs(arg) do
-		return true
-	end
-	return false
+    for _, _ in pairs(arg) do
+        return true
+    end
+    return false
 end
 
 --
@@ -106,13 +106,13 @@ end
 --
 
 function p.ucfirst(arg)
-	if not arg or arg:len() == 0 then
-		return nil
-	elseif arg:len() == 1 then
-		return arg:upper()
-	else
-		return arg:sub(1, 1):upper() .. arg:sub(2)
-	end
+    if not arg or arg:len() == 0 then
+        return nil
+    elseif arg:len() == 1 then
+        return arg:upper()
+    else
+        return arg:sub(1, 1):upper() .. arg:sub(2)
+    end
 end
 
 --
@@ -120,13 +120,13 @@ end
 --
 
 function p.ucflc(arg)
-	if not arg or arg:len() == 0 then
-		return nil
-	elseif arg:len() == 1 then
-		return arg:upper()
-	else
-		return arg:sub(1, 1):upper() .. arg:sub(2):lower()
-	end
+    if not arg or arg:len() == 0 then
+        return nil
+    elseif arg:len() == 1 then
+        return arg:upper()
+    else
+        return arg:sub(1, 1):upper() .. arg:sub(2):lower()
+    end
 end
 
 return p

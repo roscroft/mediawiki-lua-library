@@ -26,7 +26,7 @@ Examples:
 local funclib = require('Module:Funclib')
 
 -- Column building
-local column = funclib.make_preset_column('text', {
+local column = funclib.make_preset_column('LEVEL', {
     header = 'Name',
     field = 'name',
     align = 'left'
@@ -62,27 +62,24 @@ local params = funclib.process_template_params(frame.args, {
 local funclib = {}
 
 -- Imports
-local arr = require('Array')
-local clean = require('Clean_image')
+local libraryUtil = require('libraryUtil')
 local checkType = libraryUtil.checkType
 
 -- Import functional utilities from Functools
 local functools = require('Functools')
-
 -- Import Arguments for frame processing
 local arguments = require('Arguments')
-
--- Import CodeStandards for standardized error handling and monitoring
-local standards = require('CodeStandards')
-
 -- ======================
 -- TABLE/COLUMN VALIDATION - Domain Specific
 -- ======================
 
 -- Use functools for validation (delegate to pure functional validation)
-funclib.validate_value = functools.validation.validate_value
-funclib.validate_options = functools.validation.validate_options
-funclib.default_value = functools.validation.default_value -- Added from paramtest
+funclib.validate_value = functools.validation and functools.validation.validate_value or
+    function(value, rules) return true end
+funclib.validate_options = functools.validation and functools.validation.validate_options or
+    function(options, rules) return nil end
+funclib.default_value = functools.validation and functools.validation.default_value or
+    function(value, default) return value ~= nil and value or default end
 
 -- Standard validation rule sets
 funclib.VALIDATION_RULES = {
@@ -153,7 +150,7 @@ end
 
 function funclib.tooltip(text, tooltip, format_str)
     -- Use functools validation for content checking
-    if not functools.validation.default_value(tooltip, nil) then
+    if not funclib.default_value(tooltip, nil) then
         return text
     end
 
@@ -166,24 +163,30 @@ function funclib.icon(config, value)
     local icon = config[value]
     return string.format(
         '<img alt="%s" src="%s" width="%s" class="image" />',
-        icon.link,
-        clean.main(icon.file),
-        icon.width
+        icon.link or "",
+        icon.file or "",
+        icon.width or "30"
     )
 end
 
 -- String formatting helpers that use functional validation
 function funclib.format_name(name)
     -- Use functools validation instead of direct paramtest
-    if not functools.validation.default_value(name, nil) then
+    if not funclib.default_value(name, nil) then
         return ""
     end
 
     -- Use functional composition for string transformation
-    return functools.pipe(
-        functools.validation.default_value,
-        function(str) return str:sub(1, 1):upper() .. str:sub(2) end
-    )(name)
+    if functools.pipe then
+        return functools.pipe(
+            funclib.default_value,
+            function(str) return str:sub(1, 1):upper() .. str:sub(2) end
+        )(name)
+    else
+        -- Fallback implementation
+        local cleaned = funclib.default_value(name, "")
+        return cleaned ~= "" and (cleaned:sub(1, 1):upper() .. cleaned:sub(2)) or ""
+    end
 end
 
 -- String manipulation utilities
@@ -291,7 +294,7 @@ function funclib.process_column_config(config, defaults)
     defaults = defaults or funclib.DEFAULTS
 
     -- Use functools validation instead
-    config.align = functools.validation.default_value(config.align, defaults.ALIGN)
+    config.align = funclib.default_value(config.align, defaults.ALIGN)
     config.sortable = config.sortable ~= false
 
     local classes = { funclib.FORMAT.TABLE.CLASS.BASE }
@@ -302,7 +305,7 @@ function funclib.process_column_config(config, defaults)
     table.insert(classes, string.format(
         funclib.FORMAT.TABLE.CLASS.ALIGN,
         config.align,
-        functools.validation.default_value(config.colspan, 1)
+        funclib.default_value(config.colspan, 1)
     ))
 
     config.classes = table.concat(classes, " ")
@@ -311,53 +314,45 @@ function funclib.process_column_config(config, defaults)
 end
 
 function funclib.make_column(header, options, defaults)
-    -- Use CodeStandards for standardized parameter validation and monitoring
-    local isValid, errorMessage = standards.validateParameters('make_column', {
-        { name = 'header',   type = 'string', required = true },
-        { name = 'options',  type = 'table',  required = false },
-        { name = 'defaults', type = 'table',  required = false }
-    }, { header, options, defaults })
-
-    if not isValid then
-        local err = standards.createError(
-            standards.ERROR_LEVELS.FATAL,
-            errorMessage or "Parameter validation failed for make_column",
-            'Module:Funclib'
-        )
-        standards.logError(err)
-        return { header = header or "", align = "left", sortable = false }
+    if type(header) ~= 'string' then
+        error("Header must be a string", 2)
     end
 
-    return standards.trackPerformance('Module:Funclib.make_column', function()
-        local config = {
-            header = header
-        }
+    options = options or {}
+    defaults = defaults or {}
 
-        -- Start with defaults
-        if defaults then
-            for k, v in pairs(defaults) do
-                config[k] = v
-            end
-        end
+    if type(options) ~= 'table' then
+        error("Options must be a table", 2)
+    end
 
-        -- Override with column-specific options
-        if options then
-            for k, v in pairs(options) do
-                config[k] = v
-            end
-        end
+    if type(defaults) ~= 'table' then
+        error("Defaults must be a table", 2)
+    end
 
-        -- Apply tooltip if specified
-        if config.tooltip then
-            config.header = funclib.tooltip(header, config.tooltip)
-        end
+    local config = {
+        header = header
+    }
 
-        -- Use functional validation for proper defaults
-        config.align = functools.validation.default_value(config.align, "left")
-        config.sortable = config.sortable ~= false -- true unless explicitly false
+    -- Start with defaults
+    for k, v in pairs(defaults) do
+        config[k] = v
+    end
 
-        return config
-    end)()
+    -- Override with column-specific options
+    for k, v in pairs(options) do
+        config[k] = v
+    end
+
+    -- Apply tooltip if specified
+    if config.tooltip then
+        config.header = funclib.tooltip(header, config.tooltip)
+    end
+
+    -- Use functional validation for proper defaults
+    config.align = funclib.default_value(config.align, "left")
+    config.sortable = config.sortable ~= false -- true unless explicitly false
+
+    return config
 end
 
 -- ======================
@@ -366,7 +361,7 @@ end
 
 function funclib.safe_decode_json(json_str, name)
     -- Use functional validation for content checking
-    if not functools.validation.default_value(json_str, nil) then
+    if not funclib.default_value(json_str, nil) then
         return nil, "Empty JSON string"
     end
 
@@ -619,56 +614,45 @@ funclib.QueryBuilder = QueryBuilder
 
 -- Generic table builder utility
 function funclib.build_table(columns, rows, options)
-    -- Use CodeStandards for comprehensive parameter validation and monitoring
-    local isValid, errorMessage = standards.validateParameters('build_table', {
-        { name = 'columns', type = 'table', required = true },
-        { name = 'rows',    type = 'table', required = true },
-        { name = 'options', type = 'table', required = false }
-    }, { columns, rows, options })
-
-    if not isValid then
-        local err = standards.createError(
-            standards.ERROR_LEVELS.FATAL,
-            errorMessage or "Parameter validation failed for build_table",
-            'Module:Funclib'
-        )
-        standards.logError(err)
-        return ""
+    -- Simple parameter validation without CodeStandards
+    if type(columns) ~= 'table' then
+        error("Columns must be a table", 2)
+    end
+    if type(rows) ~= 'table' then
+        error("Rows must be a table", 2)
     end
 
-    return standards.trackPerformance('Module:Funclib.build_table', function()
-        options = options or {}
+    options = options or {}
 
-        local builder = TableBuilder.new(columns)
+    local builder = TableBuilder.new(columns)
 
-        if options.classes then
-            for _, class in ipairs(options.classes) do
-                builder:add_class(class)
-            end
+    if options.classes then
+        for _, class in ipairs(options.classes) do
+            builder:add_class(class)
         end
+    end
 
-        if options.attributes then
-            for name, value in pairs(options.attributes) do
-                builder:set_attribute(name, value)
-            end
+    if options.attributes then
+        for name, value in pairs(options.attributes) do
+            builder:set_attribute(name, value)
         end
+    end
 
-        for _, row in ipairs(rows) do
-            builder:start_row()
-            for _, col in ipairs(columns) do
-                local cell_value = row[col.field]
+    for _, row in ipairs(rows) do
+        builder:start_row()
+        for _, col in ipairs(columns) do
+            local cell_value = row[col.field]
 
-                if col.formatter then
-                    cell_value = col.formatter(cell_value, row)
-                end
-
-                builder:add_cell(cell_value, {})
+            if col.formatter then
+                cell_value = col.formatter(cell_value, row)
             end
-            builder:end_row()
-        end
 
-        return builder:build()
-    end)()
+            builder:add_cell(cell_value, {})
+        end
+        builder:end_row()
+    end
+
+    return builder:build()
 end
 
 ---Create enhanced table builder with Arguments integration
@@ -692,18 +676,31 @@ function funclib.build_table_from_frame(frame, config)
 
     local args = funclib.process_frame_args(frame, args_config)
 
-    -- Build columns using functional composition
-    local columns = functools.pipe(
-        function(cols)
-            return functools.map(function(col_config)
-                if type(col_config) == 'string' then
-                    return funclib.make_column(col_config, {})
-                else
-                    return funclib.make_column(col_config.header, col_config)
-                end
-            end, cols)
+    -- Build columns using functional composition if available
+    local columns
+    if functools.pipe and functools.map then
+        columns = functools.pipe(
+            function(cols)
+                return functools.map(function(col_config)
+                    if type(col_config) == 'string' then
+                        return funclib.make_column(col_config, {})
+                    else
+                        return funclib.make_column(col_config.header, col_config)
+                    end
+                end, cols)
+            end
+        )(config.columns or {})
+    else
+        -- Fallback without functools
+        columns = {}
+        for _, col_config in ipairs(config.columns or {}) do
+            if type(col_config) == 'string' then
+                table.insert(columns, funclib.make_column(col_config, {}))
+            else
+                table.insert(columns, funclib.make_column(col_config.header, col_config))
+            end
         end
-    )(config.columns or {})
+    end
 
     -- Process data using functional transformations
     local data = config.data or {}
@@ -728,7 +725,18 @@ end
 function funclib.create_column_pipeline(processors)
     checkType('create_column_pipeline', 1, processors, 'table')
 
-    return functools.compose(unpack(processors))
+    if functools.compose then
+        return functools.compose(unpack(processors))
+    else
+        -- Fallback implementation
+        return function(data)
+            local result = data
+            for _, processor in ipairs(processors) do
+                result = processor(result)
+            end
+            return result
+        end
+    end
 end
 
 ---Column processor: Apply tooltip to column headers
@@ -736,12 +744,24 @@ end
 ---@return function Column processor function
 function funclib.apply_tooltips(tooltip_map)
     return function(columns)
-        return functools.map(function(col)
-            if tooltip_map[col.header] then
-                col.header = funclib.tooltip(col.header, tooltip_map[col.header])
+        if functools.map then
+            return functools.map(function(col)
+                if tooltip_map[col.header] then
+                    col.header = funclib.tooltip(col.header, tooltip_map[col.header])
+                end
+                return col
+            end, columns)
+        else
+            -- Fallback implementation
+            local result = {}
+            for i, col in ipairs(columns) do
+                if tooltip_map[col.header] then
+                    col.header = funclib.tooltip(col.header, tooltip_map[col.header])
+                end
+                result[i] = col
             end
-            return col
-        end, columns)
+            return result
+        end
     end
 end
 
@@ -750,15 +770,30 @@ end
 ---@return function Column processor function
 function funclib.apply_formatting(format_config)
     return function(columns)
-        return functools.map(function(col)
-            if format_config.align then
-                col.align = col.align or format_config.align
+        if functools.map then
+            return functools.map(function(col)
+                if format_config.align then
+                    col.align = col.align or format_config.align
+                end
+                if format_config.sortable ~= nil then
+                    col.sortable = col.sortable ~= false and format_config.sortable
+                end
+                return col
+            end, columns)
+        else
+            -- Fallback implementation
+            local result = {}
+            for i, col in ipairs(columns) do
+                if format_config.align then
+                    col.align = col.align or format_config.align
+                end
+                if format_config.sortable ~= nil then
+                    col.sortable = col.sortable ~= false and format_config.sortable
+                end
+                result[i] = col
             end
-            if format_config.sortable ~= nil then
-                col.sortable = col.sortable ~= false and format_config.sortable
-            end
-            return col
-        end, columns)
+            return result
+        end
     end
 end
 
@@ -938,7 +973,7 @@ function funclib.process_template_params(args, config)
     if config.required then
         for _, param in ipairs(config.required) do
             local value = args[param]
-            if not functools.validation.default_value(value, nil) then
+            if not funclib.default_value(value, nil) then
                 error(string.format("Required parameter '%s' is missing", param))
             end
             result[param] = value
@@ -949,7 +984,7 @@ function funclib.process_template_params(args, config)
     if config.optional then
         for _, param in ipairs(config.optional) do
             local default_val = config.defaults and config.defaults[param] or ""
-            result[param] = functools.validation.default_value(args[param], default_val)
+            result[param] = funclib.default_value(args[param], default_val)
         end
     end
 
@@ -994,13 +1029,15 @@ end
 function funclib.compose_wikitext(generators)
     checkType('compose_wikitext', 1, generators, 'table')
 
-    local parts = arr.map(generators, function(gen)
-        return type(gen) == 'function' and gen() or tostring(gen)
-    end)
+    local parts = {}
+    for i, gen in ipairs(generators) do
+        local result = type(gen) == 'function' and gen() or tostring(gen)
+        if result and result ~= "" then
+            parts[#parts + 1] = result
+        end
+    end
 
-    return table.concat(arr.filter(parts, function(part)
-        return part and part ~= ""
-    end), '\n')
+    return table.concat(parts, '\n')
 end
 
 ---Create a template invocation builder
@@ -1079,9 +1116,13 @@ end
 funclib.transforms = {
     -- Filter out empty values
     filter_empty = function(data)
-        return arr.filter(data, function(item)
-            return item and item ~= ""
-        end)
+        local result = {}
+        for _, item in ipairs(data) do
+            if item and item ~= "" then
+                table.insert(result, item)
+            end
+        end
+        return result
     end,
 
     -- Sort by field
@@ -1112,12 +1153,18 @@ funclib.transforms = {
     -- Map field values
     map_field = function(field, mapper)
         return function(data)
-            return arr.map(data, function(item)
-                if item[field] then
-                    item[field] = mapper(item[field])
+            local result = {}
+            for i, item in ipairs(data) do
+                local new_item = {}
+                for k, v in pairs(item) do
+                    new_item[k] = v
                 end
-                return item
-            end)
+                if new_item[field] then
+                    new_item[field] = mapper(new_item[field])
+                end
+                result[i] = new_item
+            end
+            return result
         end
     end
 }

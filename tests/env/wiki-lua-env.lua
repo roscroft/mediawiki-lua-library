@@ -151,7 +151,7 @@ libraryUtil = {
             return
         end
 
-        local expectTypes = {...}
+        local expectTypes = { ... }
         for i, expectType in ipairs(expectTypes) do
             if type(arg) == expectType then
                 return

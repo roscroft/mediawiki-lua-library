@@ -52,8 +52,8 @@ print("=== Array Module Unit Tests ===\n")
 
 -- Test Array.new
 test("Array.new creates array from table", function()
-    local arr = Array.new({1, 2, 3})
-    assert_table_equal(arr, {1, 2, 3})
+    local arr = Array.new({ 1, 2, 3 })
+    assert_table_equal(arr, { 1, 2, 3 })
 end)
 
 test("Array.new handles empty table", function()
@@ -68,34 +68,34 @@ end)
 
 -- Test Array.filter
 test("Array.filter with even numbers", function()
-    local arr = Array.new({1, 2, 3, 4, 5, 6})
+    local arr = Array.new({ 1, 2, 3, 4, 5, 6 })
     local filtered = Array.filter(arr, function(x) return x % 2 == 0 end)
-    assert_table_equal(filtered, {2, 4, 6})
+    assert_table_equal(filtered, { 2, 4, 6 })
 end)
 
 test("Array.filter with no matches", function()
-    local arr = Array.new({1, 3, 5})
+    local arr = Array.new({ 1, 3, 5 })
     local filtered = Array.filter(arr, function(x) return x % 2 == 0 end)
     assert_table_equal(filtered, {})
 end)
 
 test("Array.filter with all matches", function()
-    local arr = Array.new({2, 4, 6})
+    local arr = Array.new({ 2, 4, 6 })
     local filtered = Array.filter(arr, function(x) return x % 2 == 0 end)
-    assert_table_equal(filtered, {2, 4, 6})
+    assert_table_equal(filtered, { 2, 4, 6 })
 end)
 
 -- Test Array.map
 test("Array.map doubles values", function()
-    local arr = Array.new({1, 2, 3})
+    local arr = Array.new({ 1, 2, 3 })
     local mapped = Array.map(arr, function(x) return x * 2 end)
-    assert_table_equal(mapped, {2, 4, 6})
+    assert_table_equal(mapped, { 2, 4, 6 })
 end)
 
 test("Array.map to strings", function()
-    local arr = Array.new({1, 2, 3})
+    local arr = Array.new({ 1, 2, 3 })
     local mapped = Array.map(arr, function(x) return "item" .. tostring(x) end)
-    assert_table_equal(mapped, {"item1", "item2", "item3"})
+    assert_table_equal(mapped, { "item1", "item2", "item3" })
 end)
 
 test("Array.map empty array", function()
@@ -106,16 +106,20 @@ end)
 
 -- Test error conditions
 test("Array.filter handles invalid predicate gracefully", function()
-    local arr = Array.new({1, 2, 3})
+    local arr = Array.new({ 1, 2, 3 })
     local success = pcall(function()
+        -- Expected parameter type mismatch
+        ---@diagnostic disable-next-line: param-type-mismatch
         Array.filter(arr, "not a function")
     end)
     assert_equal(success, false, "Should fail with invalid predicate")
 end)
 
 test("Array.map handles invalid transformer gracefully", function()
-    local arr = Array.new({1, 2, 3})
+    local arr = Array.new({ 1, 2, 3 })
     local success = pcall(function()
+        -- Expected param type mismatch for test
+        ---@diagnostic disable-next-line: param-type-mismatch
         Array.map(arr, "not a function")
     end)
     assert_equal(success, false, "Should fail with invalid transformer")
@@ -151,8 +155,8 @@ print(string.format("Success rate: %.1f%%", (tests_passed / tests_run) * 100))
 
 if tests_passed == tests_run then
     print("\n🎉 All Array module tests passed!")
-    os.exit(0)
+    return true
 else
     print("\n❌ Some Array module tests failed.")
-    os.exit(1)
+    return false
 end

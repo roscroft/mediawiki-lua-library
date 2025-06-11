@@ -162,7 +162,7 @@ function standards.wrapFunction(name, func, options)
                 standards.ERROR_LEVELS.FATAL,
                 result, -- pcall returns the error message as result on failure
                 name,
-                {arguments = {...}}
+                { arguments = { ... } }
             )
 
             if options.logOnly then
@@ -321,13 +321,13 @@ end
 ---@return function wrappedFunc Function with performance tracking
 function standards.trackPerformance(name, func)
     return function(...)
-        local args = {...}
+        local args = { ... }
         local startTime = os.clock()
         local startCPU = os.time()
         local argCount = select('#', ...)
 
         -- Capture all return values in a table (Lua 5.1 compatible)
-        local success, results = pcall(function() return {func(unpack(args))} end)
+        local success, results = pcall(function() return { func(unpack(args)) } end)
         local endTime = os.clock()
         local endCPU = os.time()
 
