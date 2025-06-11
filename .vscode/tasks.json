@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {
     "version": "2.0.0",
     "tasks": [
@@ -594,5 +593,3 @@
         }
     ]
 }
-=======
->>>>>>> e48a467 (🧹 Complete project cleanup after wiki migration)
