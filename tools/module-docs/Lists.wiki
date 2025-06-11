@@ -1,0 +1,16 @@
+{{Documentation}}
+|name = Lists
+
+|fname1 = <nowiki>p.make_level_column(&nbsp;options&nbsp;)</nowiki>
+|ftype1 = <samp>-> any</samp>
+|fuse1 = -------------------
+
+|fname2 = <nowiki>p.make_members_column(&nbsp;options&nbsp;)</nowiki>
+|ftype2 = <samp>-> any</samp>
+|fuse2 = No description available.
+
+|fname3 = <nowiki>p.make_name_column(&nbsp;options&nbsp;)</nowiki>
+|ftype3 = <samp>-> any</samp>
+|fuse3 = No description available.
+
+}}

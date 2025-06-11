@@ -1,0 +1,96 @@
+{{Documentation}}
+|name = CodeStandards
+
+|fname1 = <nowiki>isNil(&nbsp;value&nbsp;)</nowiki>
+|ftype1 = <samp>-> any</samp>
+|fuse1 = No description available.
+
+|fname2 = <nowiki>isEmptyString(&nbsp;value&nbsp;)</nowiki>
+|ftype2 = <samp>-> any</samp>
+|fuse2 = No description available.
+
+|fname3 = <nowiki>standards.createError(&nbsp;level, message, source, details&nbsp;)</nowiki>
+|ftype3 = <samp>-> any</samp>
+|fuse3 = Create a structured error object
+
+|fname4 = <nowiki>standards.formatError(&nbsp;err, includeDetails, colorize&nbsp;)</nowiki>
+|ftype4 = <samp>-> any</samp>
+|fuse4 = Format an error object as a string
+
+|fname5 = <nowiki>standards.logError(&nbsp;err, level&nbsp;)</nowiki>
+|ftype5 = <samp>-> any</samp>
+|fuse5 = Log an error to MediaWiki's logging system
+
+|fname6 = <nowiki>standards.throwError(&nbsp;err, level&nbsp;)</nowiki>
+|ftype6 = <samp>-> any</samp>
+|fuse6 = Throw a formatted error that halts execution
+
+|fname7 = <nowiki>standards.wrapFunction(&nbsp;name, func, options&nbsp;)</nowiki>
+|ftype7 = <samp>-> any</samp>
+|fuse7 = Wrap a function with error handling
+
+|fname8 = <nowiki>standards.validateParameters(&nbsp;name, parameters, args&nbsp;)</nowiki>
+|ftype8 = <samp>-> any</samp>
+|fuse8 = Function parameter validation
+
+|fname9 = <nowiki>standards.isEmpty(&nbsp;value&nbsp;)</nowiki>
+|ftype9 = <samp>-> any</samp>
+|fuse9 = Check if a value is empty (nil, empty string, or empty table)
+
+|fname10 = <nowiki>standards.isValid(&nbsp;value, options&nbsp;)</nowiki>
+|ftype10 = <samp>-> any</samp>
+|fuse10 = Check if a value is valid
+
+|fname11 = <nowiki>standards.tableKeys(&nbsp;t&nbsp;)</nowiki>
+|ftype11 = <samp>-> any</samp>
+|fuse11 = Get all keys from a table
+
+|fname12 = <nowiki>standards.wrapModule(&nbsp;module, options&nbsp;)</nowiki>
+|ftype12 = <samp>-> any</samp>
+|fuse12 = Create an error-handling version of a module
+
+|fname13 = <nowiki>standards.trackPerformance(&nbsp;name, func&nbsp;)</nowiki>
+|ftype13 = <samp>-> any</samp>
+|fuse13 = Performance tracking utility with detailed metrics collection
+
+|fname14 = <nowiki>standards.debugInfo(&nbsp;value, options&nbsp;)</nowiki>
+|ftype14 = <samp>-> any</samp>
+|fuse14 = Create debug information about a value
+
+|fname15 = <nowiki>_debugInfo(&nbsp;val, depth, path&nbsp;)</nowiki>
+|ftype15 = <samp>-> any</samp>
+|fuse15 = Create debug information about a value
+
+|fname16 = <nowiki>standards.recordMetric(&nbsp;name, metric&nbsp;)</nowiki>
+|ftype16 = <samp>-> any</samp>
+|fuse16 = Record a performance metric
+
+|fname17 = <nowiki>standards.getPerformanceMetrics()</nowiki>
+|ftype17 = <samp>-> any</samp>
+|fuse17 = Get performance metrics for all functions
+
+|fname18 = <nowiki>standards.getPerformanceHistory(&nbsp;name&nbsp;)</nowiki>
+|ftype18 = <samp>-> any</samp>
+|fuse18 = Get performance history for a specific function
+
+|fname19 = <nowiki>standards.generatePerformanceReport()</nowiki>
+|ftype19 = <samp>-> any</samp>
+|fuse19 = Generate a comprehensive performance report
+
+|fname20 = <nowiki>standards.clearPerformanceMetrics()</nowiki>
+|ftype20 = <samp>-> any</samp>
+|fuse20 = Clear all performance metrics
+
+|fname21 = <nowiki>standards.getPerformanceDashboard()</nowiki>
+|ftype21 = <samp>-> any</samp>
+|fuse21 = Get real-time performance dashboard data
+
+|fname22 = <nowiki>standards.getRecentActivity()</nowiki>
+|ftype22 = <samp>-> any</samp>
+|fuse22 = Get recent performance activity
+
+|fname23 = <nowiki>standards.getPerformanceAlerts()</nowiki>
+|ftype23 = <samp>-> any</samp>
+|fuse23 = Generate performance alerts
+
+}}

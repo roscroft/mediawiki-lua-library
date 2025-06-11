@@ -1,196 +1,264 @@
 {{Documentation}}
 |name = Array
 
-|fname1 = <nowiki>len(&nbsp;arr&nbsp;)</nowiki>
+|fname1 = <nowiki>__call(&nbsp;_, arr&nbsp;)</nowiki>
 |ftype1 = <samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>all(&nbsp;arr, check&nbsp;)</nowiki>
+|fname2 = <nowiki>Array.len(&nbsp;arr&nbsp;)</nowiki>
 |ftype2 = <samp>-> any</samp>
-|fuse2 = No description available.
+|fuse2 = ```
 
-|fname3 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
+|fname3 = <nowiki>Array.__concat(&nbsp;lhs, rhs&nbsp;)</nowiki>
 |ftype3 = <samp>-> any</samp>
 |fuse3 = No description available.
 
-|fname4 = <nowiki>any(&nbsp;arr, check&nbsp;)</nowiki>
+|fname4 = <nowiki>Array.__unm(&nbsp;arr&nbsp;)</nowiki>
 |ftype4 = <samp>-> any</samp>
 |fuse4 = No description available.
 
-|fname5 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
+|fname5 = <nowiki>mathTemplate(&nbsp;lhs, rhs, funName, opName, fun&nbsp;)</nowiki>
 |ftype5 = <samp>-> any</samp>
 |fuse5 = No description available.
 
-|fname6 = <nowiki>clean(&nbsp;arr&nbsp;)</nowiki>
+|fname6 = <nowiki>Array.__add(&nbsp;lhs, rhs&nbsp;)</nowiki>
 |ftype6 = <samp>-> any</samp>
 |fuse6 = No description available.
 
-|fname7 = <nowiki>clone(&nbsp;arr, deep&nbsp;)</nowiki>
+|fname7 = <nowiki>Array.__sub(&nbsp;lhs, rhs&nbsp;)</nowiki>
 |ftype7 = <samp>-> any</samp>
 |fuse7 = No description available.
 
-|fname8 = <nowiki>contains(&nbsp;arr, val&nbsp;)</nowiki>
+|fname8 = <nowiki>Array.__mul(&nbsp;lhs, rhs&nbsp;)</nowiki>
 |ftype8 = <samp>-> any</samp>
 |fuse8 = No description available.
 
-|fname9 = <nowiki>containsAny(&nbsp;arr, t&nbsp;)</nowiki>
+|fname9 = <nowiki>Array.__div(&nbsp;lhs, rhs&nbsp;)</nowiki>
 |ftype9 = <samp>-> any</samp>
 |fuse9 = No description available.
 
-|fname10 = <nowiki>containsAll(&nbsp;arr, t&nbsp;)</nowiki>
+|fname10 = <nowiki>Array.__pow(&nbsp;lhs, rhs&nbsp;)</nowiki>
 |ftype10 = <samp>-> any</samp>
 |fuse10 = No description available.
 
-|fname11 = <nowiki>convolve(&nbsp;x, y&nbsp;)</nowiki>
+|fname11 = <nowiki>Array.__eq(&nbsp;lhs, rhs&nbsp;)</nowiki>
 |ftype11 = <samp>-> any</samp>
 |fuse11 = No description available.
 
-|fname12 = <nowiki>condenseSparse(&nbsp;arr&nbsp;)</nowiki>
+|fname12 = <nowiki>Array.all(&nbsp;arr, check&nbsp;)</nowiki>
 |ftype12 = <samp>-> any</samp>
-|fuse12 = No description available.
+|fuse12 = * `nil` - Checks that the array doesn't contain any '''false''' elements.
 
-|fname13 = <nowiki>count(&nbsp;arr, check&nbsp;)</nowiki>
+|fname13 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
 |ftype13 = <samp>-> any</samp>
-|fuse13 = No description available.
+|fuse13 = * `nil` - Checks that the array doesn't contain any '''false''' elements.
 
 |fname14 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
 |ftype14 = <samp>-> any</samp>
 |fuse14 = No description available.
 
-|fname15 = <nowiki>diff(&nbsp;arr, order&nbsp;)</nowiki>
+|fname15 = <nowiki>Array.any(&nbsp;arr, check&nbsp;)</nowiki>
 |ftype15 = <samp>-> any</samp>
-|fuse15 = No description available.
+|fuse15 = * `nil` - Checks that the array contains at least one non '''false''' element.
 
-|fname16 = <nowiki>each(&nbsp;arr, fn&nbsp;)</nowiki>
+|fname16 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
 |ftype16 = <samp>-> any</samp>
-|fuse16 = No description available.
+|fuse16 = * `nil` - Checks that the array contains at least one non '''false''' element.
 
-|fname17 = <nowiki>filter(&nbsp;arr, fn&nbsp;)</nowiki>
+|fname17 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
 |ftype17 = <samp>-> any</samp>
 |fuse17 = No description available.
 
-|fname18 = <nowiki>find(&nbsp;arr, check, default&nbsp;)</nowiki>
+|fname18 = <nowiki>Array.clean(&nbsp;arr&nbsp;)</nowiki>
 |ftype18 = <samp>-> any</samp>
-|fuse18 = No description available.
+|fuse18 = Recursively removes all metatables.
 
-|fname19 = <nowiki>find_index(&nbsp;arr, check, default&nbsp;)</nowiki>
+|fname19 = <nowiki>Array.clone(&nbsp;arr, deep&nbsp;)</nowiki>
 |ftype19 = <samp>-> any</samp>
-|fuse19 = No description available.
+|fuse19 = Make a copy of the input table. Preserves metatables.
 
-|fname20 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
+|fname20 = <nowiki>Array.contains(&nbsp;arr, val&nbsp;)</nowiki>
 |ftype20 = <samp>-> any</samp>
-|fuse20 = No description available.
+|fuse20 = Check if `arr` contains `val`.
 
-|fname21 = <nowiki>get(&nbsp;arr, indices&nbsp;)</nowiki>
+|fname21 = <nowiki>Array.containsAny(&nbsp;arr, t&nbsp;)</nowiki>
 |ftype21 = <samp>-> any</samp>
-|fuse21 = No description available.
+|fuse21 = Check if `arr` contains any of the values in the table `t`.
 
-|fname22 = <nowiki>int(&nbsp;arr, start, stop&nbsp;)</nowiki>
+|fname22 = <nowiki>Array.containsAll(&nbsp;arr, t&nbsp;)</nowiki>
 |ftype22 = <samp>-> any</samp>
-|fuse22 = No description available.
+|fuse22 = Check if `arr` contains all values in the table `t`.
 
-|fname23 = <nowiki>intersect(&nbsp;left, right&nbsp;)</nowiki>
+|fname23 = <nowiki>Array.convolve(&nbsp;x, y&nbsp;)</nowiki>
 |ftype23 = <samp>-> any</samp>
-|fuse23 = No description available.
+|fuse23 = Convolute two number arrays.
 
-|fname24 = <nowiki>intersects(&nbsp;left, right&nbsp;)</nowiki>
+|fname24 = <nowiki>Array.condenseSparse(&nbsp;arr&nbsp;)</nowiki>
 |ftype24 = <samp>-> any</samp>
-|fuse24 = No description available.
+|fuse24 = Remove '''nil''' values from `arr` while preserving order.
 
-|fname25 = <nowiki>insert(&nbsp;arr, val, index, unpackVal&nbsp;)</nowiki>
+|fname25 = <nowiki>Array.count(&nbsp;arr, check&nbsp;)</nowiki>
 |ftype25 = <samp>-> any</samp>
-|fuse25 = No description available.
+|fuse25 = * `nil` -  Counts the number of non '''false''' elements.
 
-|fname26 = <nowiki>last(&nbsp;arr, offset&nbsp;)</nowiki>
+|fname26 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
 |ftype26 = <samp>-> any</samp>
-|fuse26 = No description available.
+|fuse26 = * `nil` -  Counts the number of non '''false''' elements.
 
-|fname27 = <nowiki>map(&nbsp;arr, fn&nbsp;)</nowiki>
+|fname27 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
 |ftype27 = <samp>-> any</samp>
-|fuse27 = No description available.
+|fuse27 = * `nil` -  Counts the number of non '''false''' elements.
 
-|fname28 = <nowiki>max_by(&nbsp;arr, fn&nbsp;)</nowiki>
+|fname28 = <nowiki>Array.diff(&nbsp;arr, order&nbsp;)</nowiki>
 |ftype28 = <samp>-> any</samp>
-|fuse28 = No description available.
+|fuse28 = Differentiate the array
 
-|fname29 = <nowiki>max(&nbsp;arr&nbsp;)</nowiki>
+|fname29 = <nowiki>Array.each(&nbsp;arr, fn&nbsp;)</nowiki>
 |ftype29 = <samp>-> any</samp>
-|fuse29 = No description available.
+|fuse29 = ```
 
-|fname30 = <nowiki>min(&nbsp;arr&nbsp;)</nowiki>
+|fname30 = <nowiki>Array.filter(&nbsp;arr, fn&nbsp;)</nowiki>
 |ftype30 = <samp>-> any</samp>
-|fuse30 = No description available.
+|fuse30 = ```
 
-|fname31 = <nowiki>new(&nbsp;arr&nbsp;)</nowiki>
+|fname31 = <nowiki>Array.find(&nbsp;arr, check, default&nbsp;)</nowiki>
 |ftype31 = <samp>-> any</samp>
-|fuse31 = No description available.
+|fuse31 = ```
 
-|fname32 = <nowiki>newIncrementor(&nbsp;start, step&nbsp;)</nowiki>
+|fname32 = <nowiki>Array.find_index(&nbsp;arr, check, default&nbsp;)</nowiki>
 |ftype32 = <samp>-> any</samp>
-|fuse32 = No description available.
+|fuse32 = * `fun(elem: T, i?: integer): boolean` - Predicate to search for (when '''true''') in `arr`.
 
-|fname33 = <nowiki>promote(&nbsp;arr, attr&nbsp;)</nowiki>
+|fname33 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
 |ftype33 = <samp>-> any</samp>
 |fuse33 = No description available.
 
-|fname34 = <nowiki>range(&nbsp;start, stop, step&nbsp;)</nowiki>
+|fname34 = <nowiki>Array.get(&nbsp;arr, indices&nbsp;)</nowiki>
 |ftype34 = <samp>-> any</samp>
-|fuse34 = No description available.
+|fuse34 = Extracts a subset of `arr`.
 
-|fname35 = <nowiki>reduce(&nbsp;arr, fn, accumulator&nbsp;)</nowiki>
+|fname35 = <nowiki>Array.int(&nbsp;arr, start, stop&nbsp;)</nowiki>
 |ftype35 = <samp>-> any</samp>
-|fuse35 = No description available.
+|fuse35 = Integrates the array. Effectively does <math>\left\{\sum^{n}_{start}{arr[n]} \,\Bigg|\, n \in [start, stop]\right\}</math>.
 
-|fname36 = <nowiki>reject(&nbsp;arr, check&nbsp;)</nowiki>
+|fname36 = <nowiki>Array.intersect(&nbsp;left, right&nbsp;)</nowiki>
 |ftype36 = <samp>-> any</samp>
-|fuse36 = No description available.
+|fuse36 = Returns an array with elements that are present in both arrays.
 
-|fname37 = <nowiki>rejectFn(&nbsp;elem&nbsp;)</nowiki>
+|fname37 = <nowiki>Array.intersects(&nbsp;left, right&nbsp;)</nowiki>
 |ftype37 = <samp>-> any</samp>
-|fuse37 = No description available.
+|fuse37 = Checks if the two arrays have at least one element in common.
 
-|fname38 = <nowiki>rep(&nbsp;val, n&nbsp;)</nowiki>
+|fname38 = <nowiki>Array.insert(&nbsp;arr, val, index, unpackVal&nbsp;)</nowiki>
 |ftype38 = <samp>-> any</samp>
-|fuse38 = No description available.
+|fuse38 = Inserts values into `arr`.
 
-|fname39 = <nowiki>scan(&nbsp;arr, fn, accumulator&nbsp;)</nowiki>
+|fname39 = <nowiki>Array.last(&nbsp;arr, offset&nbsp;)</nowiki>
 |ftype39 = <samp>-> any</samp>
-|fuse39 = No description available.
+|fuse39 = Returns the last element of `arr`.
 
-|fname40 = <nowiki>set(&nbsp;arr, indices, values&nbsp;)</nowiki>
+|fname40 = <nowiki>Array.map(&nbsp;arr, fn&nbsp;)</nowiki>
 |ftype40 = <samp>-> any</samp>
-|fuse40 = No description available.
+|fuse40 = ```
 
-|fname41 = <nowiki>slice(&nbsp;arr, start, stop&nbsp;)</nowiki>
+|fname41 = <nowiki>Array.max_by(&nbsp;arr, fn&nbsp;)</nowiki>
 |ftype41 = <samp>-> any</samp>
-|fuse41 = No description available.
+|fuse41 = Find the element for which `fn` returned the largest value.
 
-|fname42 = <nowiki>split(&nbsp;arr, index&nbsp;)</nowiki>
+|fname42 = <nowiki>Array.max(&nbsp;arr&nbsp;)</nowiki>
 |ftype42 = <samp>-> any</samp>
-|fuse42 = No description available.
+|fuse42 = Find the largest value in the array.
 
-|fname43 = <nowiki>sum(&nbsp;arr&nbsp;)</nowiki>
+|fname43 = <nowiki>Array.min(&nbsp;arr&nbsp;)</nowiki>
 |ftype43 = <samp>-> any</samp>
-|fuse43 = No description available.
+|fuse43 = Find the smallest value in the array.
 
-|fname44 = <nowiki>take(&nbsp;arr, count, start&nbsp;)</nowiki>
+|fname44 = <nowiki>Array.new(&nbsp;arr&nbsp;)</nowiki>
 |ftype44 = <samp>-> any</samp>
-|fuse44 = No description available.
+|fuse44 = ```
 
-|fname45 = <nowiki>take_every(&nbsp;arr, n, start, count&nbsp;)</nowiki>
+|fname45 = <nowiki>Array.newIncrementor(&nbsp;start, step&nbsp;)</nowiki>
 |ftype45 = <samp>-> any</samp>
-|fuse45 = No description available.
+|fuse45 = ```
 
-|fname46 = <nowiki>unique(&nbsp;arr, fn&nbsp;)</nowiki>
+|fname46 = <nowiki>__call()</nowiki>
 |ftype46 = <samp>-> any</samp>
 |fuse46 = No description available.
 
-|fname47 = <nowiki>zip(&nbsp;...&nbsp;)</nowiki>
+|fname47 = <nowiki>__tostring()</nowiki>
 |ftype47 = <samp>-> any</samp>
 |fuse47 = No description available.
 
-|example =
-<syntaxhighlight lang='lua'>
-    -- Example usage of Array will be added manually
-</syntaxhighlight>
+|fname48 = <nowiki>__index()</nowiki>
+|ftype48 = <samp>-> any</samp>
+|fuse48 = No description available.
+
+|fname49 = <nowiki>__newindex(&nbsp;_, k, v&nbsp;)</nowiki>
+|ftype49 = <samp>-> any</samp>
+|fuse49 = No description available.
+
+|fname50 = <nowiki>__concat(&nbsp;x, y&nbsp;)</nowiki>
+|ftype50 = <samp>-> any</samp>
+|fuse50 = No description available.
+
+|fname51 = <nowiki>Array.promote(&nbsp;arr, attr&nbsp;)</nowiki>
+|ftype51 = <samp>-> any</samp>
+|fuse51 = Returns a table created by promoting a key.
+
+|fname52 = <nowiki>Array.range(&nbsp;start, stop, step&nbsp;)</nowiki>
+|ftype52 = <samp>-> any</samp>
+|fuse52 = Returns a range of numbers.
+
+|fname53 = <nowiki>Array.reduce(&nbsp;arr, fn, accumulator&nbsp;)</nowiki>
+|ftype53 = <samp>-> any</samp>
+|fuse53 = ```
+
+|fname54 = <nowiki>Array.reject(&nbsp;arr, check&nbsp;)</nowiki>
+|ftype54 = <samp>-> any</samp>
+|fuse54 = * `fun(elem: any, i?: integer): boolean` - Remove elements for which the functions returns '''true'''.
+
+|fname55 = <nowiki>rejectFn(&nbsp;elem&nbsp;)</nowiki>
+|ftype55 = <samp>-> any</samp>
+|fuse55 = No description available.
+
+|fname56 = <nowiki>Array.rep(&nbsp;val, n&nbsp;)</nowiki>
+|ftype56 = <samp>-> any</samp>
+|fuse56 = Returns an Array with `val` repeated `n` times.
+
+|fname57 = <nowiki>Array.scan(&nbsp;arr, fn, accumulator&nbsp;)</nowiki>
+|ftype57 = <samp>-> any</samp>
+|fuse57 = ```
+
+|fname58 = <nowiki>Array.set(&nbsp;arr, indices, values&nbsp;)</nowiki>
+|ftype58 = <samp>-> any</samp>
+|fuse58 = If only one value is given but multiple indices than that value is set for all those indices. If `values` is a table then it must of the same length as `indices`.
+
+|fname59 = <nowiki>Array.slice(&nbsp;arr, start, stop&nbsp;)</nowiki>
+|ftype59 = <samp>-> any</samp>
+|fuse59 = Extract a subtable from `arr`.
+
+|fname60 = <nowiki>Array.split(&nbsp;arr, index&nbsp;)</nowiki>
+|ftype60 = <samp>-> any</samp>
+|fuse60 = Split `arr` into two arrays.
+
+|fname61 = <nowiki>Array.sum(&nbsp;arr&nbsp;)</nowiki>
+|ftype61 = <samp>-> any</samp>
+|fuse61 = Returns the sum of all elements of `arr`.
+
+|fname62 = <nowiki>Array.take(&nbsp;arr, count, start&nbsp;)</nowiki>
+|ftype62 = <samp>-> any</samp>
+|fuse62 = Extract a subtable from `arr`.
+
+|fname63 = <nowiki>Array.take_every(&nbsp;arr, n, start, count&nbsp;)</nowiki>
+|ftype63 = <samp>-> any</samp>
+|fuse63 = ```
+
+|fname64 = <nowiki>Array.unique(&nbsp;arr, fn&nbsp;)</nowiki>
+|ftype64 = <samp>-> any</samp>
+|fuse64 = Return a new table with all duplicates removed.
+
+|fname65 = <nowiki>Array.zip(&nbsp;...&nbsp;)</nowiki>
+|ftype65 = <samp>-> any</samp>
+|fuse65 = ```
+
 }}

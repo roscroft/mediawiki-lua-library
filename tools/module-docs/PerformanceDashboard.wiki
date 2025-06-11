@@ -1,0 +1,68 @@
+{{Documentation}}
+|name = PerformanceDashboard
+
+|fname1 = <nowiki>createSimpleHtmlBuilder(&nbsp;tagName&nbsp;)</nowiki>
+|ftype1 = <samp>-> any</samp>
+|fuse1 = ---------------------------------------------------------------------------------
+
+|fname2 = <nowiki>mw.html.create(&nbsp;tag&nbsp;)</nowiki>
+|ftype2 = <samp>-> any</samp>
+|fuse2 = No description available.
+
+|fname3 = <nowiki>dashboard.generateHTML()</nowiki>
+|ftype3 = <samp>-> any</samp>
+|fuse3 = Generate HTML dashboard for MediaWiki display
+
+|fname4 = <nowiki>dashboard.addMetricCard(&nbsp;container, title, value, icon&nbsp;)</nowiki>
+|ftype4 = <samp>-> any</samp>
+|fuse4 = Add a metric card to the dashboard
+
+|fname5 = <nowiki>dashboard.addPerformanceChart(&nbsp;container, title, data, valueField&nbsp;)</nowiki>
+|ftype5 = <samp>-> any</samp>
+|fuse5 = Add a performance chart to the dashboard
+
+|fname6 = <nowiki>dashboard.formatDuration(&nbsp;seconds&nbsp;)</nowiki>
+|ftype6 = <samp>-> any</samp>
+|fuse6 = Format duration in human-readable format
+
+|fname7 = <nowiki>dashboard.formatTime(&nbsp;time&nbsp;)</nowiki>
+|ftype7 = <samp>-> any</samp>
+|fuse7 = Format time value for display
+
+|fname8 = <nowiki>dashboard.formatMetricValue(&nbsp;value, field&nbsp;)</nowiki>
+|ftype8 = <samp>-> any</samp>
+|fuse8 = Format metric value based on field type
+
+|fname9 = <nowiki>dashboard.getCSS()</nowiki>
+|ftype9 = <samp>-> any</samp>
+|fuse9 = Get CSS styles for the dashboard
+
+|fname10 = <nowiki>dashboard.getJavaScript()</nowiki>
+|ftype10 = <samp>-> any</samp>
+|fuse10 = Get JavaScript for dashboard interactivity
+
+|fname11 = <nowiki>refreshDashboard()</nowiki>
+|ftype11 = <samp>-> any</samp>
+|fuse11 = Get JavaScript for dashboard interactivity
+
+|fname12 = <nowiki>dashboard.generateAnalysisReport()</nowiki>
+|ftype12 = <samp>-> any</samp>
+|fuse12 = Generate performance analysis report
+
+|fname13 = <nowiki>dashboard.exportData(&nbsp;format&nbsp;)</nowiki>
+|ftype13 = <samp>-> any</samp>
+|fuse13 = Export performance data for external analysis
+
+|fname14 = <nowiki>dashboard.instrumentModule(&nbsp;module, moduleName&nbsp;)</nowiki>
+|ftype14 = <samp>-> any</samp>
+|fuse14 = Initialize performance monitoring for a module
+
+|fname15 = <nowiki>dashboard.getConfig()</nowiki>
+|ftype15 = <samp>-> any</samp>
+|fuse15 = Get dashboard configuration
+
+|fname16 = <nowiki>dashboard.updateConfig(&nbsp;newConfig&nbsp;)</nowiki>
+|ftype16 = <samp>-> any</samp>
+|fuse16 = Update dashboard configuration
+
+}}

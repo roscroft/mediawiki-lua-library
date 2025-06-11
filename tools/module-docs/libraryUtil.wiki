@@ -1,0 +1,24 @@
+{{Documentation}}
+|name = libraryUtil
+
+|fname1 = <nowiki>libraryUtil.checkType(&nbsp;name, argIdx, arg, expectType, nilOk&nbsp;)</nowiki>
+|ftype1 = <samp>-> any</samp>
+|fuse1 = No description available.
+
+|fname2 = <nowiki>libraryUtil.checkTypeMulti(&nbsp;name, argIdx, arg, ...&nbsp;)</nowiki>
+|ftype2 = <samp>-> any</samp>
+|fuse2 = No description available.
+
+|fname3 = <nowiki>libraryUtil.checkTypeForIndex(&nbsp;index, value, expectType, nilOk&nbsp;)</nowiki>
+|ftype3 = <samp>-> any</samp>
+|fuse3 = No description available.
+
+|fname4 = <nowiki>libraryUtil.checkTypeForNamedArg(&nbsp;name, argName, arg, expectType, nilOk&nbsp;)</nowiki>
+|ftype4 = <samp>-> any</samp>
+|fuse4 = No description available.
+
+|fname5 = <nowiki>libraryUtil.checkSelf(&nbsp;self, name&nbsp;)</nowiki>
+|ftype5 = <samp>-> any</samp>
+|fuse5 = No description available.
+
+}}

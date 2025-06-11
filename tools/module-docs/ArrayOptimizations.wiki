@@ -1,0 +1,36 @@
+{{Documentation}}
+|name = ArrayOptimizations
+
+|fname1 = <nowiki>len(&nbsp;arr&nbsp;)</nowiki>
+|ftype1 = <samp>-> any</samp>
+|fuse1 = ```
+
+|fname2 = <nowiki>ArrayOpt.clearCache()</nowiki>
+|ftype2 = <samp>-> any</samp>
+|fuse2 = Clear the memoization cache
+
+|fname3 = <nowiki>memoize(&nbsp;fn, keyGenerator&nbsp;)</nowiki>
+|ftype3 = <samp>-> any</samp>
+|fuse3 = Memoize a function with array-aware key generation
+
+|fname4 = <nowiki>ArrayOpt.benchmark(&nbsp;operation, iterations, warmup&nbsp;)</nowiki>
+|ftype4 = <samp>-> any</samp>
+|fuse4 = Benchmark utility for measuring array operation performance
+
+|fname5 = <nowiki>ArrayOpt.fast.map(&nbsp;arr, fn, useMemo&nbsp;)</nowiki>
+|ftype5 = <samp>-> any</samp>
+|fuse5 = Fast map operation with optional memoization for pure functions
+
+|fname6 = <nowiki>ArrayOpt.fast.filter(&nbsp;arr, fn&nbsp;)</nowiki>
+|ftype6 = <samp>-> any</samp>
+|fuse6 = Fast filter with optimized predicate caching
+
+|fname7 = <nowiki>ArrayOpt.getMemoryInfo(&nbsp;arr&nbsp;)</nowiki>
+|ftype7 = <samp>-> any</samp>
+|fuse7 = Get memory usage statistics for an array
+
+|fname8 = <nowiki>sizeof(&nbsp;obj, visited&nbsp;)</nowiki>
+|ftype8 = <samp>-> any</samp>
+|fuse8 = Get memory usage statistics for an array
+
+}}

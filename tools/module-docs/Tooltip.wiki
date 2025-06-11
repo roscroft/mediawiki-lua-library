@@ -1,0 +1,20 @@
+{{Documentation}}
+|name = Tooltip
+
+|fname1 = <nowiki>p._div(&nbsp;args&nbsp;)</nowiki>
+|ftype1 = <samp>-> any</samp>
+|fuse1 = No description available.
+
+|fname2 = <nowiki>p._span(&nbsp;args&nbsp;)</nowiki>
+|ftype2 = <samp>-> any</samp>
+|fuse2 = No description available.
+
+|fname3 = <nowiki>p.div(&nbsp;frame&nbsp;)</nowiki>
+|ftype3 = <samp>-> any</samp>
+|fuse3 = No description available.
+
+|fname4 = <nowiki>p.span(&nbsp;frame&nbsp;)</nowiki>
+|ftype4 = <samp>-> any</samp>
+|fuse4 = No description available.
+
+}}

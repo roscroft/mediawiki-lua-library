@@ -37,7 +37,7 @@ local config = {
     },
     output = {
         format = "mediawiki",
-        extension = ".html"
+        extension = ".wiki"
     },
     processing = {
         memoization = true,
@@ -327,8 +327,8 @@ end)
 TemplateEngine.formatParameter = function(name, paramType, description)
     return string.format(
         "* '''%s''' (%s): %s",
-        name or "unknown", 
-        paramType or "any", 
+        name or "unknown",
+        paramType or "any",
         description or "No description"
     )
 end
@@ -361,7 +361,7 @@ TemplateEngine.createFunctionDoc = func.memoize(function(functionData)
                 param.description or "No description"
             )
         end, params)
-        
+
         for _, paramStr in ipairs(formattedParams) do
             table.insert(parts, paramStr)
         end
@@ -389,7 +389,7 @@ TemplateEngine.generateComplete = function(moduleData)
     -- Compose all parts
     local headerParts = { header, "", "|functions =", "" }
     local footerParts = { footer }
-    
+
     -- Manually combine arrays since func.append might return complex structures
     local allParts = {}
     for _, part in ipairs(headerParts) do
@@ -637,10 +637,10 @@ local demonstrateUltimateFunctionalMastery = function()
     }
 
     -- Simple functional data access using available Functools methods
-    local getModuleName = function(data) 
-        return data.module and data.module.name 
+    local getModuleName = function(data)
+        return data.module and data.module.name
     end
-    
+
     local setModuleName = function(newName, data)
         local newData = func.merge(data)
         if not newData.module then newData.module = {} end
@@ -678,7 +678,7 @@ local demonstrateUltimateFunctionalMastery = function()
         table.insert(first10Fib, val)
         val = fibSeq()
     end
-    
+
     print("   First 10 Fibonacci numbers:", table.concat(first10Fib, ", "))
 
     -- 6. Memoization Performance

@@ -1,0 +1,8 @@
+{{Documentation}}
+|name = StringUtil
+
+|fname1 = <nowiki>p.split(&nbsp;str, pattern, plain&nbsp;)</nowiki>
+|ftype1 = <samp>-> any</samp>
+|fuse1 = No description available.
+
+}}

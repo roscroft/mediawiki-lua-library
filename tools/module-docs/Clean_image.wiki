@@ -1,0 +1,12 @@
+{{Documentation}}
+|name = Clean_image
+
+|fname1 = <nowiki>p.main(&nbsp;frame&nbsp;)</nowiki>
+|ftype1 = <samp>-> any</samp>
+|fuse1 = No description available.
+
+|fname2 = <nowiki>p.clean(&nbsp;args&nbsp;)</nowiki>
+|ftype2 = <samp>-> any</samp>
+|fuse2 = No description available.
+
+}}

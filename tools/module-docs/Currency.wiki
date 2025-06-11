@@ -1,0 +1,28 @@
+{{Documentation}}
+|name = Currency
+
+|fname1 = <nowiki>amount(&nbsp;a, currencyType&nbsp;)</nowiki>
+|ftype1 = <samp>-> any</samp>
+|fuse1 = No description available.
+
+|fname2 = <nowiki>invokeAmount(&nbsp;a, currencyType&nbsp;)</nowiki>
+|ftype2 = <samp>-> any</samp>
+|fuse2 = No description available.
+
+|fname3 = <nowiki>makeInvokeFunction(&nbsp;currencyType&nbsp;)</nowiki>
+|ftype3 = <samp>-> any</samp>
+|fuse3 = No description available.
+
+|fname4 = <nowiki>p.nocoins(&nbsp;frame&nbsp;)</nowiki>
+|ftype4 = <samp>-> any</samp>
+|fuse4 = No description available.
+
+|fname5 = <nowiki>p._amount(&nbsp;a, currencyType&nbsp;)</nowiki>
+|ftype5 = <samp>-> any</samp>
+|fuse5 = No description available.
+
+|fname6 = <nowiki>p._coins(&nbsp;a&nbsp;)</nowiki>
+|ftype6 = <samp>-> any</samp>
+|fuse6 = No description available.
+
+}}

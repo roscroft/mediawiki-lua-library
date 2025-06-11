@@ -1,0 +1,144 @@
+{{Documentation}}
+|name = TableTools
+
+|fname1 = <nowiki>p.isPositiveInteger(&nbsp;num&nbsp;)</nowiki>
+|ftype1 = <samp>-> any</samp>
+|fuse1 = Check if a value is a positive integer
+
+|fname2 = <nowiki>p.isNan(&nbsp;num&nbsp;)</nowiki>
+|ftype2 = <samp>-> any</samp>
+|fuse2 = Check if a value is NaN (Not a Number)
+
+|fname3 = <nowiki>p.isArray(&nbsp;t&nbsp;)</nowiki>
+|ftype3 = <samp>-> any</samp>
+|fuse3 = Check if a table is a proper array (consecutive integer keys starting from 1)
+
+|fname4 = <nowiki>p.isEmpty(&nbsp;t&nbsp;)</nowiki>
+|ftype4 = <samp>-> any</samp>
+|fuse4 = Check if a table is empty
+
+|fname5 = <nowiki>p.length(&nbsp;t&nbsp;)</nowiki>
+|ftype5 = <samp>-> any</samp>
+|fuse5 = Get length of a sparse table (highest numeric index)
+
+|fname6 = <nowiki>p.size(&nbsp;t&nbsp;)</nowiki>
+|ftype6 = <samp>-> any</samp>
+|fuse6 = For arrays, use Array.len() instead for better performance
+
+|fname7 = <nowiki>p.shallowClone(&nbsp;t&nbsp;)</nowiki>
+|ftype7 = <samp>-> any</samp>
+|fuse7 = Create a shallow copy of a table
+
+|fname8 = <nowiki>_deepCopy(&nbsp;orig, includeMetatable, already_seen&nbsp;)</nowiki>
+|ftype8 = <samp>-> any</samp>
+|fuse8 = Internal recursive function for deep copying
+
+|fname9 = <nowiki>p.deepCopy(&nbsp;orig, noMetatable, already_seen&nbsp;)</nowiki>
+|ftype9 = <samp>-> any</samp>
+|fuse9 = Create a deep copy of a table with MediaWiki-specific metatable handling
+
+|fname10 = <nowiki>p.numKeys(&nbsp;t&nbsp;)</nowiki>
+|ftype10 = <samp>-> any</samp>
+|fuse10 = Get all positive integer keys from a table, sorted
+
+|fname11 = <nowiki>p.affixNums(&nbsp;t, prefix, suffix&nbsp;)</nowiki>
+|ftype11 = <samp>-> any</samp>
+|fuse11 = Extract numeric keys from string keys with given prefix/suffix pattern
+
+|fname12 = <nowiki>cleanPattern(&nbsp;s&nbsp;)</nowiki>
+|ftype12 = <samp>-> any</samp>
+|fuse12 = Extract numeric keys from string keys with given prefix/suffix pattern
+
+|fname13 = <nowiki>p.numData(&nbsp;t, compress&nbsp;)</nowiki>
+|ftype13 = <samp>-> any</samp>
+|fuse13 = Convert a table with numbered keys into a more structured format
+
+|fname14 = <nowiki>p.sparseConcat(&nbsp;t, sep, i, j&nbsp;)</nowiki>
+|ftype14 = <samp>-> any</samp>
+|fuse14 = Concatenate values from a sparse table (skipping nils)
+
+|fname15 = <nowiki>p.compressSparseArray(&nbsp;t&nbsp;)</nowiki>
+|ftype15 = <samp>-> any</samp>
+|fuse15 = Remove nil values from sparse array while preserving order
+
+|fname16 = <nowiki>p.sparseIpairs(&nbsp;t&nbsp;)</nowiki>
+|ftype16 = <samp>-> any</samp>
+|fuse16 = Iterator for sparse arrays (arrays with gaps)
+
+|fname17 = <nowiki>p.opairs(&nbsp;t&nbsp;)</nowiki>
+|ftype17 = <samp>-> any</samp>
+|fuse17 = Iterator for ordered pairs (keys sorted by type, then value)
+
+|fname18 = <nowiki>sortFunc(&nbsp;lhs, rhs&nbsp;)</nowiki>
+|ftype18 = <samp>-> any</samp>
+|fuse18 = No description available.
+
+|fname19 = <nowiki>p.spairs(&nbsp;t&nbsp;)</nowiki>
+|ftype19 = <samp>-> any</samp>
+|fuse19 = Iterator for string keys only
+
+|fname20 = <nowiki>iter(&nbsp;tbl, currentKey&nbsp;)</nowiki>
+|ftype20 = <samp>-> any</samp>
+|fuse20 = Iterator for string keys only
+
+|fname21 = <nowiki>p.ospairs(&nbsp;t&nbsp;)</nowiki>
+|ftype21 = <samp>-> any</samp>
+|fuse21 = Iterator for ordered string pairs (string keys only, sorted)
+
+|fname22 = <nowiki>defaultKeySort(&nbsp;item1, item2&nbsp;)</nowiki>
+|ftype22 = <samp>-> any</samp>
+|fuse22 = Default comparison function for sorting keys
+
+|fname23 = <nowiki>p.keysToList(&nbsp;t, keySort, checked&nbsp;)</nowiki>
+|ftype23 = <samp>-> any</samp>
+|fuse23 = Convert table keys to a sorted list
+
+|fname24 = <nowiki>p.sortedPairs(&nbsp;t, keySort&nbsp;)</nowiki>
+|ftype24 = <samp>-> any</samp>
+|fuse24 = Iterator that traverses table in sorted key order
+
+|fname25 = <nowiki>p.sortedPairsByValue(&nbsp;t, valueSort&nbsp;)</nowiki>
+|ftype25 = <samp>-> any</samp>
+|fuse25 = Iterator that traverses table sorted by values
+
+|fname26 = <nowiki>iterator(&nbsp;elements, i&nbsp;)</nowiki>
+|ftype26 = <samp>-> any</samp>
+|fuse26 = No description available.
+
+|fname27 = <nowiki>p.invert(&nbsp;array&nbsp;)</nowiki>
+|ftype27 = <samp>-> any</samp>
+|fuse27 = Create a reverse mapping from array values to their indices
+
+|fname28 = <nowiki>p.listToSet(&nbsp;t&nbsp;)</nowiki>
+|ftype28 = <samp>-> any</samp>
+|fuse28 = Convert an array to a set (values become keys with true values)
+
+|fname29 = <nowiki>p.first(&nbsp;t&nbsp;)</nowiki>
+|ftype29 = <samp>-> any</samp>
+|fuse29 = Get the first key-value pair from a table
+
+|fname30 = <nowiki>p.count(&nbsp;t, predicate&nbsp;)</nowiki>
+|ftype30 = <samp>-> any</samp>
+|fuse30 = Count elements that match a predicate function
+
+|fname31 = <nowiki>p.all(&nbsp;t, predicate&nbsp;)</nowiki>
+|ftype31 = <samp>-> any</samp>
+|fuse31 = Check if all elements in a table match a predicate
+
+|fname32 = <nowiki>p.any(&nbsp;t, predicate&nbsp;)</nowiki>
+|ftype32 = <samp>-> any</samp>
+|fuse32 = Check if any element in a table matches a predicate
+
+|fname33 = <nowiki>p.find(&nbsp;t, predicate&nbsp;)</nowiki>
+|ftype33 = <samp>-> any</samp>
+|fuse33 = Find the first element that matches a predicate
+
+|fname34 = <nowiki>p.keys(&nbsp;t&nbsp;)</nowiki>
+|ftype34 = <samp>-> any</samp>
+|fuse34 = Get all keys from a table
+
+|fname35 = <nowiki>p.values(&nbsp;t&nbsp;)</nowiki>
+|ftype35 = <samp>-> any</samp>
+|fuse35 = Get all values from a table
+
+}}
