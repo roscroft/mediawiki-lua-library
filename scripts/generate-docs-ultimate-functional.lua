@@ -399,10 +399,7 @@ TemplateEngine.createFunctionDoc = func.memoize_multi(function(functionData)
         table.insert(parts, "'''Parameters:'''")
 
         local formatParam = function(param)
-            return TemplateEngine.formatParameter
-                (param.name)
-                (param.paramType)
-                (param.description)
+            return TemplateEngine.formatParameter(param.name)(param.paramType)(param.description)
         end
 
         local formattedParams = func.map(formatParam, functionData.params)

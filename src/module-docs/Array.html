@@ -45,7 +45,7 @@
 |fuse8 = Check if <code>arr</code> contains any of the values in the table <code>t</code>.
 
 |fname9 = <nowiki>convolve(&nbsp;x, y&nbsp;)</nowiki>
-|ftype9 = <samp>generic: T: number</samp><br><samp>x: Array<T></samp><br><samp>y: Array<T></samp><br><samp>-> </samp>
+|ftype9 = <samp>T: number</samp><br><samp>x: Array<T></samp><br><samp>y: Array<T></samp><br><samp>-> </samp>
 |fuse9 = Convolute two number arrays.
 
 |fname10 = <nowiki>count(&nbsp;arr, check&nbsp;)</nowiki>
@@ -57,7 +57,7 @@
 ** <code>nil</code> -  Counts the number of non '''false''' elements.
 
 |fname11 = <nowiki>diff(&nbsp;arr, order&nbsp;)</nowiki>
-|ftype11 = <samp>generic: T: number</samp><br><samp>arr: Array<`T`></samp><br><samp>order: number?</samp><br><samp>-> </samp>
+|ftype11 = <samp>T: number</samp><br><samp>arr: Array<`T`></samp><br><samp>order: number?</samp><br><samp>-> </samp>
 |fuse11 = Differentiate the array
 
 |fname12 = <nowiki>each(&nbsp;arr, fn&nbsp;)</nowiki>
@@ -242,7 +242,7 @@ end)  -- {"1: 1", "2: 2", "3: 3", "4: 4", "5: 5"}
 </syntaxhighlight>
 
 |fname24 = <nowiki>max(&nbsp;arr&nbsp;)</nowiki>
-|ftype24 = <samp>generic: T: number # T needs to be in Eq or its Lua equivalent</samp><br><samp>arr: Array<`T`></samp><br><samp>-> integer i #</samp>
+|ftype24 = <samp>T: number # T needs to be in Eq or its Lua equivalent</samp><br><samp>arr: Array<`T`></samp><br><samp>-> integer i #</samp>
 |fuse24 = Find the largest value in the array.
 
 |fname25 = <nowiki>max_by(&nbsp;arr, fn&nbsp;)</nowiki>
@@ -250,7 +250,7 @@ end)  -- {"1: 1", "2: 2", "3: 3", "4: 4", "5: 5"}
 |fuse25 = Find the element for which <code>fn</code> returned the largest value.
 
 |fname26 = <nowiki>min(&nbsp;arr&nbsp;)</nowiki>
-|ftype26 = <samp>generic: T: number # T needs to be in Eq or its Lua equivalent</samp><br><samp>arr: Array<`T`></samp><br><samp>-> integer i #</samp>
+|ftype26 = <samp>T: number # T needs to be in Eq or its Lua equivalent</samp><br><samp>arr: Array<`T`></samp><br><samp>-> integer i #</samp>
 |fuse26 = Find the smallest value in the array.
 
 |fname27 = <nowiki>new(&nbsp;arr&nbsp;)</nowiki>
@@ -312,11 +312,11 @@ print( inc() ) -- 120
 </syntaxhighlight>
 
 |fname29 = <nowiki>promote(&nbsp;arr, attr&nbsp;)</nowiki>
-|ftype29 = <samp>generic: U: number {{!}} table {{!}} boolean {{!}} string {{!}} fun(elem: any, i?: integer): boolean</samp><br><samp>arr: Array<`T`></samp><br><samp>attr: `U`</samp><br><samp>-> </samp>
+|ftype29 = <samp>U: number {{!}} table {{!}} boolean {{!}} string {{!}} fun(elem: any, i?: integer): boolean</samp><br><samp>arr: Array<`T`></samp><br><samp>attr: `U`</samp><br><samp>-> </samp>
 |fuse29 = Returns a table created by promoting a key.
 
 |fname30 = <nowiki>range(&nbsp;start, stop, step&nbsp;)</nowiki>
-|ftype30 = <samp>generic: T: number</samp><br><samp>start: T</samp><br><samp>stop?: T</samp><br><samp>step?: T</samp><br><samp>-> </samp>
+|ftype30 = <samp>T: number</samp><br><samp>start: T</samp><br><samp>stop?: T</samp><br><samp>step?: T</samp><br><samp>-> </samp>
 |fuse30 = Returns a range of numbers.
 
 |fname31 = <nowiki>reduce(&nbsp;arr, fn, accumulator&nbsp;)</nowiki>
@@ -370,7 +370,7 @@ local x = arr.scan( t, function(elem, acc) return acc + elem end ) -- x = { 1, 3
 |fuse37 = Split <code>arr</code> into two arrays.
 
 |fname38 = <nowiki>sum(&nbsp;arr&nbsp;)</nowiki>
-|ftype38 = <samp>generic: T: number</samp><br><samp>arr: Array<T></samp><br><samp>-> number</samp>
+|ftype38 = <samp>T: number</samp><br><samp>arr: Array<T></samp><br><samp>-> number</samp>
 |fuse38 = Returns the sum of all elements of <code>arr</code>.
 
 |fname39 = <nowiki>take(&nbsp;arr, count, start&nbsp;)</nowiki>
