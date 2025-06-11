@@ -36,7 +36,7 @@ Relates to #(issue_number)
 
 ### Manual Testing
 - [ ] Local tests pass (`make test`)
-- [ ] Linting passes (`make lint`) 
+- [ ] Linting passes (`make lint`)
 - [ ] CI pipeline passes locally (`make ci-test`)
 - [ ] Performance testing (if applicable)
 
@@ -49,6 +49,7 @@ Relates to #(issue_number)
 ## 🔒 Security & Quality
 
 ### Security Checklist
+
 - [ ] No hardcoded secrets or credentials
 - [ ] Input validation implemented for new functions
 - [ ] Error handling follows CodeStandards.lua patterns
