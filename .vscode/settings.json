@@ -30,5 +30,11 @@
         "editor.tabSize": 4,
         "editor.detectIndentation": false,
         "editor.formatOnSave": true
-    }
+    },
+    "cSpell.words": [
+        "ftype",
+        "Funclib",
+        "Functools",
+        "samp"
+    ]
 }
