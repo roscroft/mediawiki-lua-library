@@ -76,12 +76,6 @@ analysis_output/
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# JetBrains IDEs
-.idea/
-*.iml
-*.iws
-*.ipr
-
 # Editor backup files
 *~
 \#*\#
@@ -104,31 +98,14 @@ Desktop.ini
 /coverage/
 /test-results/
 
-### Runtime and Cache ###
-# Node.js (if used)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Python (if used)
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-
 # Cache directories
 .cache/
 .npm/
 .yarn/
 
-### Temporary and Generated Files ###
-# Performance dashboard files in tmp
-/tmp/wiki-lua-dashboard.html
-wiki-lua-dashboard.html
-
 # Generated documentation
 docs/generated/
+src/module-docs/
 
 # Test outputs
 test-output/
