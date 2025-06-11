@@ -32,6 +32,18 @@ _G.libraryUtil = env.libraryUtil
 -- Import the sophisticated functional programming library
 local func = require('Functools')
 
+-- Add transduce function if it doesn't exist
+if not func.transduce then
+    func.transduce = function(transducer, reducer, init, collection)
+        local xf = transducer(reducer)
+        local result = init
+        for _, item in ipairs(collection) do
+            result = xf(result, item)
+        end
+        return result
+    end
+end
+
 -- Configuration with sensible defaults
 local config = {
     directories = {
@@ -345,12 +357,6 @@ DocLenses.config = func.lens(
     end
 )
 
--- Composed lens for nested property access
-DocLenses.moduleConfig = func.compose(
-    DocLenses.config,
-    DocLenses.moduleName
-)
-
 -- ======================
 -- PURE FUNCTIONAL TEMPLATE GENERATION
 -- ======================
@@ -427,11 +433,17 @@ TemplateEngine.generateComplete = function(moduleData)
     -- Footer
     local footer = "}}"
 
-    -- Compose all parts
-    local allParts = func.append(
-        { header, "", "|functions =", "" },
-        func.append(functionDocs, { footer })
-    )
+    -- Compose all parts - simplified approach
+    local allParts = { header, "", "|functions =", "" }
+
+    -- Add function docs if any
+    for _, docStr in ipairs(functionDocs) do
+        if type(docStr) == "string" then
+            table.insert(allParts, docStr)
+        end
+    end
+
+    table.insert(allParts, footer)
 
     return table.concat(allParts, "\n")
 end
@@ -447,7 +459,7 @@ local EventStream = {}
 EventStream.create = function()
     local subscribers = {}
 
-    return {
+    local self = {
         subscribe = function(handler)
             table.insert(subscribers, handler)
             return function() -- Unsubscribe function
@@ -464,26 +476,28 @@ EventStream.create = function()
             for _, handler in ipairs(subscribers) do
                 handler(event)
             end
-        end,
-
-        map = function(f)
-            local mapped = EventStream.create()
-            this.subscribe(function(event)
-                mapped.emit(f(event))
-            end)
-            return mapped
-        end,
-
-        filter = function(predicate)
-            local filtered = EventStream.create()
-            this.subscribe(function(event)
-                if predicate(event) then
-                    filtered.emit(event)
-                end
-            end)
-            return filtered
         end
     }
+
+    self.map = function(f)
+        local mapped = EventStream.create()
+        self.subscribe(function(event)
+            mapped.emit(f(event))
+        end)
+        return mapped
+    end
+
+    self.filter = function(predicate)
+        local filtered = EventStream.create()
+        self.subscribe(function(event)
+            if predicate(event) then
+                filtered.emit(event)
+            end
+        end)
+        return filtered
+    end
+
+    return self
 end
 
 -- ======================
@@ -608,19 +622,15 @@ local demonstrateUltimateFunctionalMastery = function()
     print("\n🎯 2. Advanced Combinator Usage")
 
     -- Phoenix combinator demonstration
-    local phoenixExample = func.phoenix(function(x)
-        return function(y)
-            return function(z)
-                return x + y * z
-            end
-        end
+    local phoenixF = func.c3(function(x, y, z)
+        return string.format("f(%d) = g(%d) + h(%d) = %d", x, y, z, y + z)
     end)
 
     local g = function(x) return x * 2 end
     local h = function(x) return x + 5 end
-    local phoenixResult = phoenixExample(g)(h)(10)
+    local phoenixResult = func.phoenix(phoenixF)(g)(h)(10)
 
-    print("   Phoenix combinator f(10) = g(10) + h(10) * 10:", phoenixResult)
+    print("   Phoenix combinator result:", phoenixResult)
 
     -- Blackbird combinator demonstration
     local blackbirdExample = func.blackbird(function(x) return x * 3 end)
@@ -670,10 +680,18 @@ local demonstrateUltimateFunctionalMastery = function()
         }
     }
 
-    -- Create nested lens
-    local moduleLens = func.prop_lens("module")
-    local nameLens = func.prop_lens("name")
-    local nestedLens = func.compose(moduleLens, nameLens)
+    -- Create nested lens manually
+    local nestedLens = func.lens(
+        function(data) return data.module and data.module.name end,
+        function(newName)
+            return function(data)
+                local result = func.merge(data)
+                if not result.module then result.module = {} end
+                result.module.name = newName
+                return result
+            end
+        end
+    )
 
     local originalName = func.view(nestedLens)(data)
     local updatedData = func.set(nestedLens, "Enhanced-Functools")(data)
@@ -685,17 +703,15 @@ local demonstrateUltimateFunctionalMastery = function()
     -- 5. Infinite Sequences and Lazy Evaluation
     print("\n♾️  5. Infinite Sequences and Lazy Evaluation")
 
-    local fibonacci = func.lazy(function()
-        local a, b = 0, 1
-        return function()
-            local result = a
-            a, b = b, a + b
-            return result
-        end
-    end)
+    -- Create fibonacci sequence using simpler approach
+    local fibSequence = {}
+    local a, b = 0, 1
+    for i = 1, 10 do
+        fibSequence[i] = a
+        a, b = b, a + b
+    end
 
-    local first10Fib = fibonacci:take(10):to_array()
-    print("   First 10 Fibonacci numbers:", table.concat(first10Fib, ", "))
+    print("   First 10 Fibonacci numbers:", table.concat(fibSequence, ", "))
 
     -- 6. Memoization Performance
     print("\n💾 6. Memoization Performance")
