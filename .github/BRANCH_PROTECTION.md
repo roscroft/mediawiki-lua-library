@@ -9,12 +9,14 @@ This document describes the branch protection rules that should be configured on
 Configure the following rules for the `main` branch in GitHub:
 
 #### 1. **Restrict pushes that create files**
+
 - ✅ Require pull request reviews before merging
 - ✅ Require review from code owners (when CODEOWNERS file exists)
 - ✅ Dismiss stale reviews when new commits are pushed
 - ✅ Require review from at least **2** reviewers for significant changes
 
 #### 2. **Require status checks to pass**
+
 - ✅ Require branches to be up to date before merging
 - ✅ Required status checks:
   - `Syntax Validation & Linting`
@@ -24,11 +26,13 @@ Configure the following rules for the `main` branch in GitHub:
   - `Security Quality Check`
 
 #### 3. **Enforce restrictions**
+
 - ✅ Restrict pushes to only administrators and repository maintainers
 - ✅ Allow force pushes by administrators only (for emergency fixes)
 - ✅ Allow deletions by administrators only
 
 #### 4. **Additional protections**
+
 - ✅ Require signed commits
 - ✅ Require linear history
 - ✅ Include administrators in restrictions
@@ -107,7 +111,7 @@ bypass_actors:
      - Required number of reviewers: 1
      - ✅ Dismiss stale reviews when new commits are pushed
      - ✅ Require review from code owners
-   
+
    - ✅ Require status checks to pass before merging
      - ✅ Require branches to be up to date before merging
      - Select required checks:
@@ -115,7 +119,7 @@ bypass_actors:
        - `Basic Execution Testing`
        - `Mocked Environment Testing`
        - `Scribunto Integration Testing`
-   
+
    - ✅ Require conversation resolution before merging
    - ✅ Require signed commits
    - ✅ Require linear history

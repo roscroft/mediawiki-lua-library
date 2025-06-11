@@ -2,7 +2,6 @@
 
 📚 **[Complete Documentation on Wiki →](https://github.com/roscroft/mediawiki-lua-library/wiki)**
 
-
 ## 🚀 Quick Start
 
 ### Prerequisites
