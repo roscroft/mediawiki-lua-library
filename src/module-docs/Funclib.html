@@ -4,18 +4,292 @@
     <title>Funclib Module Documentation</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
-        h1 { color: #333; }
-        .info { background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        h1 { color: #333; border-bottom: 2px solid #ccc; }
+        h2 { color: #666; margin-top: 30px; }
+        .function { margin: 20px 0; padding: 15px; background: #f9f9f9; border-left: 4px solid #4CAF50; }
+        .definition { font-family: monospace; background: #eee; padding: 10px; border-radius: 4px; }
+        .description { margin: 10px 0; }
     </style>
 </head>
 <body>
     <h1>Funclib Module</h1>
-    <div class="info">
-        <p><strong>Generated:</strong> Wed Jun 11 13:14:56 2025</p>
-        <p><strong>Source:</strong> ../../src/modules/Funclib.lua</p>
-        <p><strong>Style:</strong> refactored</p>
+    <div class="description">===================================== MediaWiki Funclib Module - Enhanced ===================================== Domain-specific functional programming library for MediaWiki table/column/query operations. This module provides high-level utilities for UI components, data transformation, and MediaWiki-specific functionality, building upon the core functional programming tools in Module:Functools. Features: - Domain-specific column and table builders - MediaWiki wikitext generation utilities - Validation systems for UI components - Template and parameter processing utilities - Integration with MediaWiki's semantic queries - Performance-optimized UI component builders Architecture: - funclib: Domain-specific, MediaWiki-focused utilities - functools: Pure functional programming utilities (imported) - Separation of concerns for maintainability and reusability Examples: ```lua local funclib = require('Module:Funclib') -- Column building local column = funclib.make_preset_column('LEVEL', { header = 'Name', field = 'name', align = 'left' }) -- Table generation with validation local table_config = { columns = {column}, data = {{name = 'Alice'}, {name = 'Bob'}} } local html = funclib.build_table(table_config) -- Template processing local params = funclib.process_template_params(frame.args, { required = {'title'}, optional = {'description', 'category'} }) ``` @module Funclib @version 2.0.0 @author MediaWiki Lua Team @since 2024 --</div>
+    <h2>Functions</h2>
+    <div class="function">
+        <h3>formatter</h3>
+        <div class="definition">formatter = function(is_members)</div>
+        <div class="description">=====================================
+MediaWiki Funclib Module - Enhanced
+=====================================
+
+Domain-specific functional programming library for MediaWiki table/column/query operations.
+This module provides high-level utilities for UI components, data transformation, and
+MediaWiki-specific functionality, building upon the core functional programming tools
+in Module:Functools.
+
+Features:
+- Domain-specific column and table builders
+- MediaWiki wikitext generation utilities
+- Validation systems for UI components
+- Template and parameter processing utilities
+- Integration with MediaWiki's semantic queries
+- Performance-optimized UI component builders
+
+Architecture:
+- funclib: Domain-specific, MediaWiki-focused utilities
+- functools: Pure functional programming utilities (imported)
+- Separation of concerns for maintainability and reusability
+
+Examples:
+```lua
+local funclib = require('Module:Funclib')
+
+-- Column building
+local column = funclib.make_preset_column('LEVEL', {
+    header = 'Name',
+    field = 'name',
+    align = 'left'
+})
+
+-- Table generation with validation
+local table_config = {
+    columns = {column},
+    data = {{name = 'Alice'}, {name = 'Bob'}}
+}
+local html = funclib.build_table(table_config)
+
+-- Template processing
+local params = funclib.process_template_params(frame.args, {
+    required = {'title'},
+    optional = {'description', 'category'}
+})
+```
+
+@module Funclib
+@version 2.0.0
+@author MediaWiki Lua Team
+@since 2024
+--
+
+-- Table/Column/Query Specific Library
+--
+-- This module provides domain-specific functions for working with tables, columns, and queries.
+-- Pure functional programming utilities are in Module:Functools, which is imported here.
+-- funclib focuses on specific UI components and builders, while functools provides
+-- general-purpose functional programming tools.
+
+local funclib = {}
+
+-- Imports
+local libraryUtil = require('libraryUtil')
+local checkType = libraryUtil.checkType
+
+-- Import functional utilities from Functools
+local functools = require('Functools')
+-- Import Arguments for frame processing
+local arguments = require('Arguments')
+-- ======================
+-- TABLE/COLUMN VALIDATION - Domain Specific
+-- ======================
+
+-- Use functools for validation (delegate to pure functional validation)
+funclib.validate_value = functools.validation and functools.validation.validate_value or
+    function(value, rules) return true end
+funclib.validate_options = functools.validation and functools.validation.validate_options or
+    function(options, rules) return nil end
+funclib.default_value = functools.validation and functools.validation.default_value or
+    function(value, default) return value ~= nil and value or default end
+
+-- Standard validation rule sets
+funclib.VALIDATION_RULES = {
+    COLUMN = {
+        header = { type = 'string', required = true },
+        field = { type = 'string', required = true },
+        align = { type = 'string', required = false },
+        colspan = { type = 'number', required = false },
+        formatter = { type = 'function', required = false },
+        tooltip = { type = 'string', required = false },
+        sortable = { type = 'boolean', required = false }
+    }
+}
+
+function funclib.validate_column(column, index)
+    -- Column must be a table
+    local valid_table = funclib.validate_value(column, { type = 'table', required = true })
+    if valid_table ~= true then
+        return false, string.format("Column %s must be a table", index or "")
+    end
+
+    -- Validate required and optional fields
+    local valid_fields = funclib.validate_options(column, funclib.VALIDATION_RULES.COLUMN)
+    if valid_fields then
+        return false, string.format("Column %s: %s", index or "", valid_fields)
+    end
+
+    return true
+end
+
+function funclib.validate_columns(columns)
+    for i, col in ipairs(columns) do
+        local valid, err = funclib.validate_column(col, i)
+        if not valid then
+            return false, err
+        end
+    end
+    return true
+end
+
+-- ======================
+-- SAFE FUNCTION UTILITIES - Delegate to functools
+-- ======================
+
+funclib.safe_call = functools.safe_call
+funclib.maybe_call = functools.maybe_call
+funclib.chain_safe = functools.chain_safe
+
+-- ======================
+-- TABLE-SPECIFIC ROW MAPPING
+-- ======================
+
+function funclib.make_row_mapper(field_alignments)
+    return function(t, entry)
+        t:tr()
+        for field, align in pairs(field_alignments) do
+            t:td(entry[field] or "")
+                :addClass("align-" .. align)
+                :naIf(not entry[field])
+        end
+        return t
+    end
+end
+
+-- ======================
+-- FORMATTING HELPERS - Direct Access
+-- ======================
+
+function funclib.tooltip(text, tooltip, format_str)
+    -- Use functools validation for content checking
+    if not funclib.default_value(tooltip, nil) then
+        return text
+    end
+
+    format_str = format_str or '<span class="Tooltip-noedit" title="%s">%s</span>'
+    return string.format(format_str, tooltip, text)
+end
+
+function funclib.icon(config, value)
+    if not config[value] then return "" end
+    local icon = config[value]
+    return string.format(
+        '<img alt="%s" src="%s" width="%s" class="image" />',
+        icon.link or "",
+        icon.file or "",
+        icon.width or "30"
+    )
+end
+
+-- String formatting helpers that use functional validation
+function funclib.format_name(name)
+    -- Use functools validation instead of direct paramtest
+    if not funclib.default_value(name, nil) then
+        return ""
+    end
+
+    -- Use functional composition for string transformation
+    if functools.pipe then
+        return functools.pipe(
+            funclib.default_value,
+            function(str) return str:sub(1, 1):upper() .. str:sub(2) end
+        )(name)
+    else
+        -- Fallback implementation
+        local cleaned = funclib.default_value(name, "")
+        return cleaned ~= "" and (cleaned:sub(1, 1):upper() .. cleaned:sub(2)) or ""
+    end
+end
+
+-- String manipulation utilities
+function funclib.trim(text)
+    if type(text) ~= 'string' then
+        return text
+    end
+    return text:gsub("^%s*(.-)%s*$", "%1")
+end
+
+-- Table manipulation utilities
+function funclib.keys(table)
+    checkType('funclib.keys', 1, table, 'table')
+
+    local keys = {}
+    local index = 1
+    for key, _ in pairs(table) do
+        keys[index] = key
+        index = index + 1
+    end
+    return keys
+end
+
+-- ======================
+-- CONSTANTS - Direct Access
+-- ======================
+
+funclib.DEFAULTS = {
+    LIMIT = 10000,
+    ALIGN = "left",
+    IMAGE_SIZE = "30px"
+}
+
+funclib.FORMAT = {
+    HTML = {
+        ERROR = '<div class="error">%s</div>',
+        TOOLTIP = '<span class="Tooltip-noedit" title="%s">%s</span>'
+    },
+    TABLE = {
+        CLASS = {
+            BASE = "wikitable",
+            SORTABLE = "sortable",
+            ALIGN = "align-%s-%d"
+        }
+    }
+}
+
+funclib.SMW_FORMAT = {
+    CATEGORY = '[[Category:%s',
+    FIELD = "?%s=JSON",
+    MAINLINE = "mainline=-",
+    LIMIT = "limit=%d"
+}
+
+funclib.ICONS = {
+    MEMBERS = {
+        [false] = {
+            file = 'F2P icon.png',
+            width = '30',
+            link = 'Free-to-play'
+        },
+        [true] = {
+            file = 'P2P icon.png',
+            width = '30',
+            link = 'Members'
+        }
+    }
+}
+
+-- ======================
+-- COLUMN CONFIGURATION - Direct Access
+-- ======================
+
+funclib.COLUMN_PRESETS = {
+    LEVEL = {
+        header = "Level",
+        align = "center",
+        field = "level"
+    },
+    MEMBERS = {
+        header = "Members",
+        align = "center",
+        field = "members",</div>
     </div>
-    <p>This documentation was generated by the unified documentation generator.</p>
-    <p>For detailed API documentation, please refer to the source code comments.</p>
+
 </body>
 </html>
