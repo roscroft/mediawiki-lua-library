@@ -1,0 +1,45 @@
+# MediaWiki Lua Library Code Owners
+#
+# This file defines who gets automatically requested for review
+# when pull requests modify specific files or directories.
+#
+# Learn more: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+# These owners will be requested for review unless a later match takes precedence
+* @roscroft
+
+# Source code requires core maintainer review
+/src/ @roscroft
+/src/modules/ @roscroft
+
+# Testing infrastructure
+/tests/ @roscroft
+
+# Build and deployment configuration
+/build/ @roscroft
+/scripts/ @roscroft
+/Makefile @roscroft
+/package.json @roscroft
+
+# GitHub Actions and CI/CD pipeline
+/.github/ @roscroft
+/.github/workflows/ @roscroft
+
+# Documentation and project management
+/README.md @roscroft
+/CONTRIBUTING.md @roscroft
+/LICENSE @roscroft
+
+# Configuration files
+/.env.template @roscroft
+/LocalSettings.php @roscroft
+/.luarc.json @roscroft
+/.gitignore @roscroft
+
+# Docker and container configuration
+/docker/ @roscroft
+/config/ @roscroft
+
+# VS Code workspace configuration
+/.vscode/ @roscroft

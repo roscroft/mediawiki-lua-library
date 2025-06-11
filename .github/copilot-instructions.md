@@ -36,3 +36,11 @@
 - Use `src/modules/` for all code changes and fixes
 - `build/modules/` is automatically generated via symlinks for MediaWiki compatibility
 - Do not apply CodeStandards.lua integrations unless specifically requested 
+
+## Git Practices
+- **ALWAYS** use 'main' to refer to the main/master/primary/trunk branch. **NEVER** use 'master'.
+- **ALWAYS create a new branch for each feature or bugfix**
+- **NEVER commit directly to the main branch**
+- When feature development is complete, merge the feature branch with a pull request and delete the feature branch if and only if it has been successfully merged
+- Use descriptive commit messages
+- Keep commits small and focused

@@ -1,0 +1,94 @@
+name: Setup Branch Protection
+
+# This workflow sets up branch protection rules for the main branch
+# It runs manually or when repository settings need to be updated
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply_protection:
+        description: 'Apply branch protection rules'
+        required: true
+        default: 'true'
+        type: boolean
+
+permissions:
+  contents: read
+  administration: write
+
+jobs:
+  setup-branch-protection:
+    name: Configure Main Branch Protection
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event.inputs.apply_protection == 'true'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup GitHub CLI
+      run: |
+        # GitHub CLI is pre-installed on GitHub Actions runners
+        gh --version
+        
+    - name: Apply Branch Protection Rules
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "🛡️ Setting up branch protection for main branch..."
+        
+        # Note: This requires admin permissions which may not be available
+        # in standard GitHub Actions. Consider running this manually or
+        # with a personal access token with admin permissions.
+        
+        gh api repos/${{ github.repository }}/branches/main/protection \
+          --method PUT \
+          --field required_status_checks='{
+            "strict": true,
+            "contexts": [
+              "Syntax Validation & Linting",
+              "Basic Execution Testing", 
+              "Mocked Environment Testing",
+              "Scribunto Integration Testing"
+            ]
+          }' \
+          --field enforce_admins=true \
+          --field required_pull_request_reviews='{
+            "dismiss_stale_reviews": true,
+            "require_code_owner_reviews": true,
+            "required_approving_review_count": 1,
+            "require_last_push_approval": false
+          }' \
+          --field restrictions='{"users":[],"teams":[],"apps":[]}' \
+          --field allow_force_pushes=false \
+          --field allow_deletions=false \
+        && echo "✅ Branch protection rules applied successfully!" \
+        || echo "❌ Failed to apply rules. May require manual setup with admin permissions."
+
+    - name: Verify Protection Rules
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "📋 Current branch protection status:"
+        gh api repos/${{ github.repository }}/branches/main/protection \
+          --jq '.required_status_checks.contexts[]' \
+        && echo "✅ Protection rules verified" \
+        || echo "ℹ️ Protection rules not yet active"
+
+    - name: Setup Instructions
+      run: |
+        echo "📚 Branch Protection Setup Complete!"
+        echo ""
+        echo "If automatic setup failed, please manually configure:"
+        echo "1. Go to: https://github.com/${{ github.repository }}/settings/branches"
+        echo "2. Add rule for 'main' branch"
+        echo "3. Enable required status checks:"
+        echo "   - Syntax Validation & Linting"
+        echo "   - Basic Execution Testing"
+        echo "   - Mocked Environment Testing" 
+        echo "   - Scribunto Integration Testing"
+        echo "4. Require pull request reviews (1 reviewer)"
+        echo "5. Enable 'Dismiss stale reviews'"
+        echo "6. Enable 'Require review from code owners'"
+        echo ""
+        echo "📖 Full documentation: .github/BRANCH_PROTECTION.md"
