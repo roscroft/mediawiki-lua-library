@@ -83,17 +83,13 @@ jobs:
         
     - name: Generate documentation (${{ matrix.generator }})
       run: |
-        cd scripts
         if [ "${{ github.event.inputs.module_name }}" != "" ]; then
-          lua generate-docs-${{ matrix.generator }}.lua "${{ github.event.inputs.module_name }}"
+          lua scripts/generate-docs-unified.lua --style=${{ matrix.generator }} "${{ github.event.inputs.module_name }}"
         elif [ "${{ needs.detect-changes.outputs.force-all }}" = "true" ]; then
-          lua generate-docs-${{ matrix.generator }}.lua
+          lua scripts/generate-docs-unified.lua --style=${{ matrix.generator }} --all
         else
-          # Generate docs for changed modules
-          for module in $(echo '${{ needs.detect-changes.outputs.modules-changed }}' | jq -r '.[]'); do
-            echo "Generating docs for: $module"
-            lua generate-docs-${{ matrix.generator }}.lua "$module"
-          done
+          # Generate docs for all modules using unified generator
+          lua scripts/generate-docs-unified.lua --style=${{ matrix.generator }} --all
         fi
         
     - name: Upload generated docs

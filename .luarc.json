@@ -21,11 +21,31 @@
         "globals": [
             "mw",
             "require",
-            "unpack"
+            "unpack",
+            "type",
+            "select"
         ],
         "disable": [
             "undefined-doc-name"
-        ]
+        ],
+        "neededFileStatus": {
+            "codestyle-check": "Any"
+        }
+    },
+    "completion": {
+        "callSnippet": "Both"
+    },
+    "hint": {
+        "enable": true,
+        "paramType": true
+    },
+    "typeFormat": {
+        "config": {
+            "format_line": "on"
+        }
+    },
+    "hover": {
+        "expandAlias": true
     },
     "type": {
         "castNumberToInteger": false

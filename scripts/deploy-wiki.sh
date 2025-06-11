@@ -46,6 +46,18 @@ cp "$WIKI_CONTENT_DIR"/*.md "$TEMP_DIR"/
 
 # Deploy to GitHub
 cd "$TEMP_DIR"
+
+# Detect and switch to the correct default branch
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+CURRENT_BRANCH=$(git branch --show-current)
+echo "📋 Wiki repository default branch: $DEFAULT_BRANCH"
+echo "📋 Current branch: $CURRENT_BRANCH"
+
+if [ "$CURRENT_BRANCH" != "$DEFAULT_BRANCH" ]; then
+    echo "🔄 Switching to default branch: $DEFAULT_BRANCH"
+    git checkout "$DEFAULT_BRANCH"
+fi
+
 echo "📝 Staging changes..."
 git add .
 
@@ -66,7 +78,19 @@ else
 Auto-generated from repository documentation."
 
     echo "🚀 Pushing to GitHub Wiki..."
-    if git push origin main; then
+    
+    # Detect the default branch (master or main)
+    DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+    echo "📋 Detected default branch: $DEFAULT_BRANCH"
+    
+    # If we're on a different branch, switch to the default branch
+    CURRENT_BRANCH=$(git branch --show-current)
+    if [ "$CURRENT_BRANCH" != "$DEFAULT_BRANCH" ]; then
+        echo "🔄 Switching from $CURRENT_BRANCH to $DEFAULT_BRANCH"
+        git checkout "$DEFAULT_BRANCH"
+    fi
+    
+    if git push origin "$DEFAULT_BRANCH"; then
         echo "✅ Wiki deployment successful!"
         echo "🌐 View at: https://github.com/roscroft/mediawiki-lua-library/wiki"
     else

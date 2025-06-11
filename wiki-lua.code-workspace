@@ -1,0 +1,36 @@
+{
+    "folders": [
+        {
+            "name": "MediaWiki Lua Library",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "*.lua": "lua",
+            "*.luarc.json": "jsonc"
+        },
+        "search.exclude": {
+            "**/build/**": true,
+            "**/node_modules/**": true,
+            "**/.git/**": true
+        },
+        "files.watcherExclude": {
+            "**/build/**": true,
+            "**/node_modules/**": true
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "sumneko.lua",
+            "github.copilot",
+            "davidanson.vscode-markdownlint"
+        ]
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "options": {
+            "cwd": "${workspaceFolder}"
+        }
+    }
+}
