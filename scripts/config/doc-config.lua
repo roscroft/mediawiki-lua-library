@@ -6,8 +6,8 @@ Centralized configuration settings for the documentation generator.
 local DocConfig = {
     -- Directory paths
     directories = {
-        source = "src/modules",
-        docs = "src/module-docs"
+        source = "../src/modules",
+        docs = "../src/module-docs"
     },
 
     -- Function parsing settings
