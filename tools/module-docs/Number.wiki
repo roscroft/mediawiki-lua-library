@@ -1,20 +1,20 @@
 {{Documentation}}
+{{Helper module
 |name = Number
 
-|fname1 = <nowiki>p._round(&nbsp;num, dp&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
+|fname1 = <nowiki>_round(&nbsp;num, dp&nbsp;)</nowiki>
+|ftype1 = <samp>num: any</samp><br><samp>dp: any</samp><br><samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>p.round(&nbsp;frame&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
+|fname2 = <nowiki>_short(&nbsp;str&nbsp;)</nowiki>
+|ftype2 = <samp>str: any</samp><br><samp>-> any</samp>
 |fuse2 = No description available.
 
-|fname3 = <nowiki>p._short(&nbsp;str&nbsp;)</nowiki>
-|ftype3 = <samp>-> any</samp>
+|fname3 = <nowiki>round(&nbsp;frame&nbsp;)</nowiki>
+|ftype3 = <samp>frame: any</samp><br><samp>-> any</samp>
 |fuse3 = No description available.
 
-|fname4 = <nowiki>p.short(&nbsp;frame&nbsp;)</nowiki>
-|ftype4 = <samp>-> any</samp>
+|fname4 = <nowiki>short(&nbsp;frame&nbsp;)</nowiki>
+|ftype4 = <samp>frame: any</samp><br><samp>-> any</samp>
 |fuse4 = No description available.
-
 }}

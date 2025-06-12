@@ -1,28 +1,24 @@
 {{Documentation}}
+{{Helper module
 |name = MediaWikiEnvironment
 
-|fname1 = <nowiki>isRealMediaWiki()</nowiki>
+|fname1 = <nowiki>ensureLoaded(&nbsp;&nbsp;)</nowiki>
 |ftype1 = <samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>isContainerAccessible()</nowiki>
+|fname2 = <nowiki>getInfo(&nbsp;&nbsp;)</nowiki>
 |ftype2 = <samp>-> any</samp>
 |fuse2 = No description available.
 
-|fname3 = <nowiki>MediaWikiEnvironment.initialize()</nowiki>
+|fname3 = <nowiki>initialize(&nbsp;&nbsp;)</nowiki>
 |ftype3 = <samp>-> any</samp>
 |fuse3 = No description available.
 
-|fname4 = <nowiki>execute(&nbsp;luaCode&nbsp;)</nowiki>
+|fname4 = <nowiki>isContainerAccessible(&nbsp;&nbsp;)</nowiki>
 |ftype4 = <samp>-> any</samp>
 |fuse4 = No description available.
 
-|fname5 = <nowiki>MediaWikiEnvironment.ensureLoaded()</nowiki>
+|fname5 = <nowiki>isRealMediaWiki(&nbsp;&nbsp;)</nowiki>
 |ftype5 = <samp>-> any</samp>
 |fuse5 = No description available.
-
-|fname6 = <nowiki>MediaWikiEnvironment.getInfo()</nowiki>
-|ftype6 = <samp>-> any</samp>
-|fuse6 = No description available.
-
 }}

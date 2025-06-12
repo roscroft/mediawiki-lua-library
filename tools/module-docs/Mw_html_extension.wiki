@@ -1,28 +1,12 @@
 {{Documentation}}
+{{Helper module
 |name = Mw_html_extension
 
-|fname1 = <nowiki>addValues(&nbsp;self, settings&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
+|fname1 = <nowiki>addFunction(&nbsp;func, name&nbsp;)</nowiki>
+|ftype1 = <samp>func: any</samp><br><samp>name: any</samp><br><samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>p.addFunction(&nbsp;func, name&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
+|fname2 = <nowiki>addValues(&nbsp;self, settings&nbsp;)</nowiki>
+|ftype2 = <samp>self: any</samp><br><samp>settings: any</samp><br><samp>-> any</samp>
 |fuse2 = No description available.
-
-|fname3 = <nowiki>__index(&nbsp;self&nbsp;)</nowiki>
-|ftype3 = <samp>-> any</samp>
-|fuse3 = No description available.
-
-|fname4 = <nowiki>__call(&nbsp;self&nbsp;)</nowiki>
-|ftype4 = <samp>-> any</samp>
-|fuse4 = No description available.
-
-|fname5 = <nowiki>__tostring()</nowiki>
-|ftype5 = <samp>-> any</samp>
-|fuse5 = No description available.
-
-|fname6 = <nowiki>__concat()</nowiki>
-|ftype6 = <samp>-> any</samp>
-|fuse6 = No description available.
-
 }}

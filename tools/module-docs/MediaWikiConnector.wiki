@@ -1,48 +1,24 @@
 {{Documentation}}
+{{Helper module
 |name = MediaWikiConnector
 
 |fname1 = <nowiki>executeInMediaWiki(&nbsp;luaCode&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
+|ftype1 = <samp>luaCode: any</samp><br><samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>MediaWikiConnector.getMW()</nowiki>
+|fname2 = <nowiki>getLibraryUtil(&nbsp;&nbsp;)</nowiki>
 |ftype2 = <samp>-> any</samp>
 |fuse2 = No description available.
 
-|fname3 = <nowiki>create(&nbsp;tag&nbsp;)</nowiki>
+|fname3 = <nowiki>getMW(&nbsp;&nbsp;)</nowiki>
 |ftype3 = <samp>-> any</samp>
 |fuse3 = No description available.
 
-|fname4 = <nowiki>split(&nbsp;text, sep, plain&nbsp;)</nowiki>
+|fname4 = <nowiki>initializeEnvironment(&nbsp;&nbsp;)</nowiki>
 |ftype4 = <samp>-> any</samp>
 |fuse4 = No description available.
 
-|fname5 = <nowiki>trim(&nbsp;text&nbsp;)</nowiki>
+|fname5 = <nowiki>testConnection(&nbsp;&nbsp;)</nowiki>
 |ftype5 = <samp>-> any</samp>
 |fuse5 = No description available.
-
-|fname6 = <nowiki>log(&nbsp;...&nbsp;)</nowiki>
-|ftype6 = <samp>-> any</samp>
-|fuse6 = No description available.
-
-|fname7 = <nowiki>MediaWikiConnector.testConnection()</nowiki>
-|ftype7 = <samp>-> any</samp>
-|fuse7 = No description available.
-
-|fname8 = <nowiki>MediaWikiConnector.getLibraryUtil()</nowiki>
-|ftype8 = <samp>-> any</samp>
-|fuse8 = No description available.
-
-|fname9 = <nowiki>checkType(&nbsp;name, argIdx, arg, expectType, nilOk&nbsp;)</nowiki>
-|ftype9 = <samp>-> any</samp>
-|fuse9 = No description available.
-
-|fname10 = <nowiki>checkTypeMulti(&nbsp;name, argIdx, arg, ...&nbsp;)</nowiki>
-|ftype10 = <samp>-> any</samp>
-|fuse10 = No description available.
-
-|fname11 = <nowiki>MediaWikiConnector.initializeEnvironment()</nowiki>
-|ftype11 = <samp>-> any</samp>
-|fuse11 = No description available.
-
 }}

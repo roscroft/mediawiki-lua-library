@@ -1,264 +1,460 @@
 {{Documentation}}
+{{Helper module
 |name = Array
 
-|fname1 = <nowiki>__call(&nbsp;_, arr&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
-|fuse1 = No description available.
-
-|fname2 = <nowiki>Array.len(&nbsp;arr&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
-|fuse2 = ```
-
-|fname3 = <nowiki>Array.__concat(&nbsp;lhs, rhs&nbsp;)</nowiki>
-|ftype3 = <samp>-> any</samp>
-|fuse3 = No description available.
-
-|fname4 = <nowiki>Array.__unm(&nbsp;arr&nbsp;)</nowiki>
-|ftype4 = <samp>-> any</samp>
-|fuse4 = No description available.
-
-|fname5 = <nowiki>mathTemplate(&nbsp;lhs, rhs, funName, opName, fun&nbsp;)</nowiki>
-|ftype5 = <samp>-> any</samp>
-|fuse5 = No description available.
-
-|fname6 = <nowiki>Array.__add(&nbsp;lhs, rhs&nbsp;)</nowiki>
-|ftype6 = <samp>-> any</samp>
-|fuse6 = No description available.
-
-|fname7 = <nowiki>Array.__sub(&nbsp;lhs, rhs&nbsp;)</nowiki>
-|ftype7 = <samp>-> any</samp>
-|fuse7 = No description available.
-
-|fname8 = <nowiki>Array.__mul(&nbsp;lhs, rhs&nbsp;)</nowiki>
-|ftype8 = <samp>-> any</samp>
-|fuse8 = No description available.
-
-|fname9 = <nowiki>Array.__div(&nbsp;lhs, rhs&nbsp;)</nowiki>
-|ftype9 = <samp>-> any</samp>
-|fuse9 = No description available.
-
-|fname10 = <nowiki>Array.__pow(&nbsp;lhs, rhs&nbsp;)</nowiki>
-|ftype10 = <samp>-> any</samp>
-|fuse10 = No description available.
-
-|fname11 = <nowiki>Array.__eq(&nbsp;lhs, rhs&nbsp;)</nowiki>
-|ftype11 = <samp>-> any</samp>
-|fuse11 = No description available.
-
-|fname12 = <nowiki>Array.all(&nbsp;arr, check&nbsp;)</nowiki>
-|ftype12 = <samp>-> any</samp>
-|fuse12 = * `nil` - Checks that the array doesn't contain any '''false''' elements.
-
-|fname13 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
-|ftype13 = <samp>-> any</samp>
-|fuse13 = * `nil` - Checks that the array doesn't contain any '''false''' elements.
-
-|fname14 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
-|ftype14 = <samp>-> any</samp>
-|fuse14 = No description available.
-
-|fname15 = <nowiki>Array.any(&nbsp;arr, check&nbsp;)</nowiki>
-|ftype15 = <samp>-> any</samp>
-|fuse15 = * `nil` - Checks that the array contains at least one non '''false''' element.
-
-|fname16 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
-|ftype16 = <samp>-> any</samp>
-|fuse16 = * `nil` - Checks that the array contains at least one non '''false''' element.
-
-|fname17 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
-|ftype17 = <samp>-> any</samp>
-|fuse17 = No description available.
-
-|fname18 = <nowiki>Array.clean(&nbsp;arr&nbsp;)</nowiki>
-|ftype18 = <samp>-> any</samp>
-|fuse18 = Recursively removes all metatables.
-
-|fname19 = <nowiki>Array.clone(&nbsp;arr, deep&nbsp;)</nowiki>
-|ftype19 = <samp>-> any</samp>
-|fuse19 = Make a copy of the input table. Preserves metatables.
-
-|fname20 = <nowiki>Array.contains(&nbsp;arr, val&nbsp;)</nowiki>
-|ftype20 = <samp>-> any</samp>
-|fuse20 = Check if `arr` contains `val`.
-
-|fname21 = <nowiki>Array.containsAny(&nbsp;arr, t&nbsp;)</nowiki>
-|ftype21 = <samp>-> any</samp>
-|fuse21 = Check if `arr` contains any of the values in the table `t`.
-
-|fname22 = <nowiki>Array.containsAll(&nbsp;arr, t&nbsp;)</nowiki>
-|ftype22 = <samp>-> any</samp>
-|fuse22 = Check if `arr` contains all values in the table `t`.
-
-|fname23 = <nowiki>Array.convolve(&nbsp;x, y&nbsp;)</nowiki>
-|ftype23 = <samp>-> any</samp>
-|fuse23 = Convolute two number arrays.
-
-|fname24 = <nowiki>Array.condenseSparse(&nbsp;arr&nbsp;)</nowiki>
-|ftype24 = <samp>-> any</samp>
-|fuse24 = Remove '''nil''' values from `arr` while preserving order.
-
-|fname25 = <nowiki>Array.count(&nbsp;arr, check&nbsp;)</nowiki>
-|ftype25 = <samp>-> any</samp>
-|fuse25 = * `nil` -  Counts the number of non '''false''' elements.
-
-|fname26 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
-|ftype26 = <samp>-> any</samp>
-|fuse26 = * `nil` -  Counts the number of non '''false''' elements.
-
-|fname27 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
-|ftype27 = <samp>-> any</samp>
-|fuse27 = * `nil` -  Counts the number of non '''false''' elements.
-
-|fname28 = <nowiki>Array.diff(&nbsp;arr, order&nbsp;)</nowiki>
-|ftype28 = <samp>-> any</samp>
-|fuse28 = Differentiate the array
-
-|fname29 = <nowiki>Array.each(&nbsp;arr, fn&nbsp;)</nowiki>
-|ftype29 = <samp>-> any</samp>
-|fuse29 = ```
-
-|fname30 = <nowiki>Array.filter(&nbsp;arr, fn&nbsp;)</nowiki>
-|ftype30 = <samp>-> any</samp>
-|fuse30 = ```
-
-|fname31 = <nowiki>Array.find(&nbsp;arr, check, default&nbsp;)</nowiki>
-|ftype31 = <samp>-> any</samp>
-|fuse31 = ```
-
-|fname32 = <nowiki>Array.find_index(&nbsp;arr, check, default&nbsp;)</nowiki>
-|ftype32 = <samp>-> any</samp>
-|fuse32 = * `fun(elem: T, i?: integer): boolean` - Predicate to search for (when '''true''') in `arr`.
-
-|fname33 = <nowiki>check(&nbsp;item&nbsp;)</nowiki>
-|ftype33 = <samp>-> any</samp>
-|fuse33 = No description available.
-
-|fname34 = <nowiki>Array.get(&nbsp;arr, indices&nbsp;)</nowiki>
-|ftype34 = <samp>-> any</samp>
-|fuse34 = Extracts a subset of `arr`.
-
-|fname35 = <nowiki>Array.int(&nbsp;arr, start, stop&nbsp;)</nowiki>
-|ftype35 = <samp>-> any</samp>
-|fuse35 = Integrates the array. Effectively does <math>\left\{\sum^{n}_{start}{arr[n]} \,\Bigg|\, n \in [start, stop]\right\}</math>.
-
-|fname36 = <nowiki>Array.intersect(&nbsp;left, right&nbsp;)</nowiki>
-|ftype36 = <samp>-> any</samp>
-|fuse36 = Returns an array with elements that are present in both arrays.
-
-|fname37 = <nowiki>Array.intersects(&nbsp;left, right&nbsp;)</nowiki>
-|ftype37 = <samp>-> any</samp>
-|fuse37 = Checks if the two arrays have at least one element in common.
-
-|fname38 = <nowiki>Array.insert(&nbsp;arr, val, index, unpackVal&nbsp;)</nowiki>
-|ftype38 = <samp>-> any</samp>
-|fuse38 = Inserts values into `arr`.
-
-|fname39 = <nowiki>Array.last(&nbsp;arr, offset&nbsp;)</nowiki>
-|ftype39 = <samp>-> any</samp>
-|fuse39 = Returns the last element of `arr`.
-
-|fname40 = <nowiki>Array.map(&nbsp;arr, fn&nbsp;)</nowiki>
-|ftype40 = <samp>-> any</samp>
-|fuse40 = ```
-
-|fname41 = <nowiki>Array.max_by(&nbsp;arr, fn&nbsp;)</nowiki>
-|ftype41 = <samp>-> any</samp>
-|fuse41 = Find the element for which `fn` returned the largest value.
-
-|fname42 = <nowiki>Array.max(&nbsp;arr&nbsp;)</nowiki>
-|ftype42 = <samp>-> any</samp>
-|fuse42 = Find the largest value in the array.
-
-|fname43 = <nowiki>Array.min(&nbsp;arr&nbsp;)</nowiki>
-|ftype43 = <samp>-> any</samp>
-|fuse43 = Find the smallest value in the array.
-
-|fname44 = <nowiki>Array.new(&nbsp;arr&nbsp;)</nowiki>
-|ftype44 = <samp>-> any</samp>
-|fuse44 = ```
-
-|fname45 = <nowiki>Array.newIncrementor(&nbsp;start, step&nbsp;)</nowiki>
-|ftype45 = <samp>-> any</samp>
-|fuse45 = ```
-
-|fname46 = <nowiki>__call()</nowiki>
-|ftype46 = <samp>-> any</samp>
-|fuse46 = No description available.
-
-|fname47 = <nowiki>__tostring()</nowiki>
-|ftype47 = <samp>-> any</samp>
-|fuse47 = No description available.
-
-|fname48 = <nowiki>__index()</nowiki>
-|ftype48 = <samp>-> any</samp>
-|fuse48 = No description available.
-
-|fname49 = <nowiki>__newindex(&nbsp;_, k, v&nbsp;)</nowiki>
-|ftype49 = <samp>-> any</samp>
-|fuse49 = No description available.
-
-|fname50 = <nowiki>__concat(&nbsp;x, y&nbsp;)</nowiki>
-|ftype50 = <samp>-> any</samp>
-|fuse50 = No description available.
-
-|fname51 = <nowiki>Array.promote(&nbsp;arr, attr&nbsp;)</nowiki>
-|ftype51 = <samp>-> any</samp>
-|fuse51 = Returns a table created by promoting a key.
-
-|fname52 = <nowiki>Array.range(&nbsp;start, stop, step&nbsp;)</nowiki>
-|ftype52 = <samp>-> any</samp>
-|fuse52 = Returns a range of numbers.
-
-|fname53 = <nowiki>Array.reduce(&nbsp;arr, fn, accumulator&nbsp;)</nowiki>
-|ftype53 = <samp>-> any</samp>
-|fuse53 = ```
-
-|fname54 = <nowiki>Array.reject(&nbsp;arr, check&nbsp;)</nowiki>
-|ftype54 = <samp>-> any</samp>
-|fuse54 = * `fun(elem: any, i?: integer): boolean` - Remove elements for which the functions returns '''true'''.
-
-|fname55 = <nowiki>rejectFn(&nbsp;elem&nbsp;)</nowiki>
-|ftype55 = <samp>-> any</samp>
-|fuse55 = No description available.
-
-|fname56 = <nowiki>Array.rep(&nbsp;val, n&nbsp;)</nowiki>
-|ftype56 = <samp>-> any</samp>
-|fuse56 = Returns an Array with `val` repeated `n` times.
-
-|fname57 = <nowiki>Array.scan(&nbsp;arr, fn, accumulator&nbsp;)</nowiki>
-|ftype57 = <samp>-> any</samp>
-|fuse57 = ```
-
-|fname58 = <nowiki>Array.set(&nbsp;arr, indices, values&nbsp;)</nowiki>
-|ftype58 = <samp>-> any</samp>
-|fuse58 = If only one value is given but multiple indices than that value is set for all those indices. If `values` is a table then it must of the same length as `indices`.
-
-|fname59 = <nowiki>Array.slice(&nbsp;arr, start, stop&nbsp;)</nowiki>
-|ftype59 = <samp>-> any</samp>
-|fuse59 = Extract a subtable from `arr`.
-
-|fname60 = <nowiki>Array.split(&nbsp;arr, index&nbsp;)</nowiki>
-|ftype60 = <samp>-> any</samp>
-|fuse60 = Split `arr` into two arrays.
-
-|fname61 = <nowiki>Array.sum(&nbsp;arr&nbsp;)</nowiki>
-|ftype61 = <samp>-> any</samp>
-|fuse61 = Returns the sum of all elements of `arr`.
-
-|fname62 = <nowiki>Array.take(&nbsp;arr, count, start&nbsp;)</nowiki>
-|ftype62 = <samp>-> any</samp>
-|fuse62 = Extract a subtable from `arr`.
-
-|fname63 = <nowiki>Array.take_every(&nbsp;arr, n, start, count&nbsp;)</nowiki>
-|ftype63 = <samp>-> any</samp>
-|fuse63 = ```
-
-|fname64 = <nowiki>Array.unique(&nbsp;arr, fn&nbsp;)</nowiki>
-|ftype64 = <samp>-> any</samp>
-|fuse64 = Return a new table with all duplicates removed.
-
-|fname65 = <nowiki>Array.zip(&nbsp;...&nbsp;)</nowiki>
-|ftype65 = <samp>-> any</samp>
-|fuse65 = ```
-
+|fname1 = <nowiki>all(&nbsp;arr, check&nbsp;)</nowiki>
+|ftype1 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>check: number {{!}} table {{!}} boolean {{!}} string {{!}} fun(elem: T, i?: integer): boolean {{!}} nil</samp><br><samp>-> boolean</samp>
+|fuse1 = Checks if every value in an array satisfies a predicate or matches a value.
+
+Behaviour depends on the value of <code>check</code>:
+* <code>number</code> {{!}} <code>table</code> {{!}} <code>boolean</code> {{!}} <code>string</code> - Checks that all elements in <code>arr</code> are equal to this value.
+* <code>fun(elem: any, i?: integer): boolean</code> - Returns '''true''' if <code>fun</code> returns '''true''' for every element.
+* <code>nil</code> - Checks that the array doesn't contain any '''false''' elements.
+
+|fname2 = <nowiki>any(&nbsp;arr, check&nbsp;)</nowiki>
+|ftype2 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>check: number {{!}} table {{!}} boolean {{!}} string {{!}} fun(elem: T, i?: integer): boolean {{!}} nil</samp><br><samp>-> boolean</samp>
+|fuse2 = Checks if at least one value in an array satisfies a predicate or matches a value.
+
+Behaviour depends on the value of <code>fn</code>:
+* <code>number</code> {{!}} <code>table</code> {{!}} <code>boolean</code> {{!}} <code>string</code> - Checks that <code>arr</code> contains this value.
+* <code>fun(elem: any, i?: integer): boolean</code> - Returns '''true''' if <code>fn</code> returns '''true''' for at least one element.
+* <code>nil</code> - Checks that the array contains at least one non '''false''' element.
+
+|fname3 = <nowiki>clean(&nbsp;arr&nbsp;)</nowiki>
+|ftype3 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>-> Array<`T`></samp>
+|fuse3 = Recursively removes all metatables.
+
+|fname4 = <nowiki>clone(&nbsp;arr, deep&nbsp;)</nowiki>
+|ftype4 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>deep: any</samp><br><samp>-> Array<`T`></samp>
+|fuse4 = Make a copy of the input table. Preserves metatables.
+
+|fname5 = <nowiki>condenseSparse(&nbsp;arr&nbsp;)</nowiki>
+|ftype5 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>-> Array<`T`></samp>
+|fuse5 = Remove '''nil''' values from <code>arr</code> while preserving order.
+
+|fname6 = <nowiki>contains(&nbsp;arr, val&nbsp;)</nowiki>
+|ftype6 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>val: any</samp><br><samp>-> boolean</samp>
+|fuse6 = Check if <code>arr</code> contains <code>val</code>.
+
+|fname7 = <nowiki>containsAll(&nbsp;arr, t&nbsp;)</nowiki>
+|ftype7 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>t: any[]</samp><br><samp>-> boolean</samp>
+|fuse7 = Check if <code>arr</code> contains all values in the table <code>t</code>.
+
+|fname8 = <nowiki>containsAny(&nbsp;arr, t&nbsp;)</nowiki>
+|ftype8 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>t: any[]</samp><br><samp>-> boolean</samp>
+|fuse8 = Check if <code>arr</code> contains any of the values in the table <code>t</code>.
+
+|fname9 = <nowiki>convolve(&nbsp;x, y&nbsp;)</nowiki>
+|ftype9 = <samp>generic: T</samp><br><samp>x: Array<`T`></samp><br><samp>y: Array<`T`></samp><br><samp>-> Array<`T`></samp>
+|fuse9 = Convolute two number arrays.
+
+|fname10 = <nowiki>count(&nbsp;arr, check&nbsp;)</nowiki>
+|ftype10 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>check: number {{!}} table {{!}} boolean {{!}} string {{!}} fun(elem: T, i?: integer): boolean {{!}} nil</samp><br><samp>-> integer</samp>
+|fuse10 = 
+
+Behaviour depends on the value of <code>check</code>:
+* <code>number</code> {{!}} <code>table</code> {{!}} <code>boolean</code> {{!}} <code>string</code> - Counts the number of times this value occurs in <code>arr</code>.
+* <code>fun(elem: any): boolean</code> - Count the number of times the function returs '''true''' when called on the elements of <code>arr</code>.
+* <code>nil</code> -  Counts the number of non '''false''' elements.
+
+|fname11 = <nowiki>diff(&nbsp;arr, order&nbsp;)</nowiki>
+|ftype11 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>order: number?</samp><br><samp>-> Array<`T`></samp>
+|fuse11 = Differentiate the array
+
+Type definitions:
+* order: Order of the differentiation. Default is 1.
+
+|fname12 = <nowiki>each(&nbsp;arr, fn&nbsp;)</nowiki>
+|ftype12 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>fn: fun(elem: T, i?: integer)</samp><br><samp>-> any</samp>
+|fuse12 = Iterate over each element in the array  Executes the provided function for every element in the array. This function is optimized based on array type for maximum performance: - Standard arrays: Uses <code>ipairs</code> for optimal performance (O(n)) - Proxy/sparse arrays: Uses manual indexing with cached length (O(n)) Works with proxy arrays too:
+
+Type definitions:
+* arr: Array to iterate over
+* fn: Function called for each element
+
+Examples:
+<syntaxhighlight lang='lua'>
+local arr = {1, 2, 3, 4, 5}
+Array.each(arr, function(value, index)
+   print(string.format('arr[%d] = %s', index, value))
+end)
+</syntaxhighlight>
+<syntaxhighlight lang='lua'>
+local proxy = setmetatable({[1] = 'a', [2] = 'b'}, proxy_mt)
+Array.each(proxy, function(value, index)
+   print(value) -- Automatically detects proxy and uses appropriate iteration
+end)
+</syntaxhighlight>
+
+|fname13 = <nowiki>filter(&nbsp;arr, fn&nbsp;)</nowiki>
+|ftype13 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>fn: fun(elem: T, i?: integer): boolean</samp><br><samp>-> Array<`T`></samp>
+|fuse13 = Filter array elements using a predicate function  Creates a new array containing only elements for which the predicate function returns a truthy value. This operation is immutable - the original array is not modified. Performance is optimized with array length caching.   With index parameter:
+
+Type definitions:
+* arr: Array to filter
+* fn: Predicate function
+
+Performance characteristics:
+* Performance characteristics:
+* Time complexity: O(n) where n is the array length
+* Space complexity: O(k) where k is the number of matching elements
+* Uses cached array length for optimal iteration
+
+Examples:
+<syntaxhighlight lang='lua'>
+local numbers = {1, 2, 3, 4, 5, 6}
+local evens = Array.filter(numbers, function(x)
+   return x % 2 == 0
+end)  -- {2, 4, 6}
+
+local people = {
+   {name = "Alice", age = 25},
+   {name = "Bob", age = 17},
+   {name = "Charlie", age = 30}
+}
+local adults = Array.filter(people, function(person)
+   return person.age >= 18
+end)  -- {{name = "Alice", age = 25}, {name = "Charlie", age = 30}}
+</syntaxhighlight>
+<syntaxhighlight lang='lua'>
+local firstHalf = Array.filter(numbers, function(value, index)
+   return index <= #numbers / 2
+end)  -- {1, 2, 3}
+</syntaxhighlight>
+
+|fname14 = <nowiki>find(&nbsp;arr, check, default&nbsp;)</nowiki>
+|ftype14 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>check: number {{!}} table {{!}} boolean {{!}} string {{!}} fun(elem: T, i?: integer): boolean</samp><br><samp>default: any</samp><br><samp>-> integer?</samp>
+|fuse14 = Find the first element matching a condition or value. Searches through the array to find the first element that matches. Returns both the element and its index.
+
+Behaviour depends on the value of <code>check</code>:
+* <code>number</code> {{!}} <code>table</code> {{!}} <code>boolean</code> {{!}} <code>string</code> - Value to search for in <code>arr</code>.
+* <code>fun(elem: T, i?: integer): boolean</code> - Predicate to search for (when '''true''') in <code>arr</code>.
+
+Type definitions:
+* arr: Array to search through
+* check: Value to search for OR predicate function
+
+Performance characteristics:
+* Performance characteristics:
+* Direct value search: O(n) with optimized value comparison
+* Function search: O(n) with cached array length and early termination
+* Best case: O(1) if element is found early
+* Worst case: O(n) if element not found or is last
+
+Examples:
+<syntaxhighlight lang='lua'>
+local numbers = {10, 20, 30, 40, 50}
+local value, index = Array.find(numbers, 30)
+print(value, index)  -- 30, 3
+
+local notFound, idx = Array.find(numbers, 99, "default")
+print(notFound, idx)  -- "default", nil
+</syntaxhighlight>
+<syntaxhighlight lang='lua'>
+local people = {
+   {name = "Alice", age = 25},
+   {name = "Bob", age = 17},
+   {name = "Charlie", age = 30}
+}
+
+local adult, pos = Array.find(people, function(person)
+   return person.age >= 18
+end)
+print(adult.name, pos)  -- "Alice", 1
+</syntaxhighlight>
+<syntaxhighlight lang='lua'>
+local firstInSecondHalf = Array.find(numbers, function(value, index)
+   return index > #numbers / 2
+end)
+print(firstInSecondHalf)  -- 40 (first element in second half)
+</syntaxhighlight>
+
+|fname15 = <nowiki>find_index(&nbsp;arr, check, default&nbsp;)</nowiki>
+|ftype15 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>check: number {{!}} table {{!}} boolean {{!}} string {{!}} fun(elem: T, i?: integer): boolean</samp><br><samp>default: any</samp><br><samp>-> integer?</samp>
+|fuse15 = Find the index of <code>check</code> in <code>arr</code>, or the index of the function satisfying <code>check</code>.
+
+Behaviour depends on the value of <code>check</code>:
+* <code>number</code> {{!}} <code>table</code> {{!}} <code>boolean</code> {{!}} <code>string</code> - Value to search for in <code>arr</code>.
+* <code>fun(elem: T, i?: integer): boolean</code> - Predicate to search for (when '''true''') in <code>arr</code>.
+
+Type definitions:
+* arr: Array to search through
+* check: Value to search for OR predicate function
+
+|fname16 = <nowiki>get(&nbsp;arr, indices&nbsp;)</nowiki>
+|ftype16 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>indices: integer {{!}} integer[]</samp><br><samp>-> T {{!}} Array<`T`> {{!}} nil</samp>
+|fuse16 = Extracts a subset of <code>arr</code>.
+
+Type definitions:
+* indices: indices of the elements.
+
+|fname17 = <nowiki>insert(&nbsp;arr, val, index, unpackVal&nbsp;)</nowiki>
+|ftype17 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>val: T</samp><br><samp>index: any</samp><br><samp>unpackVal: any</samp><br><samp>-> Array<`T`></samp>
+|fuse17 = Inserts values into <code>arr</code>.
+
+Type definitions:
+* val: If <code>val</code> is an array and <code>unpackVal</code> is '''true''' then the individual elements of <code>val</code> are inserted.
+
+|fname18 = <nowiki>int(&nbsp;arr, start, stop&nbsp;)</nowiki>
+|ftype18 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>start: any</samp><br><samp>stop: any</samp><br><samp>-> Array<`T`></samp>
+|fuse18 = Integrates the array. Effectively does <math>\left\{\sum^{n}_{start}{arr[n]} \,\Bigg{{!}}\, n \in [start, stop]\right\}</math>.
+
+Type definitions:
+* arr: Array of numbers
+
+|fname19 = <nowiki>intersect(&nbsp;left, right&nbsp;)</nowiki>
+|ftype19 = <samp>generic: T</samp><br><samp>left: Array<`T`></samp><br><samp>right: Array<`T`></samp><br><samp>-> Array<`T`></samp>
+|fuse19 = Returns an array with elements that are present in both arrays.
+
+|fname20 = <nowiki>intersects(&nbsp;left, right&nbsp;)</nowiki>
+|ftype20 = <samp>generic: T</samp><br><samp>left: Array<`T`></samp><br><samp>right: Array<`T`></samp><br><samp>-> boolean</samp>
+|fuse20 = Checks if the two arrays have at least one element in common.
+
+|fname21 = <nowiki>last(&nbsp;arr, offset&nbsp;)</nowiki>
+|ftype21 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>offset: any</samp><br><samp>-> T</samp>
+|fuse21 = Returns the last element of <code>arr</code>.
+
+|fname22 = <nowiki>len(&nbsp;arr&nbsp;)</nowiki>
+|ftype22 = <samp>arr: Array<`any`></samp><br><samp>-> integer</samp>
+|fuse22 = Calculates the length of arrays including proxy arrays  This function provides optimized length calculation for different array types: - Standard arrays: Uses native # operator (O(1)) - Proxy arrays: Uses exponential search followed by binary search (O(log n)) - Empty arrays: Quick detection and return (O(1))
+
+Type definitions:
+* arr: Array to measure (can be standard array or proxy table)
+
+Examples:
+<syntaxhighlight lang='lua'>
+local std_array = {1, 2, 3}  -- Standard array
+local proxy_array = setmetatable({[1] = 'a', [2] = 'b'}, proxy_mt)
+print(len(std_array))    -- 3 (O(1) operation)
+print(len(proxy_array))  -- 2 (O(log n) operation)
+print(len({}))           -- 0 (O(1) early detection)
+</syntaxhighlight>
+
+|fname23 = <nowiki>map(&nbsp;arr, fn&nbsp;)</nowiki>
+|ftype23 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>fn: fun(elem: T, i?: integer): `U`</samp><br><samp>-> Array<`U`></samp>
+|fuse23 = Transform array elements using a mapping function  Creates a new array by applying the transformation function to every element of the input array. This operation is immutable - the original array is not modified. Supports filtering during mapping by returning nil for unwanted elements.  Map with filtering (nil values are excluded): Using index parameter:
+
+Type definitions:
+* arr: Array to transform
+* fn: Transformation function
+
+Performance characteristics:
+* Performance characteristics:
+* Time complexity: O(n) where n is the array length
+* Space complexity: O(m) where m is the number of non-nil results
+* Uses cached array length and optimized result building
+* Automatically filters out nil results for sparse result arrays
+
+Examples:
+<syntaxhighlight lang='lua'>
+local numbers = {1, 2, 3, 4, 5}
+local doubled = Array.map(numbers, function(x)
+   return x * 2
+end)  -- {2, 4, 6, 8, 10}
+
+local words = {"hello", "world", "test"}
+local lengths = Array.map(words, function(word)
+   return #word
+end)  -- {5, 5, 4}
+</syntaxhighlight>
+<syntaxhighlight lang='lua'>
+local mixed = {1, 2, 3, 4, 5}
+local evenDoubled = Array.map(mixed, function(x)
+   if x % 2 == 0 then
+       return x * 2
+   else
+       return nil  -- This will be filtered out
+   end
+end)  -- {4, 8}
+</syntaxhighlight>
+<syntaxhighlight lang='lua'>
+local indexed = Array.map(numbers, function(value, index)
+   return string.format('%d: %s', index, value)
+end)  -- {"1: 1", "2: 2", "3: 3", "4: 4", "5: 5"}
+</syntaxhighlight>
+
+|fname24 = <nowiki>mathTemplate(&nbsp;lhs, rhs, funName, opName, fun&nbsp;)</nowiki>
+|ftype24 = <samp>lhs: number {{!}} number[] {{!}} Array</samp><br><samp>rhs: number {{!}} number[] {{!}} Array</samp><br><samp>funName: string</samp><br><samp>opName: string</samp><br><samp>fun: fun(lhs: number, rhs: number): number</samp><br><samp>-> Array<`number`></samp>
+|fuse24 = 
+
+|fname25 = <nowiki>max(&nbsp;arr&nbsp;)</nowiki>
+|ftype25 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>-> integer</samp>
+|fuse25 = Find the largest value in the array.
+
+Type definitions:
+* arr: The values need to be comparable using the <code><</code> operator.
+
+|fname26 = <nowiki>max_by(&nbsp;arr, fn&nbsp;)</nowiki>
+|ftype26 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>fn: fun(elem: T): U</samp><br><samp>-> integer</samp>
+|fuse26 = Find the element for which <code>fn</code> returned the largest value.
+
+Type definitions:
+* fn: The returned value needs to be comparable using the <code><</code> operator.
+
+|fname27 = <nowiki>min(&nbsp;arr&nbsp;)</nowiki>
+|ftype27 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>-> integer</samp>
+|fuse27 = Find the smallest value in the array.
+
+Type definitions:
+* arr: The values need to be comparable using the <code><</code> operator.
+
+|fname28 = <nowiki>new(&nbsp;arr&nbsp;)</nowiki>
+|ftype28 = <samp>generic: T</samp><br><samp>arr: any</samp><br><samp>-> Array<`T`></samp>
+|fuse28 = Create a new Array. Converts a regular Lua table into an Array object that supports: - Method chaining with colon syntax (:map, :filter, :reduce, etc.) - Mathematical operators (+, -, *, /, ^, unary -) - Concatenation operators (..) - Equality comparison (==) - Optimized iteration for different array types  Mathematical operations: Alternative creation syntax: Empty array:
+
+Performance characteristics:
+* Performance characteristics:
+* Construction: O(n) for shallow conversion, O(n*m) for deep nested arrays
+* Method calls: Optimized based on array type (standard vs proxy)
+* Memory: Minimal overhead with shared metatable
+
+Examples:
+<syntaxhighlight lang='lua'>
+local numbers = Array.new({1, 2, 3, 4, 5})
+local result = numbers
+   :filter(function(x) return x > 2 end)  -- {3, 4, 5}
+   :map(function(x) return x * x end)     -- {9, 16, 25}
+   :reduce(function(acc, x) return acc + x end, 0)  -- 50
+</syntaxhighlight>
+<syntaxhighlight lang='lua'>
+local x = Array.new({1, 2, 3})
+local y = Array.new({4, 5, 6})
+print(-x)      -- {-1, -2, -3}
+print(x + 2)   -- {3, 4, 5}
+print(x * y)   -- {4, 10, 18}
+print(x .. y)  -- {1, 2, 3, 4, 5, 6}
+</syntaxhighlight>
+<syntaxhighlight lang='lua'>
+local alt = Array({10, 20, 30}) -- Shorthand syntax
+</syntaxhighlight>
+<syntaxhighlight lang='lua'>
+local empty = Array.new() -- Creates empty array ready for operations
+</syntaxhighlight>
+
+|fname29 = <nowiki>newIncrementor(&nbsp;start, step&nbsp;)</nowiki>
+|ftype29 = <samp>start: any</samp><br><samp>step: any</samp><br><samp>-> Array.Incrementor</samp>
+|fuse29 = Creates an object that returns a value that is <code>step</code> higher than the previous value each time it gets called. The stored value can be read without incrementing by reading the <code>val</code> field. A new stored value can be set through the <code>val</code> field. A new step size can be set through the <code>step</code> field.
+
+Examples:
+<syntaxhighlight lang='lua'>
+local inc = arr.newIncrementor(10, 5)
+print( inc() ) -- 10
+print( inc() ) -- 15
+print( inc.val ) -- 15
+inc.val = 100
+inc.step = 20
+print( inc.val ) -- 100
+print( inc() ) -- 120
+</syntaxhighlight>
+
+|fname30 = <nowiki>promote(&nbsp;arr, attr&nbsp;)</nowiki>
+|ftype30 = <samp>generic: T</samp><br><samp>generic: U</samp><br><samp>arr: Array<`T`></samp><br><samp>attr: `U`</samp><br><samp>-> Array<`U`></samp>
+|fuse30 = Returns a table created by promoting a key.
+
+Type definitions:
+* attr: Value of common key to promote, or function that returns true for the value to promote
+
+|fname31 = <nowiki>range(&nbsp;start, stop, step&nbsp;)</nowiki>
+|ftype31 = <samp>generic: T</samp><br><samp>start: T</samp><br><samp>stop: any</samp><br><samp>step: any</samp><br><samp>-> Array<`T`></samp>
+|fuse31 = Returns a range of numbers. @overload fun(stop: number): Array
+
+Type definitions:
+* start: Start value inclusive.
+
+|fname32 = <nowiki>reduce(&nbsp;arr, fn, accumulator&nbsp;)</nowiki>
+|ftype32 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>fn: fun(elem: T, acc: U, i?: integer): U</samp><br><samp>accumulator: any</samp><br><samp>-> U</samp>
+|fuse32 = Condenses the array into a single value. For each element <code>fn</code> is called with the current element, the current accumulator, and the current element index. The returned value of <code>fn</code> becomes the accumulator for the next element. If no <code>accumulator</code> value is given at the start then the first element off <code>arr</code> becomes the accumulator and the iteration starts from the second element.
+
+Type definitions:
+* fn: The result of this function becomes the <code>acc</code> for the next element.
+
+Examples:
+<syntaxhighlight lang='lua'>
+local t = { 1, 2, 3, 4 }
+local sum = arr.reduce( t, function(elem, acc) return acc + elem end ) -- sum == 10
+</syntaxhighlight>
+
+|fname33 = <nowiki>reject(&nbsp;arr, check&nbsp;)</nowiki>
+|ftype33 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>check: number {{!}} boolean {{!}} string {{!}} table {{!}} fun(elem: T, i?: integer): boolean</samp><br><samp>-> Array<`T`></samp>
+|fuse33 = Make a copy of <code>arr</code> with certain values removed. Behaviour for different values of <code>check</code>:
+
+* <code>number</code> {{!}} <code>boolean</code> {{!}} <code>string</code> - Remove values equal to this.
+* <code>table</code> - Remove values found in this table.
+* <code>fun(elem: any, i?: integer): boolean</code> - Remove elements for which the functions returns '''true'''.
+
+|fname34 = <nowiki>rep(&nbsp;val, n&nbsp;)</nowiki>
+|ftype34 = <samp>generic: T</samp><br><samp>val: `T`</samp><br><samp>n: integer</samp><br><samp>-> Array<`T`></samp>
+|fuse34 = Returns an Array with <code>val</code> repeated <code>n</code> times.
+
+|fname35 = <nowiki>scan(&nbsp;arr, fn, accumulator&nbsp;)</nowiki>
+|ftype35 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>fn: fun(elem: T, acc: `U`, i?: integer): U</samp><br><samp>accumulator: any</samp><br><samp>-> Array<`U`></samp>
+|fuse35 = Condenses the array into a single value while saving every accumulator value. For each element <code>fn</code> is called with the current element, the current accumulator, and the current element index. The returned value of <code>fn</code> becomes the accumulator for the next element. If no <code>accumulator</code> value is given at the start then the first element off <code>arr</code> becomes the accumulator and the iteration starts from the second element.
+
+Type definitions:
+* fn: Returned value becomes the accumulator for the next element.
+
+Examples:
+<syntaxhighlight lang='lua'>
+local t = { 1, 2, 3, 4 }
+local x = arr.scan( t, function(elem, acc) return acc + elem end ) -- x = { 1, 3, 6, 10 }
+</syntaxhighlight>
+
+|fname36 = <nowiki>set(&nbsp;arr, indices, values&nbsp;)</nowiki>
+|ftype36 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>indices: integer {{!}} integer[]</samp><br><samp>values: U {{!}} U[]</samp><br><samp>-> Array<`T {{!}} U`></samp>
+|fuse36 = Update a range of index with a range of values. If only one value is given but multiple indices than that value is set for all those indices. If <code>values</code> is a table then it must of the same length as <code>indices</code>.
+
+|fname37 = <nowiki>slice(&nbsp;arr, start, stop&nbsp;)</nowiki>
+|ftype37 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>start: integer</samp><br><samp>stop: any</samp><br><samp>-> Array<`T`></samp>
+|fuse37 = Extract a subtable from <code>arr</code>.
+
+Type definitions:
+* start: Start index. Use negative values to count form the end of the array.
+
+|fname38 = <nowiki>split(&nbsp;arr, index&nbsp;)</nowiki>
+|ftype38 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>index: integer</samp><br><samp>-> Array<`T`></samp>
+|fuse38 = Split <code>arr</code> into two arrays.
+
+Type definitions:
+* index: Index to split on.
+
+|fname39 = <nowiki>sum(&nbsp;arr&nbsp;)</nowiki>
+|ftype39 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>-> number</samp>
+|fuse39 = Returns the sum of all elements of <code>arr</code>.
+
+|fname40 = <nowiki>take(&nbsp;arr, count, start&nbsp;)</nowiki>
+|ftype40 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>count: integer</samp><br><samp>start: any</samp><br><samp>-> Array<`T`></samp>
+|fuse40 = Extract a subtable from <code>arr</code>.
+
+Type definitions:
+* count: Length of the subtable.
+
+|fname41 = <nowiki>take_every(&nbsp;arr, n, start, count&nbsp;)</nowiki>
+|ftype41 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>n: integer</samp><br><samp>start: any</samp><br><samp>count: any</samp><br><samp>-> Array<`T`></samp>
+|fuse41 = Extract a subtable from <code>arr</code>.
+
+Type definitions:
+* n: Step size.
+
+Examples:
+<syntaxhighlight lang='lua'>
+local t = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+local x = arr.take_every( t, 2 )       -- x = { 1, 3, 5, 7, 9 }
+local x = arr.take_every( t, 2, 3 )    -- x = { 3, 5, 7, 9 }
+local x = arr.take_every( t, 2, 3, 2 ) -- x = { 3, 5 }
+</syntaxhighlight>
+
+|fname42 = <nowiki>unique(&nbsp;arr, fn&nbsp;)</nowiki>
+|ftype42 = <samp>generic: T</samp><br><samp>arr: Array<`T`></samp><br><samp>fn: any</samp><br><samp>-> Array<`T`></samp>
+|fuse42 = Return a new table with all duplicates removed.
+
+|fname43 = <nowiki>zip(&nbsp;...&nbsp;)</nowiki>
+|ftype43 = <samp>generic: T</samp><br><samp>...: any</samp><br><samp>-> Array<`Array<T`>></samp>
+|fuse43 = Combine elements with the same index from multiple arrays.
+
+Examples:
+<syntaxhighlight lang='lua'>
+local x = {1, 2, 3}
+local y = {4, 5, 6, 7}
+local z = arr.zip( x, y ) -- z = { { 1, 4 }, { 2, 5 }, { 3, 6 }, { 7 } }
+</syntaxhighlight>
 }}

@@ -1,24 +1,24 @@
 {{Documentation}}
+{{Helper module
 |name = libraryUtil
 
-|fname1 = <nowiki>libraryUtil.checkType(&nbsp;name, argIdx, arg, expectType, nilOk&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
+|fname1 = <nowiki>checkSelf(&nbsp;self, name&nbsp;)</nowiki>
+|ftype1 = <samp>self: any</samp><br><samp>name: any</samp><br><samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>libraryUtil.checkTypeMulti(&nbsp;name, argIdx, arg, ...&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
+|fname2 = <nowiki>checkType(&nbsp;name, argIdx, arg, expectType, nilOk&nbsp;)</nowiki>
+|ftype2 = <samp>name: any</samp><br><samp>argIdx: any</samp><br><samp>arg: any</samp><br><samp>expectType: any</samp><br><samp>nilOk: any</samp><br><samp>-> any</samp>
 |fuse2 = No description available.
 
-|fname3 = <nowiki>libraryUtil.checkTypeForIndex(&nbsp;index, value, expectType, nilOk&nbsp;)</nowiki>
-|ftype3 = <samp>-> any</samp>
+|fname3 = <nowiki>checkTypeForIndex(&nbsp;index, value, expectType, nilOk&nbsp;)</nowiki>
+|ftype3 = <samp>index: any</samp><br><samp>value: any</samp><br><samp>expectType: any</samp><br><samp>nilOk: any</samp><br><samp>-> any</samp>
 |fuse3 = No description available.
 
-|fname4 = <nowiki>libraryUtil.checkTypeForNamedArg(&nbsp;name, argName, arg, expectType, nilOk&nbsp;)</nowiki>
-|ftype4 = <samp>-> any</samp>
+|fname4 = <nowiki>checkTypeForNamedArg(&nbsp;name, argName, arg, expectType, nilOk&nbsp;)</nowiki>
+|ftype4 = <samp>name: any</samp><br><samp>argName: any</samp><br><samp>arg: any</samp><br><samp>expectType: any</samp><br><samp>nilOk: any</samp><br><samp>-> any</samp>
 |fuse4 = No description available.
 
-|fname5 = <nowiki>libraryUtil.checkSelf(&nbsp;self, name&nbsp;)</nowiki>
-|ftype5 = <samp>-> any</samp>
+|fname5 = <nowiki>checkTypeMulti(&nbsp;name, argIdx, arg, ...&nbsp;)</nowiki>
+|ftype5 = <samp>name: any</samp><br><samp>argIdx: any</samp><br><samp>arg: any</samp><br><samp>...: any</samp><br><samp>-> any</samp>
 |fuse5 = No description available.
-
 }}

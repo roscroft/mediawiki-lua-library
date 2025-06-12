@@ -1,24 +1,24 @@
 {{Documentation}}
+{{Helper module
 |name = Calcvalue
 
-|fname1 = <nowiki>p.main(&nbsp;frame&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
+|fname1 = <nowiki>_get(&nbsp;item, img, multi&nbsp;)</nowiki>
+|ftype1 = <samp>item: any</samp><br><samp>img: any</samp><br><samp>multi: any</samp><br><samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>parseMultiplier(&nbsp;multi&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
+|fname2 = <nowiki>_set(&nbsp;val&nbsp;)</nowiki>
+|ftype2 = <samp>val: any</samp><br><samp>-> any</samp>
 |fuse2 = No description available.
 
-|fname3 = <nowiki>p.price(&nbsp;frame&nbsp;)</nowiki>
-|ftype3 = <samp>-> any</samp>
+|fname3 = <nowiki>main(&nbsp;frame&nbsp;)</nowiki>
+|ftype3 = <samp>frame: any</samp><br><samp>-> any</samp>
 |fuse3 = No description available.
 
-|fname4 = <nowiki>p._get(&nbsp;item, img, multi&nbsp;)</nowiki>
-|ftype4 = <samp>-> any</samp>
+|fname4 = <nowiki>parseMultiplier(&nbsp;multi&nbsp;)</nowiki>
+|ftype4 = <samp>multi: any</samp><br><samp>-> any</samp>
 |fuse4 = No description available.
 
-|fname5 = <nowiki>p._set(&nbsp;val&nbsp;)</nowiki>
-|ftype5 = <samp>-> any</samp>
+|fname5 = <nowiki>price(&nbsp;frame&nbsp;)</nowiki>
+|ftype5 = <samp>frame: any</samp><br><samp>-> any</samp>
 |fuse5 = No description available.
-
 }}

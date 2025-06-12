@@ -1,8 +1,8 @@
 {{Documentation}}
+{{Helper module
 |name = StringUtil
 
-|fname1 = <nowiki>p.split(&nbsp;str, pattern, plain&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
+|fname1 = <nowiki>split(&nbsp;str, pattern, plain&nbsp;)</nowiki>
+|ftype1 = <samp>str: any</samp><br><samp>pattern: any</samp><br><samp>plain: any</samp><br><samp>-> any</samp>
 |fuse1 = No description available.
-
 }}

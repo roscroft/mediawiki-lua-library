@@ -1,12 +1,12 @@
 {{Documentation}}
+{{Helper module
 |name = Tables
 
-|fname1 = <nowiki>p._row(&nbsp;row, elts, header&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
+|fname1 = <nowiki>_row(&nbsp;row, elts, header&nbsp;)</nowiki>
+|ftype1 = <samp>row: any</samp><br><samp>elts: any</samp><br><samp>header: any</samp><br><samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>p._table(&nbsp;table, data&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
+|fname2 = <nowiki>_table(&nbsp;table, data&nbsp;)</nowiki>
+|ftype2 = <samp>table: any</samp><br><samp>data: any</samp><br><samp>-> any</samp>
 |fuse2 = No description available.
-
 }}

@@ -1,68 +1,68 @@
 {{Documentation}}
+{{Helper module
 |name = PerformanceDashboard
 
-|fname1 = <nowiki>createSimpleHtmlBuilder(&nbsp;tagName&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
-|fuse1 = ---------------------------------------------------------------------------------
+|fname1 = <nowiki>html.create(&nbsp;tag&nbsp;)</nowiki>
+|ftype1 = <samp>tag: any</samp><br><samp>-> any</samp>
+|fuse1 = No description available.
 
-|fname2 = <nowiki>mw.html.create(&nbsp;tag&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
-|fuse2 = No description available.
+|fname2 = <nowiki>addMetricCard(&nbsp;container, title, value, icon&nbsp;)</nowiki>
+|ftype2 = <samp>container: any HTML container</samp><br><samp>title: string Metric title</samp><br><samp>value: any Metric value</samp><br><samp>icon: string Icon for the metric</samp><br><samp>-> any</samp>
+|fuse2 = Add a metric card to the dashboard
 
-|fname3 = <nowiki>dashboard.generateHTML()</nowiki>
-|ftype3 = <samp>-> any</samp>
-|fuse3 = Generate HTML dashboard for MediaWiki display
+|fname3 = <nowiki>addPerformanceChart(&nbsp;container, title, data, valueField&nbsp;)</nowiki>
+|ftype3 = <samp>container: any HTML container</samp><br><samp>title: string Chart title</samp><br><samp>data: table Chart data</samp><br><samp>valueField: string Field to chart</samp><br><samp>-> any</samp>
+|fuse3 = Add a performance chart to the dashboard
 
-|fname4 = <nowiki>dashboard.addMetricCard(&nbsp;container, title, value, icon&nbsp;)</nowiki>
-|ftype4 = <samp>-> any</samp>
-|fuse4 = Add a metric card to the dashboard
+|fname4 = <nowiki>createSimpleHtmlBuilder(&nbsp;tagName&nbsp;)</nowiki>
+|ftype4 = <samp>tagName: any</samp><br><samp>-> any</samp>
+|fuse4 = --------------------------------------------------------------------------------- DASHBOARD VISUALIZATION --------------------------------------------------------------------------------- ]]
 
-|fname5 = <nowiki>dashboard.addPerformanceChart(&nbsp;container, title, data, valueField&nbsp;)</nowiki>
-|ftype5 = <samp>-> any</samp>
-|fuse5 = Add a performance chart to the dashboard
+|fname5 = <nowiki>exportData(&nbsp;format&nbsp;)</nowiki>
+|ftype5 = <samp>format: any</samp><br><samp>-> string</samp>
+|fuse5 = Export performance data for external analysis
 
-|fname6 = <nowiki>dashboard.formatDuration(&nbsp;seconds&nbsp;)</nowiki>
-|ftype6 = <samp>-> any</samp>
-|fuse6 = Format duration in human-readable format
+|fname6 = <nowiki>formatDuration(&nbsp;seconds&nbsp;)</nowiki>
+|ftype6 = <samp>seconds: any</samp><br><samp>-> any</samp>
+|fuse6 = --------------------------------------------------------------------------------- UTILITY FUNCTIONS --------------------------------------------------------------------------------- ]]
 
-|fname7 = <nowiki>dashboard.formatTime(&nbsp;time&nbsp;)</nowiki>
-|ftype7 = <samp>-> any</samp>
-|fuse7 = Format time value for display
+|fname7 = <nowiki>formatMetricValue(&nbsp;value, field&nbsp;)</nowiki>
+|ftype7 = <samp>value: number Value to format</samp><br><samp>field: string Field type</samp><br><samp>-> string</samp>
+|fuse7 = Format metric value based on field type
 
-|fname8 = <nowiki>dashboard.formatMetricValue(&nbsp;value, field&nbsp;)</nowiki>
-|ftype8 = <samp>-> any</samp>
-|fuse8 = Format metric value based on field type
+|fname8 = <nowiki>formatTime(&nbsp;time&nbsp;)</nowiki>
+|ftype8 = <samp>time: number Time in seconds</samp><br><samp>-> string</samp>
+|fuse8 = Format time value for display
 
-|fname9 = <nowiki>dashboard.getCSS()</nowiki>
+|fname9 = <nowiki>generateAnalysisReport(&nbsp;&nbsp;)</nowiki>
 |ftype9 = <samp>-> any</samp>
-|fuse9 = Get CSS styles for the dashboard
+|fuse9 = --------------------------------------------------------------------------------- REPORTING AND ANALYSIS --------------------------------------------------------------------------------- ]]
 
-|fname10 = <nowiki>dashboard.getJavaScript()</nowiki>
-|ftype10 = <samp>-> any</samp>
-|fuse10 = Get JavaScript for dashboard interactivity
+|fname10 = <nowiki>generateHTML(&nbsp;&nbsp;)</nowiki>
+|ftype10 = <samp>-> string</samp>
+|fuse10 = Generate HTML dashboard for MediaWiki display
 
-|fname11 = <nowiki>refreshDashboard()</nowiki>
-|ftype11 = <samp>-> any</samp>
-|fuse11 = Get JavaScript for dashboard interactivity
+|fname11 = <nowiki>getCSS(&nbsp;&nbsp;)</nowiki>
+|ftype11 = <samp>-> string</samp>
+|fuse11 = Get CSS styles for the dashboard
 
-|fname12 = <nowiki>dashboard.generateAnalysisReport()</nowiki>
-|ftype12 = <samp>-> any</samp>
-|fuse12 = Generate performance analysis report
+|fname12 = <nowiki>getConfig(&nbsp;&nbsp;)</nowiki>
+|ftype12 = <samp>-> table</samp>
+|fuse12 = Get dashboard configuration
 
-|fname13 = <nowiki>dashboard.exportData(&nbsp;format&nbsp;)</nowiki>
-|ftype13 = <samp>-> any</samp>
-|fuse13 = Export performance data for external analysis
+|fname13 = <nowiki>getJavaScript(&nbsp;&nbsp;)</nowiki>
+|ftype13 = <samp>-> string</samp>
+|fuse13 = Get JavaScript for dashboard interactivity
 
-|fname14 = <nowiki>dashboard.instrumentModule(&nbsp;module, moduleName&nbsp;)</nowiki>
-|ftype14 = <samp>-> any</samp>
-|fuse14 = Initialize performance monitoring for a module
+|fname14 = <nowiki>instrumentModule(&nbsp;module, moduleName&nbsp;)</nowiki>
+|ftype14 = <samp>module: any</samp><br><samp>moduleName: any</samp><br><samp>-> any</samp>
+|fuse14 = --------------------------------------------------------------------------------- MODULE INTEGRATION --------------------------------------------------------------------------------- ]]
 
-|fname15 = <nowiki>dashboard.getConfig()</nowiki>
+|fname15 = <nowiki>refreshDashboard(&nbsp;&nbsp;)</nowiki>
 |ftype15 = <samp>-> any</samp>
-|fuse15 = Get dashboard configuration
+|fuse15 = No description available.
 
-|fname16 = <nowiki>dashboard.updateConfig(&nbsp;newConfig&nbsp;)</nowiki>
-|ftype16 = <samp>-> any</samp>
+|fname16 = <nowiki>updateConfig(&nbsp;newConfig&nbsp;)</nowiki>
+|ftype16 = <samp>newConfig: table New configuration settings</samp><br><samp>-> any</samp>
 |fuse16 = Update dashboard configuration
-
 }}

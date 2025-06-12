@@ -1,20 +1,20 @@
 {{Documentation}}
+{{Helper module
 |name = TemplateUtil
 
-|fname1 = <nowiki>p.parseTemplateParams(&nbsp;template&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
+|fname1 = <nowiki>marker(&nbsp;n&nbsp;)</nowiki>
+|ftype1 = <samp>n: any</samp><br><samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>p.marker(&nbsp;n&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
+|fname2 = <nowiki>parseTemplateParams(&nbsp;template&nbsp;)</nowiki>
+|ftype2 = <samp>template: any</samp><br><samp>-> any</samp>
 |fuse2 = No description available.
 
-|fname3 = <nowiki>p.recursiveTemplateMatch(&nbsp;value&nbsp;)</nowiki>
-|ftype3 = <samp>-> any</samp>
+|fname3 = <nowiki>recursiveTemplateMatch(&nbsp;value&nbsp;)</nowiki>
+|ftype3 = <samp>value: any</samp><br><samp>-> any</samp>
 |fuse3 = No description available.
 
 |fname4 = <nowiki>recursiveTemplateMatchImpl(&nbsp;v&nbsp;)</nowiki>
-|ftype4 = <samp>-> any</samp>
+|ftype4 = <samp>v: any</samp><br><samp>-> any</samp>
 |fuse4 = No description available.
-
 }}

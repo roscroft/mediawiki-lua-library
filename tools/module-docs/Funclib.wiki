@@ -1,172 +1,155 @@
 {{Documentation}}
+{{Helper module
 |name = Funclib
 
-|fname1 = <nowiki>funclib.validate_column(&nbsp;column, index&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
-|fuse1 = No description available.
+|fname1 = <nowiki>add_cells(&nbsp;row, cells, is_header&nbsp;)</nowiki>
+|ftype1 = <samp>row: table mw.html row object</samp><br><samp>cells: table {{!}} string[] Array of cell content or cell configs</samp><br><samp>is_header: boolean Whether to use th tags instead of td</samp><br><samp>-> table</samp>
+|fuse1 = Simple helper to add cells to a table row (alternative to Tables._row)
 
-|fname2 = <nowiki>funclib.validate_columns(&nbsp;columns&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
-|fuse2 = No description available.
+|fname2 = <nowiki>add_rows(&nbsp;table_element, rows&nbsp;)</nowiki>
+|ftype2 = <samp>table_element: table mw.html table object</samp><br><samp>rows: table[] Array of row data</samp><br><samp>-> table</samp>
+|fuse2 = Simple helper to build a table from data (alternative to Tables._table)
 
-|fname3 = <nowiki>funclib.make_row_mapper(&nbsp;field_alignments&nbsp;)</nowiki>
-|ftype3 = <samp>-> any</samp>
-|fuse3 = No description available.
+|fname3 = <nowiki>apply_formatting(&nbsp;format_config&nbsp;)</nowiki>
+|ftype3 = <samp>format_config: table Formatting configuration</samp><br><samp>-> function</samp>
+|fuse3 = Column processor: Apply consistent formatting
 
-|fname4 = <nowiki>funclib.tooltip(&nbsp;text, tooltip, format_str&nbsp;)</nowiki>
-|ftype4 = <samp>-> any</samp>
-|fuse4 = No description available.
+|fname4 = <nowiki>apply_tooltips(&nbsp;tooltip_map&nbsp;)</nowiki>
+|ftype4 = <samp>tooltip_map: table Map of column headers to tooltips</samp><br><samp>-> function</samp>
+|fuse4 = Column processor: Apply tooltip to column headers
 
-|fname5 = <nowiki>funclib.icon(&nbsp;config, value&nbsp;)</nowiki>
-|ftype5 = <samp>-> any</samp>
-|fuse5 = No description available.
+|fname5 = <nowiki>batch_columns(&nbsp;column_configs&nbsp;)</nowiki>
+|ftype5 = <samp>column_configs: table[] Array of column configurations</samp><br><samp>-> table[]</samp>
+|fuse5 = Batch column creation with performance optimizations
 
-|fname6 = <nowiki>funclib.format_name(&nbsp;name&nbsp;)</nowiki>
-|ftype6 = <samp>-> any</samp>
+|fname6 = <nowiki>build_table(&nbsp;columns, rows, options&nbsp;)</nowiki>
+|ftype6 = <samp>columns: any</samp><br><samp>rows: any</samp><br><samp>options: any</samp><br><samp>-> any</samp>
 |fuse6 = No description available.
 
-|fname7 = <nowiki>funclib.trim(&nbsp;text&nbsp;)</nowiki>
-|ftype7 = <samp>-> any</samp>
-|fuse7 = No description available.
+|fname7 = <nowiki>build_table_from_frame(&nbsp;frame, config&nbsp;)</nowiki>
+|ftype7 = <samp>frame: table MediaWiki frame object</samp><br><samp>config: table Table configuration</samp><br><samp>-> string</samp>
+|fuse7 = Create enhanced table builder with Arguments integration
 
-|fname8 = <nowiki>funclib.keys(&nbsp;table&nbsp;)</nowiki>
+|fname8 = <nowiki>clearColumnCache(&nbsp;&nbsp;)</nowiki>
 |ftype8 = <samp>-> any</samp>
-|fuse8 = No description available.
+|fuse8 = 
 
-|fname9 = <nowiki>formatter(&nbsp;is_members&nbsp;)</nowiki>
-|ftype9 = <samp>-> any</samp>
-|fuse9 = No description available.
+Performance characteristics:
+* Performance-optimized column processing with memoization
 
-|fname10 = <nowiki>funclib.make_preset_column(&nbsp;preset, options&nbsp;)</nowiki>
-|ftype10 = <samp>-> any</samp>
-|fuse10 = No description available.
+|fname9 = <nowiki>compose_wikitext(&nbsp;generators&nbsp;)</nowiki>
+|ftype9 = <samp>generators: table[] Array of generator functions</samp><br><samp>-> string</samp>
+|fuse9 = Generate optimized wikitext with functional composition
 
-|fname11 = <nowiki>funclib.process_column_config(&nbsp;config, defaults&nbsp;)</nowiki>
-|ftype11 = <samp>-> any</samp>
-|fuse11 = No description available.
+|fname10 = <nowiki>convert_type(&nbsp;value, target_type&nbsp;)</nowiki>
+|ftype10 = <samp>value: string Input value</samp><br><samp>target_type: string Target type ('number', 'boolean', 'table')</samp><br><samp>-> any</samp>
+|fuse10 = Convert string values to appropriate types
 
-|fname12 = <nowiki>funclib.make_column(&nbsp;header, options, defaults&nbsp;)</nowiki>
-|ftype12 = <samp>-> any</samp>
-|fuse12 = No description available.
+|fname11 = <nowiki>create_column_pipeline(&nbsp;processors&nbsp;)</nowiki>
+|ftype11 = <samp>processors: function[] Array of column processors</samp><br><samp>-> function</samp>
+|fuse11 = Create column processing pipeline using functional composition
 
-|fname13 = <nowiki>funclib.safe_decode_json(&nbsp;json_str, name&nbsp;)</nowiki>
-|ftype13 = <samp>-> any</samp>
-|fuse13 = No description available.
+|fname12 = <nowiki>create_pipeline(&nbsp;transformations&nbsp;)</nowiki>
+|ftype12 = <samp>transformations: function[] Array of transformation functions</samp><br><samp>-> function</samp>
+|fuse12 = Create a data transformation pipeline with error handling
 
-|fname14 = <nowiki>ColumnBuilder.new(&nbsp;columns&nbsp;)</nowiki>
-|ftype14 = <samp>-> any</samp>
+|fname13 = <nowiki>fast_column(&nbsp;header, options, defaults&nbsp;)</nowiki>
+|ftype13 = <samp>header: string Column header</samp><br><samp>options: table Column options</samp><br><samp>defaults: any</samp><br><samp>-> table</samp>
+|fuse13 = Optimized column builder with caching for repeated configurations
+
+|fname14 = <nowiki>format_name(&nbsp;name&nbsp;)</nowiki>
+|ftype14 = <samp>name: any</samp><br><samp>-> any</samp>
 |fuse14 = No description available.
 
-|fname15 = <nowiki>TableBuilder.new(&nbsp;columns&nbsp;)</nowiki>
-|ftype15 = <samp>-> any</samp>
+|fname15 = <nowiki>icon(&nbsp;config, value&nbsp;)</nowiki>
+|ftype15 = <samp>config: any</samp><br><samp>value: any</samp><br><samp>-> any</samp>
 |fuse15 = No description available.
 
-|fname16 = <nowiki>QueryBuilder.new(&nbsp;category&nbsp;)</nowiki>
-|ftype16 = <samp>-> any</samp>
+|fname16 = <nowiki>keys(&nbsp;table&nbsp;)</nowiki>
+|ftype16 = <samp>table: any</samp><br><samp>-> any</samp>
 |fuse16 = No description available.
 
-|fname17 = <nowiki>funclib.build_table(&nbsp;columns, rows, options&nbsp;)</nowiki>
-|ftype17 = <samp>-> any</samp>
+|fname17 = <nowiki>level_col(&nbsp;opts&nbsp;)</nowiki>
+|ftype17 = <samp>opts: any</samp><br><samp>-> any</samp>
 |fuse17 = No description available.
 
-|fname18 = <nowiki>funclib.build_table_from_frame(&nbsp;frame, config&nbsp;)</nowiki>
-|ftype18 = <samp>-> any</samp>
-|fuse18 = Create enhanced table builder with Arguments integration
+|fname18 = <nowiki>make_column(&nbsp;header, options, defaults&nbsp;)</nowiki>
+|ftype18 = <samp>header: any</samp><br><samp>options: any</samp><br><samp>defaults: any</samp><br><samp>-> any</samp>
+|fuse18 = No description available.
 
-|fname19 = <nowiki>funclib.create_column_pipeline(&nbsp;processors&nbsp;)</nowiki>
-|ftype19 = <samp>-> any</samp>
-|fuse19 = Create column processing pipeline using functional composition
+|fname19 = <nowiki>make_preset_column(&nbsp;preset, options&nbsp;)</nowiki>
+|ftype19 = <samp>preset: any</samp><br><samp>options: any</samp><br><samp>-> any</samp>
+|fuse19 = No description available.
 
-|fname20 = <nowiki>funclib.apply_tooltips(&nbsp;tooltip_map&nbsp;)</nowiki>
-|ftype20 = <samp>-> any</samp>
-|fuse20 = Column processor: Apply tooltip to column headers
+|fname20 = <nowiki>make_row_mapper(&nbsp;field_alignments&nbsp;)</nowiki>
+|ftype20 = <samp>field_alignments: any</samp><br><samp>-> any</samp>
+|fuse20 = No description available.
 
-|fname21 = <nowiki>funclib.apply_formatting(&nbsp;format_config&nbsp;)</nowiki>
-|ftype21 = <samp>-> any</samp>
-|fuse21 = Column processor: Apply consistent formatting
+|fname21 = <nowiki>members_col(&nbsp;opts&nbsp;)</nowiki>
+|ftype21 = <samp>opts: any</samp><br><samp>-> any</samp>
+|fuse21 = No description available.
 
-|fname22 = <nowiki>funclib.level_col(&nbsp;opts&nbsp;)</nowiki>
-|ftype22 = <samp>-> any</samp>
+|fname22 = <nowiki>name_col(&nbsp;opts&nbsp;)</nowiki>
+|ftype22 = <samp>opts: any</samp><br><samp>-> any</samp>
 |fuse22 = No description available.
 
-|fname23 = <nowiki>funclib.members_col(&nbsp;opts&nbsp;)</nowiki>
-|ftype23 = <samp>-> any</samp>
+|fname23 = <nowiki>new(&nbsp;category&nbsp;)</nowiki>
+|ftype23 = <samp>category: any</samp><br><samp>-> any</samp>
 |fuse23 = No description available.
 
-|fname24 = <nowiki>funclib.name_col(&nbsp;opts&nbsp;)</nowiki>
-|ftype24 = <samp>-> any</samp>
+|fname24 = <nowiki>new(&nbsp;columns&nbsp;)</nowiki>
+|ftype24 = <samp>columns: any</samp><br><samp>-> any</samp>
 |fuse24 = No description available.
 
-|fname25 = <nowiki>funclib.clearColumnCache()</nowiki>
-|ftype25 = <samp>-> any</samp>
-|fuse25 = Clear the column processing cache
+|fname25 = <nowiki>new(&nbsp;columns&nbsp;)</nowiki>
+|ftype25 = <samp>columns: any</samp><br><samp>-> any</samp>
+|fuse25 = No description available.
 
-|fname26 = <nowiki>funclib.fast_column(&nbsp;header, options, defaults&nbsp;)</nowiki>
-|ftype26 = <samp>-> any</samp>
-|fuse26 = Optimized column builder with caching for repeated configurations
+|fname26 = <nowiki>process_column_config(&nbsp;config, defaults&nbsp;)</nowiki>
+|ftype26 = <samp>config: any</samp><br><samp>defaults: any</samp><br><samp>-> any</samp>
+|fuse26 = No description available.
 
-|fname27 = <nowiki>funclib.batch_columns(&nbsp;column_configs&nbsp;)</nowiki>
-|ftype27 = <samp>-> any</samp>
-|fuse27 = Batch column creation with performance optimizations
+|fname27 = <nowiki>process_frame_args(&nbsp;frame, config&nbsp;)</nowiki>
+|ftype27 = <samp>frame: table MediaWiki frame object</samp><br><samp>config: table Processing configuration</samp><br><samp>-> table</samp>
+|fuse27 = Enhanced template parameter processing using Arguments module
 
-|fname28 = <nowiki>funclib.process_frame_args(&nbsp;frame, config&nbsp;)</nowiki>
-|ftype28 = <samp>-> any</samp>
-|fuse28 = Enhanced template parameter processing using Arguments module
+|fname28 = <nowiki>process_template_params(&nbsp;args, config&nbsp;)</nowiki>
+|ftype28 = <samp>args: table Template arguments</samp><br><samp>config: table Processing configuration</samp><br><samp>-> table</samp>
+|fuse28 = Process MediaWiki template parameters with validation and defaults
 
-|fname29 = <nowiki>funclib.process_template_params(&nbsp;args, config&nbsp;)</nowiki>
-|ftype29 = <samp>-> any</samp>
-|fuse29 = Process MediaWiki template parameters with validation and defaults
+|fname29 = <nowiki>safe_decode_json(&nbsp;json_str, name&nbsp;)</nowiki>
+|ftype29 = <samp>json_str: any</samp><br><samp>name: any</samp><br><samp>-> any</samp>
+|fuse29 = No description available.
 
-|fname30 = <nowiki>funclib.convert_type(&nbsp;value, target_type&nbsp;)</nowiki>
-|ftype30 = <samp>-> any</samp>
-|fuse30 = Convert string values to appropriate types
+|fname30 = <nowiki>semantic_builder(&nbsp;category&nbsp;)</nowiki>
+|ftype30 = <samp>category: string Category to query</samp><br><samp>-> table</samp>
+|fuse30 = Build semantic query string with fluent interface
 
-|fname31 = <nowiki>funclib.compose_wikitext(&nbsp;generators&nbsp;)</nowiki>
-|ftype31 = <samp>-> any</samp>
-|fuse31 = Generate optimized wikitext with functional composition
+|fname31 = <nowiki>semantic_query(&nbsp;query, use_cache&nbsp;)</nowiki>
+|ftype31 = <samp>query: string SMW query</samp><br><samp>use_cache: any</samp><br><samp>-> table</samp>
+|fuse31 = Execute semantic query with error handling and caching
 
-|fname32 = <nowiki>funclib.template_builder(&nbsp;template_name&nbsp;)</nowiki>
-|ftype32 = <samp>-> any</samp>
-|fuse32 = Create a template invocation builder
+|fname32 = <nowiki>simple_table(&nbsp;data, options&nbsp;)</nowiki>
+|ftype32 = <samp>data: table[] Array of row data</samp><br><samp>options: table Optional table configuration</samp><br><samp>-> string</samp>
+|fuse32 = Ultra-simple table creator (combines both helpers)
 
-|fname33 = <nowiki>funclib.create_pipeline(&nbsp;transformations&nbsp;)</nowiki>
-|ftype33 = <samp>-> any</samp>
-|fuse33 = Create a data transformation pipeline with error handling
+|fname33 = <nowiki>template_builder(&nbsp;template_name&nbsp;)</nowiki>
+|ftype33 = <samp>template_name: string Name of the template</samp><br><samp>-> table</samp>
+|fuse33 = Create a template invocation builder
 
-|fname34 = <nowiki>filter_empty(&nbsp;data&nbsp;)</nowiki>
-|ftype34 = <samp>-> any</samp>
-|fuse34 = Common data transformations
+|fname34 = <nowiki>tooltip(&nbsp;text, tooltip, format_str&nbsp;)</nowiki>
+|ftype34 = <samp>text: any</samp><br><samp>tooltip: any</samp><br><samp>format_str: any</samp><br><samp>-> any</samp>
+|fuse34 = No description available.
 
-|fname35 = <nowiki>sort_by(&nbsp;field&nbsp;)</nowiki>
-|ftype35 = <samp>-> any</samp>
+|fname35 = <nowiki>trim(&nbsp;text&nbsp;)</nowiki>
+|ftype35 = <samp>text: any</samp><br><samp>-> any</samp>
 |fuse35 = No description available.
 
-|fname36 = <nowiki>group_by(&nbsp;field&nbsp;)</nowiki>
-|ftype36 = <samp>-> any</samp>
+|fname36 = <nowiki>validate_column(&nbsp;column, index&nbsp;)</nowiki>
+|ftype36 = <samp>column: any</samp><br><samp>index: any</samp><br><samp>-> any</samp>
 |fuse36 = No description available.
 
-|fname37 = <nowiki>map_field(&nbsp;field, mapper&nbsp;)</nowiki>
-|ftype37 = <samp>-> any</samp>
+|fname37 = <nowiki>validate_columns(&nbsp;columns&nbsp;)</nowiki>
+|ftype37 = <samp>columns: any</samp><br><samp>-> any</samp>
 |fuse37 = No description available.
-
-|fname38 = <nowiki>funclib.semantic_query(&nbsp;query, use_cache&nbsp;)</nowiki>
-|ftype38 = <samp>-> any</samp>
-|fuse38 = Execute semantic query with error handling and caching
-
-|fname39 = <nowiki>funclib.semantic_builder(&nbsp;category&nbsp;)</nowiki>
-|ftype39 = <samp>-> any</samp>
-|fuse39 = Build semantic query string with fluent interface
-
-|fname40 = <nowiki>funclib.add_cells(&nbsp;row, cells, is_header&nbsp;)</nowiki>
-|ftype40 = <samp>-> any</samp>
-|fuse40 = Simple helper to add cells to a table row (alternative to Tables._row)
-
-|fname41 = <nowiki>funclib.add_rows(&nbsp;table_element, rows&nbsp;)</nowiki>
-|ftype41 = <samp>-> any</samp>
-|fuse41 = Simple helper to build a table from data (alternative to Tables._table)
-
-|fname42 = <nowiki>funclib.simple_table(&nbsp;data, options&nbsp;)</nowiki>
-|ftype42 = <samp>-> any</samp>
-|fuse42 = Ultra-simple table creator (combines both helpers)
-
 }}

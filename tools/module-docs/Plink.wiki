@@ -1,24 +1,24 @@
 {{Documentation}}
+{{Helper module
 |name = Plink
 
-|fname1 = <nowiki>plink(&nbsp;link, pic, txt, size&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
+|fname1 = <nowiki>_plink(&nbsp;link, args&nbsp;)</nowiki>
+|ftype1 = <samp>link: any</samp><br><samp>args: any</samp><br><samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>p.main(&nbsp;frame&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
+|fname2 = <nowiki>_plinkp(&nbsp;link, args&nbsp;)</nowiki>
+|ftype2 = <samp>link: any</samp><br><samp>args: any</samp><br><samp>-> any</samp>
 |fuse2 = No description available.
 
-|fname3 = <nowiki>p._plink(&nbsp;link, args&nbsp;)</nowiki>
-|ftype3 = <samp>-> any</samp>
+|fname3 = <nowiki>_plinkt(&nbsp;link, args&nbsp;)</nowiki>
+|ftype3 = <samp>link: any</samp><br><samp>args: any</samp><br><samp>-> any</samp>
 |fuse3 = No description available.
 
-|fname4 = <nowiki>p._plinkp(&nbsp;link, args&nbsp;)</nowiki>
-|ftype4 = <samp>-> any</samp>
+|fname4 = <nowiki>main(&nbsp;frame&nbsp;)</nowiki>
+|ftype4 = <samp>frame: any</samp><br><samp>-> any</samp>
 |fuse4 = No description available.
 
-|fname5 = <nowiki>p._plinkt(&nbsp;link, args&nbsp;)</nowiki>
-|ftype5 = <samp>-> any</samp>
+|fname5 = <nowiki>plink(&nbsp;link, pic, txt, size&nbsp;)</nowiki>
+|ftype5 = <samp>link: any</samp><br><samp>pic: any</samp><br><samp>txt: any</samp><br><samp>size: any</samp><br><samp>-> any</samp>
 |fuse5 = No description available.
-
 }}

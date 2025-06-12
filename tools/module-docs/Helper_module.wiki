@@ -1,40 +1,40 @@
 {{Documentation}}
+{{Helper module
 |name = Helper_module
 
-|fname1 = <nowiki>p.main(&nbsp;frame&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
+|fname1 = <nowiki>_main(&nbsp;modn, func_list, example, showModuleName&nbsp;)</nowiki>
+|ftype1 = <samp>modn: any</samp><br><samp>func_list: any</samp><br><samp>example: any</samp><br><samp>showModuleName: any</samp><br><samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>formatFuncNames(&nbsp;list&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
-|fuse2 = Format function names with code formatting
+|fname2 = <nowiki>escapePipes(&nbsp;text&nbsp;)</nowiki>
+|ftype2 = <samp>text: string Text to escape</samp><br><samp>-> string</samp>
+|fuse2 = Pipe escaping with MediaWiki-specific handling
 
-|fname3 = <nowiki>p._main(&nbsp;modn, func_list, example, showModuleName&nbsp;)</nowiki>
-|ftype3 = <samp>-> any</samp>
-|fuse3 = No description available.
+|fname3 = <nowiki>formatCodeBlock(&nbsp;code, language, options&nbsp;)</nowiki>
+|ftype3 = <samp>code: string Code content</samp><br><samp>language: string? Programming language (default: "lua")</samp><br><samp>options: table? Additional options {highlight, lineNumbers}</samp><br><samp>-> string</samp>
+|fuse3 = Format MediaWiki code blocks with proper escaping
 
-|fname4 = <nowiki>p.escapePipes(&nbsp;text&nbsp;)</nowiki>
-|ftype4 = <samp>-> any</samp>
-|fuse4 = Pipe escaping with MediaWiki-specific handling
+|fname4 = <nowiki>formatDescription(&nbsp;description, options&nbsp;)</nowiki>
+|ftype4 = <samp>description: string {{!}} table Raw description text or array of lines</samp><br><samp>options: table? Formatting options {convertInlineCode, addBullets}</samp><br><samp>-> string</samp>
+|fuse4 = Format description text with MediaWiki markup conversion
 
-|fname5 = <nowiki>p.formatParameterList(&nbsp;params, options&nbsp;)</nowiki>
-|ftype5 = <samp>-> any</samp>
-|fuse5 = Format a list of parameters with consistent MediaWiki styling
+|fname5 = <nowiki>formatFuncNames(&nbsp;list&nbsp;)</nowiki>
+|ftype5 = <samp>list: string Semicolon-separated list of function names</samp><br><samp>-> string</samp>
+|fuse5 = Format function names with code formatting
 
-|fname6 = <nowiki>p.formatFunctionSignature(&nbsp;funcData, options&nbsp;)</nowiki>
-|ftype6 = <samp>-> any</samp>
-|fuse6 = Format function signature with consistent styling
+|fname6 = <nowiki>formatFunctionEntry(&nbsp;funcData, index, moduleName&nbsp;)</nowiki>
+|ftype6 = <samp>funcData: table Function data with all properties</samp><br><samp>index: number Function index for template numbering</samp><br><samp>moduleName: string? Module name for display name extraction</samp><br><samp>-> table</samp>
+|fuse6 = Format a complete function entry for Helper module template
 
-|fname7 = <nowiki>p.formatCodeBlock(&nbsp;code, language, options&nbsp;)</nowiki>
-|ftype7 = <samp>-> any</samp>
-|fuse7 = Format MediaWiki code blocks with proper escaping
+|fname7 = <nowiki>formatFunctionSignature(&nbsp;funcData, options&nbsp;)</nowiki>
+|ftype7 = <samp>funcData: table Function data {name, params, returns, generics}</samp><br><samp>options: table? Formatting options</samp><br><samp>-> string</samp>
+|fuse7 = Format function signature with consistent styling
 
-|fname8 = <nowiki>p.formatDescription(&nbsp;description, options&nbsp;)</nowiki>
-|ftype8 = <samp>-> any</samp>
-|fuse8 = Format description text with MediaWiki markup conversion
+|fname8 = <nowiki>formatParameterList(&nbsp;params, options&nbsp;)</nowiki>
+|ftype8 = <samp>params: table Array of {name, type} parameter objects</samp><br><samp>options: table? Formatting options {tag="samp", separator="<br>", prefix="", suffix=""}</samp><br><samp>-> string</samp>
+|fuse8 = Format a list of parameters with consistent MediaWiki styling
 
-|fname9 = <nowiki>p.formatFunctionEntry(&nbsp;funcData, index, moduleName&nbsp;)</nowiki>
-|ftype9 = <samp>-> any</samp>
-|fuse9 = Format a complete function entry for Helper module template
-
+|fname9 = <nowiki>main(&nbsp;frame&nbsp;)</nowiki>
+|ftype9 = <samp>frame: any</samp><br><samp>-> any</samp>
+|fuse9 = No description available.
 }}

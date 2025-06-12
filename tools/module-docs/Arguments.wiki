@@ -1,64 +1,40 @@
 {{Documentation}}
+{{Helper module
 |name = Arguments
 
-|fname1 = <nowiki>tidyValDefault(&nbsp;key, val&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
+|fname1 = <nowiki>getArgs(&nbsp;frame, options&nbsp;)</nowiki>
+|ftype1 = <samp>frame: any</samp><br><samp>options: any</samp><br><samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>tidyValTrimOnly(&nbsp;key, val&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
+|fname2 = <nowiki>inext(&nbsp;t, i&nbsp;)</nowiki>
+|ftype2 = <samp>t: any</samp><br><samp>i: any</samp><br><samp>-> any</samp>
 |fuse2 = No description available.
 
-|fname3 = <nowiki>tidyValRemoveBlanksOnly(&nbsp;key, val&nbsp;)</nowiki>
-|ftype3 = <samp>-> any</samp>
+|fname3 = <nowiki>matchesTitle(&nbsp;given, title&nbsp;)</nowiki>
+|ftype3 = <samp>given: any</samp><br><samp>title: any</samp><br><samp>-> any</samp>
 |fuse3 = No description available.
 
-|fname4 = <nowiki>tidyValNoChange(&nbsp;key, val&nbsp;)</nowiki>
-|ftype4 = <samp>-> any</samp>
+|fname4 = <nowiki>mergeArgs(&nbsp;tables&nbsp;)</nowiki>
+|ftype4 = <samp>tables: any</samp><br><samp>-> any</samp>
 |fuse4 = No description available.
 
-|fname5 = <nowiki>matchesTitle(&nbsp;given, title&nbsp;)</nowiki>
-|ftype5 = <samp>-> any</samp>
+|fname5 = <nowiki>tidyValDefault(&nbsp;key, val&nbsp;)</nowiki>
+|ftype5 = <samp>key: any</samp><br><samp>val: any</samp><br><samp>-> any</samp>
 |fuse5 = No description available.
 
-|fname6 = <nowiki>__index(&nbsp;t, k&nbsp;)</nowiki>
-|ftype6 = <samp>-> any</samp>
+|fname6 = <nowiki>tidyValNoChange(&nbsp;key, val&nbsp;)</nowiki>
+|ftype6 = <samp>key: any</samp><br><samp>val: any</samp><br><samp>-> any</samp>
 |fuse6 = No description available.
 
-|fname7 = <nowiki>arguments.getArgs(&nbsp;frame, options&nbsp;)</nowiki>
-|ftype7 = <samp>-> any</samp>
+|fname7 = <nowiki>tidyValRemoveBlanksOnly(&nbsp;key, val&nbsp;)</nowiki>
+|ftype7 = <samp>key: any</samp><br><samp>val: any</samp><br><samp>-> any</samp>
 |fuse7 = No description available.
 
-|fname8 = <nowiki>__index(&nbsp;t, k&nbsp;)</nowiki>
-|ftype8 = <samp>-> any</samp>
+|fname8 = <nowiki>tidyValTrimOnly(&nbsp;key, val&nbsp;)</nowiki>
+|ftype8 = <samp>key: any</samp><br><samp>val: any</samp><br><samp>-> any</samp>
 |fuse8 = No description available.
 
-|fname9 = <nowiki>mergeArgs(&nbsp;tables&nbsp;)</nowiki>
-|ftype9 = <samp>-> any</samp>
+|fname9 = <nowiki>translatenext(&nbsp;invariant&nbsp;)</nowiki>
+|ftype9 = <samp>invariant: any</samp><br><samp>-> any</samp>
 |fuse9 = No description available.
-
-|fname10 = <nowiki>metatable.__index(&nbsp;t, key&nbsp;)</nowiki>
-|ftype10 = <samp>-> any</samp>
-|fuse10 = No description available.
-
-|fname11 = <nowiki>metatable.__newindex(&nbsp;t, key, val&nbsp;)</nowiki>
-|ftype11 = <samp>-> any</samp>
-|fuse11 = No description available.
-
-|fname12 = <nowiki>translatenext(&nbsp;invariant&nbsp;)</nowiki>
-|ftype12 = <samp>-> any</samp>
-|fuse12 = No description available.
-
-|fname13 = <nowiki>metatable.__pairs()</nowiki>
-|ftype13 = <samp>-> any</samp>
-|fuse13 = No description available.
-
-|fname14 = <nowiki>inext(&nbsp;t, i&nbsp;)</nowiki>
-|ftype14 = <samp>-> any</samp>
-|fuse14 = No description available.
-
-|fname15 = <nowiki>metatable.__ipairs(&nbsp;t&nbsp;)</nowiki>
-|ftype15 = <samp>-> any</samp>
-|fuse15 = No description available.
-
 }}

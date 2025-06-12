@@ -1,36 +1,36 @@
 {{Documentation}}
+{{Helper module
 |name = Paramtest
 
-|fname1 = <nowiki>p.is_empty(&nbsp;arg&nbsp;)</nowiki>
-|ftype1 = <samp>-> any</samp>
+|fname1 = <nowiki>default_to(&nbsp;arg, default&nbsp;)</nowiki>
+|ftype1 = <samp>arg: any</samp><br><samp>default: any</samp><br><samp>-> any</samp>
 |fuse1 = No description available.
 
-|fname2 = <nowiki>p.table_is_empty(&nbsp;arg&nbsp;)</nowiki>
-|ftype2 = <samp>-> any</samp>
+|fname2 = <nowiki>defaults(&nbsp;args&nbsp;)</nowiki>
+|ftype2 = <samp>args: any</samp><br><samp>-> any</samp>
 |fuse2 = No description available.
 
-|fname3 = <nowiki>p.default_to(&nbsp;arg, default&nbsp;)</nowiki>
-|ftype3 = <samp>-> any</samp>
+|fname3 = <nowiki>has_content(&nbsp;arg&nbsp;)</nowiki>
+|ftype3 = <samp>arg: any</samp><br><samp>-> any</samp>
 |fuse3 = No description available.
 
-|fname4 = <nowiki>p.defaults(&nbsp;args&nbsp;)</nowiki>
-|ftype4 = <samp>-> any</samp>
+|fname4 = <nowiki>is_empty(&nbsp;arg&nbsp;)</nowiki>
+|ftype4 = <samp>arg: any</samp><br><samp>-> any</samp>
 |fuse4 = No description available.
 
-|fname5 = <nowiki>p.has_content(&nbsp;arg&nbsp;)</nowiki>
-|ftype5 = <samp>-> any</samp>
+|fname5 = <nowiki>table_has_content(&nbsp;arg&nbsp;)</nowiki>
+|ftype5 = <samp>arg: any</samp><br><samp>-> any</samp>
 |fuse5 = No description available.
 
-|fname6 = <nowiki>p.table_has_content(&nbsp;arg&nbsp;)</nowiki>
-|ftype6 = <samp>-> any</samp>
+|fname6 = <nowiki>table_is_empty(&nbsp;arg&nbsp;)</nowiki>
+|ftype6 = <samp>arg: any</samp><br><samp>-> any</samp>
 |fuse6 = No description available.
 
-|fname7 = <nowiki>p.ucfirst(&nbsp;arg&nbsp;)</nowiki>
-|ftype7 = <samp>-> any</samp>
+|fname7 = <nowiki>ucfirst(&nbsp;arg&nbsp;)</nowiki>
+|ftype7 = <samp>arg: any</samp><br><samp>-> any</samp>
 |fuse7 = No description available.
 
-|fname8 = <nowiki>p.ucflc(&nbsp;arg&nbsp;)</nowiki>
-|ftype8 = <samp>-> any</samp>
+|fname8 = <nowiki>ucflc(&nbsp;arg&nbsp;)</nowiki>
+|ftype8 = <samp>arg: any</samp><br><samp>-> any</samp>
 |fuse8 = No description available.
-
 }}
