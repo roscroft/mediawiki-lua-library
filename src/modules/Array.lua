@@ -647,8 +647,8 @@ function Array.get(arr, indices)
 end
 
 ---Integrates the array. Effectively does <math>\left\{\sum^{n}_{start}{arr[n]} \,\Bigg|\, n \in [start, stop]\right\}</math>.
----@generic T
----@param arr Array<`T`> # number
+---@generic T: number
+---@param arr Array<`T`> # Array of numbers
 ---@param start? integer # Index where to start the summation. Defaults to 1.
 ---@param stop? integer # Index where to stop the summation. Defaults to #arr.
 ---@return Array<T>
