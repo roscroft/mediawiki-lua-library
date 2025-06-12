@@ -106,6 +106,7 @@ Desktop.ini
 # Generated documentation
 docs/generated/
 src/module-docs/
+tools/module-docs/
 
 # Test outputs
 test-output/
@@ -125,7 +126,7 @@ luacov.stats.out
 
 ### Project Cleanup Prevention ###
 # Wiki migration artifacts (prevent re-accumulation)
-scripts/wiki-content/
+# Wiki content is now in docs/ directory and should be tracked
 scripts/wiki-ready/
 scripts/archive-*/
 *-wiki-deploy.sh
@@ -143,17 +144,7 @@ CONVERSION_EXAMPLE.md
 DEPENDENCY_SIMPLIFICATION_*
 
 # Temporary documentation (use wiki instead)
-docs/README.md
-docs/usage.md
-docs/testing.md
-docs/development-history.md
-docs/github-actions-guide.md
-docs/PROJECT_STATUS.md
-docs/SECURITY.md
-docs/code-refactoring-analysis.md
-docs/PERFORMANCE_DASHBOARD_STATUS.md
-docs/*_REPORT.md
-docs/*_COMPLETE.md
+docs/*
 
 # Obsolete script versions
 scripts/*-refactored.*

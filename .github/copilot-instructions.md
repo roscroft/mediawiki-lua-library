@@ -269,7 +269,7 @@ Mandatory testing approach for all code changes:
 - **Source Authority**: `src/modules/` contains authoritative source code
 - **Build Artifacts**: `build/modules/` contains symlinks only (DO NOT EDIT)
 - **Unified Scripts**: `scripts/` contains consolidated development tools
-- **Wiki Content**: `scripts/wiki-content/` for generated wiki pages
+- **Wiki Content**: `docs/` for generated wiki pages
 - **Clean History**: Remove temporary files and completed migration artifacts
 
 ### **Performance & Monitoring**

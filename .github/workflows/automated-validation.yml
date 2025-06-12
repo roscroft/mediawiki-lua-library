@@ -104,7 +104,7 @@ jobs:
         
         # Check if source modules are newer than wiki content
         newest_module=$(find src/modules -name "*.lua" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
-        newest_wiki=$(find scripts/wiki-content -name "*.md" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2- 2>/dev/null || echo "")
+        newest_wiki=$(find docs -name "Home.md" -o -name "Getting-Started.md" -o -name "Development-Guide.md" -o -name "Testing.md" -o -name "Security.md" -o -name "GitHub-Actions.md" -o -name "Project-Status.md" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2- 2>/dev/null || echo "")
         
         if [ -n "$newest_module" ] && [ -n "$newest_wiki" ]; then
           module_time=$(stat -c %Y "$newest_module")

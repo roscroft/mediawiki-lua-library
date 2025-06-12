@@ -9,11 +9,11 @@ echo "================================================"
 echo ""
 
 # Check if wiki content exists
-if [ -d "scripts/wiki-content" ]; then
-    WIKI_COUNT=$(find scripts/wiki-content -name "*.md" | wc -l)
+if [ -d "docs" ]; then
+    WIKI_COUNT=$(find docs -name "*.md" -not -name "DOCUMENT-GENERATION-DEPENDENCIES.md" -not -name "FUNCTIONAL-*" -not -name "functional-*" -not -name "automation-*" | wc -l)
     echo "✅ Wiki Content: $WIKI_COUNT pages generated"
-    echo "   📂 Location: scripts/wiki-content/"
-    echo "   📄 Pages: $(ls scripts/wiki-content/*.md | sed 's|scripts/wiki-content/||' | sed 's|\.md||' | tr '\n' ', ' | sed 's|, $||')"
+    echo "   📂 Location: docs/"
+    echo "   📄 Pages: $(ls docs/Home.md docs/Getting-Started.md docs/Development-Guide.md docs/Testing.md docs/Security.md docs/GitHub-Actions.md docs/Project-Status.md 2>/dev/null | sed 's|docs/||' | sed 's|\.md||' | tr '\n' ', ' | sed 's|, $||')"
 else
     echo "❌ Wiki Content: Not generated"
     echo "   Run: ./scripts/generate-wiki-quick.sh"
@@ -63,7 +63,7 @@ else
     echo ""
     echo "📋 Manual Deployment Steps:"
     echo "   1. When network available, run: ./scripts/deploy-wiki.sh"
-    echo "   2. Or manually copy scripts/wiki-content/*.md to GitHub Wiki"
+    echo "   2. Or manually copy docs/*.md to GitHub Wiki"
     echo "   3. Verify all 7 wiki pages are deployed correctly"
 fi
 

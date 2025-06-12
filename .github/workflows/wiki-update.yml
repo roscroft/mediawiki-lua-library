@@ -46,7 +46,7 @@ jobs:
       - name: Update wiki content
         run: |
           # Copy generated content to wiki
-          cp scripts/wiki-content/*.md wiki/ || true
+          cp docs/Home.md docs/Getting-Started.md docs/Development-Guide.md docs/Testing.md docs/Security.md docs/GitHub-Actions.md docs/Project-Status.md wiki/ || true
           
           cd wiki
           
@@ -67,6 +67,6 @@ jobs:
       - name: Create wiki summary
         run: |
           echo "## Wiki Update Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- **Generated**: $(find scripts/wiki-content -name "*.md" | wc -l) wiki pages" >> $GITHUB_STEP_SUMMARY
+          echo "- **Generated**: $(find docs -name "Home.md" -o -name "Getting-Started.md" -o -name "Development-Guide.md" -o -name "Testing.md" -o -name "Security.md" -o -name "GitHub-Actions.md" -o -name "Project-Status.md" | wc -l) wiki pages" >> $GITHUB_STEP_SUMMARY
           echo "- **Updated**: $(date)" >> $GITHUB_STEP_SUMMARY
           echo "- **Wiki URL**: [${{ github.repository }}/wiki](https://github.com/${{ github.repository }}/wiki)" >> $GITHUB_STEP_SUMMARY

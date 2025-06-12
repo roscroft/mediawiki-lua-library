@@ -6,7 +6,7 @@
 
 set -e
 
-WIKI_CONTENT_DIR="scripts/wiki-content"
+WIKI_CONTENT_DIR="docs"
 WIKI_REPO="https://github.com/roscroft/mediawiki-lua-library.wiki.git"
 TEMP_DIR="temp-wiki-deploy"
 
