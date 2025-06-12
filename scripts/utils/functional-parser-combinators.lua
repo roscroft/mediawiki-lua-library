@@ -437,7 +437,7 @@ FunctionalParser.completeFunction = function(state)
                     for _, funcParam in ipairs(funcInfo.params) do
                         local docParam = func.find(function(dp)
                             return dp.name == funcParam
-                        end, doc.params)
+                        end)(doc.params)
 
                         if docParam then
                             table.insert(richFunc.params, docParam)
