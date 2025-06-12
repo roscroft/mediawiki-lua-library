@@ -4,7 +4,8 @@
 
 ### Overview
 
-This analysis identifies opportunities to simplify the current `generate-docs.lua` script using functional programming patterns from the Functools library. The goal is to reduce complexity, improve maintainability, and demonstrate elegant functional programming techniques.
+This analysis identifies opportunities to simplify the current `generate-docs.lua` script using functional programming patterns from the Functools library. The goal is to reduce complexity,
+improve maintainability, and demonstrate elegant functional programming techniques.
 
 ## Current Complexity Analysis
 
